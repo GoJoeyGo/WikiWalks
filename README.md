@@ -1,3 +1,3 @@
-ITC 303 Wiki walk projects
-Credits
-  Joseph Lunt
+# ITC 303 Wiki walk projects
+##  Project Members
+###   Joseph Lunt
