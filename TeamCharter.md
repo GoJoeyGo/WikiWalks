@@ -1,4 +1,6 @@
-# Team Charter
+<h1 align="center"><u>Team Charter</u></h1>
+
+
 **Team Name:** WikiWalks Project  
 **Team Mission and Objectives or Goals**  
 The team has been formed to work on the WikiWalks project, an Android app to crowdsource bush paths and display paths in the user's area. The goal of the team is to successfully plan and then create the app and its backend with all basic capabilities and ideally some bonus nicety features.
@@ -47,6 +49,7 @@ Tyler @[tyleroneillAU](https://github.com/tyleroneillAU)
 * Experience using Git
 * A little experience with Android development  
 
+---
 **Role Identification**  
 Isaac
 * Scribe
@@ -121,7 +124,7 @@ Resolution steps:
 **Sign Off:**  
 I have participated in the development of this charter and agree to it.  
 Team Member: Tyler O'Neill     
-Team Member: Joseph Lunt    
+Team Member: Joseph Lunt
 Team Member: _________________      
 Team Member: _________________      
 
