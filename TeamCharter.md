@@ -1,4 +1,4 @@
-<h1 align="center"><u>Team Charter</u></h1>
+<h1 align="center">Team Charter</h1>
 
 
 **Team Name:** WikiWalks Project  
