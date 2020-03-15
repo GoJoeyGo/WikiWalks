@@ -126,6 +126,6 @@ I have participated in the development of this charter and agree to it.
 Team Member: Tyler O'Neill     
 Team Member: Joseph Lunt  
 Team Member: Sanjay Dass     
-Team Member: _________________      
+Team Member: Isaac Prior     
 
 Date:
