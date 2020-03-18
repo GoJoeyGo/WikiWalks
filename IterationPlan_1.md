@@ -18,6 +18,10 @@
   4. Determine architecture and platforms
 ---
 ## 3. Evaluation criteria
+  1. Vision is clear and all team members are on board
+  2. Use case and domain models are satisfactory for what they need to show
+  3. Core use case is identified and fleshed out
+  4. Architecture and platforms have been set and all members understand
 ---
 ## 4.  Work Item assignments
 
