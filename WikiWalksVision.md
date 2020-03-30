@@ -46,3 +46,7 @@ WikiWalks Is a team of 4 people working together via online collaboration to dev
 ## 5 Other Product Requirements (not sure what to do here)
 | Requirements | Priority | Planced Realsesed |
 | --- | --- | --- |
+| Efficiency <br> is important in the WikiWalks application as the application needs to use little power so that the uses pohone dont loose a charge mid way though a walk| 2| 1.0 | 
+| privacy <br> is important as WikiWalks is collecting location data that should be private and confidental this will be done by using anonomising the data a users upload to a servr and not requiring uses to signup to use wikiwalks
+| Usability <br> wiki walks is intened to be widely addoped and due to this its users will have a range of tecnical skills WikiWalks will be designed to be usable for thoguse whith very poor technical knowledge| 1 | 1.0 |
+| Testability <br> The testability of wiki walks is important as the application works on mass data collection so the wikiwalks deveopment team needs to be able to easily test the application without dissrupting other data that is stored on the servers |
