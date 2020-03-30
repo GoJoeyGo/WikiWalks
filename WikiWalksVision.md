@@ -38,7 +38,11 @@ WikiWalks Is a team of 4 people working together via online collaboration to dev
 ### 4.1 Needs and Features (im a tad confused on this bit)
 | Need | Priority | Features | Planced Realsesed |
 | --- | --- | --- | --- |
+| The WikiWalks Application needs to be able to collect gps data | 1 | this will be done by using the andriod location api|  1.0 |
+| The WikiWalks Application needs to have a method of comuniicating with a server | 3 | this will be done using an adroid networking libary| 1.0 |
+| The WikiWalks Application needs to be able to store data on phones and on servers | 2 | this will be done by having maps stored in chahe on a phone and stored in server so that its avalible to users to download | 1.0 |
+
 ---
-## 5 Other Product Requirements
+## 5 Other Product Requirements (not sure what to do here)
 | Requirements | Priority | Planced Realsesed |
 | --- | --- | --- |
