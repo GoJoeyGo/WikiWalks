@@ -1,4 +1,6 @@
-from flask import Flask, jsonify
+import json
+
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
@@ -14,12 +16,12 @@ ma = Marshmallow(app)
 class Path(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     picture = db.Column(db.String)
-    latitude = db.Column(db.JSON)
-    longitude = db.Column(db.JSON)
+    latitude = db.Column(db.JSON, nullable=False)
+    longitude = db.Column(db.JSON, nullable=False)
     rating = db.Column(db.Float)
     rating_count = db.Column(db.Integer)
-    starting_point = db.Column(db.JSON)
-    ending_point = db.Column(db.JSON)
+    starting_point = db.Column(db.JSON, nullable=False)
+    ending_point = db.Column(db.JSON, nullable=False)
 
 
 class PathSchema(ma.SQLAlchemyAutoSchema):
@@ -31,7 +33,7 @@ class PathSchema(ma.SQLAlchemyAutoSchema):
 db.create_all()
 
 
-@app.route("/paths/", methods=["GET"])
+@app.route("/paths/")
 def path_list():
     paths = Path.query.all()
     print(paths)
@@ -53,6 +55,19 @@ def path_detail(path_id):
     path_schema = PathSchema()
     output = path_schema.dump(path).data
     return jsonify({"path": output})
+
+
+@app.route("/new/path", methods=["POST"])
+def add_path():
+    try:
+        path_schema = PathSchema()
+        request_json = request.get_json(force=True)["attributes"]
+        data = path_schema.loads(json.dumps(request_json)).data
+        db.session.add(Path(**data))
+        db.session.commit()
+        return jsonify({"status": "success", "path": request_json})
+    except:
+        return jsonify({"status": "failed"})
 
 
 if __name__ == '__main__':
