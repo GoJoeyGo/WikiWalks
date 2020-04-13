@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Tech Competency Demo.iml" filepath="$PROJECT_DIR$/Tech Competency Demo.iml" group="Tech Competency Demo" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="Tech Competency Demo/app" />
+      <module fileurl="file://$PROJECT_DIR$/WikiWalksTest.iml" filepath="$PROJECT_DIR$/WikiWalksTest.iml" group="WikiWalksTest" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="WikiWalksTest/app" />
     </modules>
   </component>
 </project>

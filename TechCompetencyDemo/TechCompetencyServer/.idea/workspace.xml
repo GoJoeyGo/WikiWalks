@@ -2,10 +2,38 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9d1f24af-cda5-4a4d-9ee3-269a7ef6080a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_annotation_annotation_1_0_0_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_arch_core_core_common_2_0_0_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_collection_collection_1_0_0_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_common_2_0_0_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/WikiWalksTest.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_activity_activity_1_0_0_aar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_annotation_annotation_1_1_0_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_appcompat_appcompat_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_appcompat_appcompat_1_0_2_aar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_appcompat_appcompat_resources_1_1_0_aar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_arch_core_core_common_2_1_0_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_collection_collection_1_1_0_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_constraintlayout_constraintlayout_1_1_3_aar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_constraintlayout_constraintlayout_solver_1_1_3_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_core_core_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_core_core_1_0_1_aar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_fragment_fragment_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_fragment_fragment_1_0_0_aar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_common_2_1_0_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_extensions_2_0_0_aar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_process_2_0_0_aar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_runtime_2_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_runtime_2_0_0_aar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_service_2_0_0_aar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_viewmodel_2_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_viewmodel_2_0_0_aar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_savedstate_savedstate_1_0_0_aar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_vectordrawable_vectordrawable_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_vectordrawable_vectordrawable_1_0_1_aar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_vectordrawable_vectordrawable_animated_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_vectordrawable_vectordrawable_animated_1_0_0_aar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_versionedparcelable_versionedparcelable_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_versionedparcelable_versionedparcelable_1_0_0_aar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/Tech Competency Demo.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/app/app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/app/src/main/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/paths.db" beforeDir="false" afterPath="$PROJECT_DIR$/paths.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -73,6 +101,9 @@
       <workItem from="1586157477410" duration="40000" />
       <workItem from="1586407673558" duration="185000" />
       <workItem from="1586407868850" duration="4770000" />
+      <workItem from="1586413981304" duration="673000" />
+      <workItem from="1586440217980" duration="1982000" />
+      <workItem from="1586623638567" duration="833000" />
     </task>
     <servers />
   </component>
@@ -84,10 +115,10 @@
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
     <state x="1020" y="327" key="#DatabaseHost/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586407903320" />
-    <state x="765" y="375" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586407927909">
+    <state x="765" y="375" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586413987371">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
-    <state x="765" y="375" key="#com.intellij.execution.impl.EditConfigurationsDialog/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586407927909" />
+    <state x="765" y="375" key="#com.intellij.execution.impl.EditConfigurationsDialog/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586413987371" />
     <state x="1073" y="523" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1585924570740">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
@@ -100,22 +131,22 @@
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
     <state x="1045" y="482" key="EnvironmentVariablesDialog/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586001078152" />
-    <state width="2455" height="413" key="GridCell.Tab.0.bottom" timestamp="1586412832527">
+    <state width="2455" height="413" key="GridCell.Tab.0.bottom" timestamp="1586624471240">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
-    <state width="2455" height="413" key="GridCell.Tab.0.bottom/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586412832527" />
-    <state width="2455" height="413" key="GridCell.Tab.0.center" timestamp="1586412832527">
+    <state width="2455" height="413" key="GridCell.Tab.0.bottom/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586624471240" />
+    <state width="2455" height="413" key="GridCell.Tab.0.center" timestamp="1586624471240">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
-    <state width="2455" height="413" key="GridCell.Tab.0.center/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586412832527" />
-    <state width="2455" height="413" key="GridCell.Tab.0.left" timestamp="1586412832527">
+    <state width="2455" height="413" key="GridCell.Tab.0.center/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586624471240" />
+    <state width="2455" height="413" key="GridCell.Tab.0.left" timestamp="1586624471240">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
-    <state width="2455" height="413" key="GridCell.Tab.0.left/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586412832527" />
-    <state width="2455" height="413" key="GridCell.Tab.0.right" timestamp="1586412832527">
+    <state width="2455" height="413" key="GridCell.Tab.0.left/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586624471240" />
+    <state width="2455" height="413" key="GridCell.Tab.0.right" timestamp="1586624471240">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
-    <state width="2455" height="413" key="GridCell.Tab.0.right/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586412832527" />
+    <state width="2455" height="413" key="GridCell.Tab.0.right/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586624471240" />
     <state x="812" y="365" key="SettingsEditor" timestamp="1586407808158">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
@@ -127,6 +158,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/DatabaseHost$DatabaseHost.coverage" NAME="DatabaseHost Coverage Results" MODIFIED="1586063325199" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/TechCompetencyServer$DatabaseHost.coverage" NAME="DatabaseHost Coverage Results" MODIFIED="1586411876509" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TechCompetencyServer$DatabaseHost.coverage" NAME="DatabaseHost Coverage Results" MODIFIED="1586623712387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
