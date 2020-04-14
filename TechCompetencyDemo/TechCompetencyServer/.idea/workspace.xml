@@ -2,39 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9d1f24af-cda5-4a4d-9ee3-269a7ef6080a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_annotation_annotation_1_0_0_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_arch_core_core_common_2_0_0_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_collection_collection_1_0_0_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_common_2_0_0_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../TechCompetencyApp/WikiWalksTest.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_activity_activity_1_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_annotation_annotation_1_1_0_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_appcompat_appcompat_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_appcompat_appcompat_1_0_2_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_appcompat_appcompat_resources_1_1_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_arch_core_core_common_2_1_0_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_collection_collection_1_1_0_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_constraintlayout_constraintlayout_1_1_3_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_constraintlayout_constraintlayout_solver_1_1_3_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_core_core_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_core_core_1_0_1_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_fragment_fragment_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_fragment_fragment_1_0_0_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_common_2_1_0_jar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_extensions_2_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_process_2_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_runtime_2_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_runtime_2_0_0_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_service_2_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_viewmodel_2_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_lifecycle_lifecycle_viewmodel_2_0_0_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_savedstate_savedstate_1_0_0_aar.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_vectordrawable_vectordrawable_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_vectordrawable_vectordrawable_1_0_1_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_vectordrawable_vectordrawable_animated_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_vectordrawable_vectordrawable_animated_1_0_0_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_versionedparcelable_versionedparcelable_1_1_0_aar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/libraries/Gradle__androidx_versionedparcelable_versionedparcelable_1_0_0_aar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/Tech Competency Demo.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/app/app.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TechCompetencyApp/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TechCompetencyApp/app/src/main/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/paths.db" beforeDir="false" afterPath="$PROJECT_DIR$/paths.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +30,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/PycharmProjects/WikiWalksServer" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
@@ -104,6 +72,8 @@
       <workItem from="1586413981304" duration="673000" />
       <workItem from="1586440217980" duration="1982000" />
       <workItem from="1586623638567" duration="833000" />
+      <workItem from="1586867791717" duration="1387000" />
+      <workItem from="1586879319304" duration="28000" />
     </task>
     <servers />
   </component>
@@ -131,6 +101,10 @@
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
     <state x="1045" y="482" key="EnvironmentVariablesDialog/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586001078152" />
+    <state x="1091" y="475" key="FileChooserDialogImpl" timestamp="1586879345555">
+      <screen x="62" y="0" width="2498" height="1440" />
+    </state>
+    <state x="1091" y="475" key="FileChooserDialogImpl/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586879345555" />
     <state width="2455" height="413" key="GridCell.Tab.0.bottom" timestamp="1586624471240">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
