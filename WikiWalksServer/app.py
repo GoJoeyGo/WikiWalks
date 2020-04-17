@@ -1,5 +1,4 @@
-from flask import Flask
-from schemas import *
+from posts import *
 
 
 app = Flask(__name__)
@@ -11,6 +10,8 @@ ma.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+app.register_blueprint(posts)
 
 if __name__ == '__main__':
     app.run(debug=True)

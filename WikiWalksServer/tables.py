@@ -11,15 +11,19 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     device_id = db.Column(db.String, nullable=False, unique=True)
     nickname = db.Column(db.String, unique=True)
-    paths = db.relationship("Path")
-    points_of_interest = db.relationship("PointOfInterest")
-    group_walks = db.relationship("GroupWalk")
-    path_pictures = db.relationship("PathPicture")
-    poi_pictures = db.relationship("PointOfInterestPicture")
-    path_reviews = db.relationship("PathReview")
-    poi_reviews = db.relationship("PointOfInterestReview")
+    paths = db.relationship("Path", cascade="delete")
+    points_of_interest = db.relationship("PointOfInterest", cascade="delete")
+    group_walks = db.relationship("GroupWalk", cascade="delete")
+    path_pictures = db.relationship("PathPicture", cascade="delete")
+    poi_pictures = db.relationship("PointOfInterestPicture", cascade="delete")
+    path_reviews = db.relationship("PathReview", cascade="delete")
+    poi_reviews = db.relationship("PointOfInterestReview", cascade="delete")
     group_walks_attending = db.relationship("GroupWalk", secondary=group_walk_attendance,
                                             backref=db.backref("attendees", lazy=True))
+
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 
 class Path(db.Model):
@@ -27,16 +31,21 @@ class Path(db.Model):
     name = db.Column(db.String, nullable=False)
     submitter = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_time = db.Column(db.Integer, nullable=False)
-    children = db.relationship("Path")
+    children = db.relationship("Path", cascade="delete")
     parent_path = db.Column(db.Integer, (db.ForeignKey("path.id")))
     latitudes = db.Column(db.JSON, nullable=False)
     longitudes = db.Column(db.JSON, nullable=False)
     walk_count = db.Column(db.Integer, default=1, nullable=False)
     starting_point = db.Column(db.JSON, nullable=False)
     ending_point = db.Column(db.JSON, nullable=False)
-    points_of_interest = db.relationship("PointOfInterest")
-    reviews = db.relationship("PathReview")
-    pictures = db.relationship("PathPicture")
+    points_of_interest = db.relationship("PointOfInterest", cascade="delete")
+    reviews = db.relationship("PathReview", cascade="delete")
+    pictures = db.relationship("PathPicture", cascade="delete")
+    group_walks = db.relationship("GroupWalk", cascade="delete")
+
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 
 class PointOfInterest(db.Model):
@@ -47,8 +56,12 @@ class PointOfInterest(db.Model):
     path = db.Column(db.Integer, db.ForeignKey("path.id"), nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
-    reviews = db.relationship("PointOfInterestReview")
-    pictures = db.relationship("PointOfInterestPicture")
+    reviews = db.relationship("PointOfInterestReview", cascade="delete")
+    pictures = db.relationship("PointOfInterestPicture", cascade="delete")
+
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 
 class GroupWalk(db.Model):
@@ -56,7 +69,11 @@ class GroupWalk(db.Model):
     path_id = db.Column(db.Integer, db.ForeignKey("path.id"), nullable=False)
     submitter = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_time = db.Column(db.Integer, nullable=False)
-    time = db.Column(db.BigInteger)
+    time = db.Column(db.Integer, nullable=False)
+
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 
 class PathPicture(db.Model):
@@ -67,6 +84,10 @@ class PathPicture(db.Model):
     description = db.Column(db.String)
     url = db.Column(db.String, nullable=False)
 
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
+
 
 class PointOfInterestPicture(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -75,6 +96,10 @@ class PointOfInterestPicture(db.Model):
     created_time = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String)
     url = db.Column(db.String, nullable=False)
+
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
 
 class PathReview(db.Model):
@@ -85,6 +110,10 @@ class PathReview(db.Model):
     text = db.Column(db.String)
     rating = db.Column(db.Integer)
 
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
+
 
 class PointOfInterestReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -93,3 +122,7 @@ class PointOfInterestReview(db.Model):
     created_time = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String)
     rating = db.Column(db.Integer)
+
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }

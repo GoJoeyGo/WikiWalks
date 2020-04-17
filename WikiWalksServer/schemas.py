@@ -1,4 +1,6 @@
-from flask_marshmallow import Marshmallow, Schema
+from flask_marshmallow import Marshmallow
+from marshmallow import EXCLUDE
+
 from tables import *
 
 ma = Marshmallow()
@@ -7,46 +9,46 @@ ma = Marshmallow()
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        exclude = ["device_id"]
+        unknown = EXCLUDE
 
 
 class PathSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Path
-        exclude = ["submitter"]
+        unknown = EXCLUDE
 
 
 class PointOfInterestSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PointOfInterest
-        exclude = ["submitter"]
+        unknown = EXCLUDE
 
 
 class GroupWalkSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = GroupWalk
-        exclude = ["submitter"]
+        unknown = EXCLUDE
 
 
 class PathPictureSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PathPicture
-        exclude = ["submitter"]
+        unknown = EXCLUDE
 
 
 class PointOfInterestPictureSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PointOfInterestPicture
-        exclude = ["submitter"]
+        unknown = EXCLUDE
 
 
 class PathReviewSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PathReview
-        exclude = ["submitter"]
+        unknown = EXCLUDE
 
 
 class PointOfInterestReviewSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PointOfInterestReview
-        exclude = ["submitter"]
+        unknown = EXCLUDE
