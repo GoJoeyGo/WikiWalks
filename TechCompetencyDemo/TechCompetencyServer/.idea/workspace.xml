@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="9d1f24af-cda5-4a4d-9ee3-269a7ef6080a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../WikiWalksServer/data.db" beforeDir="false" afterPath="$PROJECT_DIR$/../../WikiWalksServer/data.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +31,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../WikiWalksServer" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
@@ -80,6 +80,7 @@
       <workItem from="1587092745426" duration="612000" />
       <workItem from="1587101057697" duration="647000" />
       <workItem from="1587103964037" duration="863000" />
+      <workItem from="1587528723495" duration="2319000" />
     </task>
     <servers />
   </component>
@@ -107,10 +108,10 @@
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
     <state x="1045" y="482" key="EnvironmentVariablesDialog/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586001078152" />
-    <state x="1091" y="475" key="FileChooserDialogImpl" timestamp="1586879345555">
+    <state x="1091" y="475" key="FileChooserDialogImpl" timestamp="1587532803226">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>
-    <state x="1091" y="475" key="FileChooserDialogImpl/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1586879345555" />
+    <state x="1091" y="475" key="FileChooserDialogImpl/62.0.2498.1440/2622.349.1858.1080@62.0.2498.1440" timestamp="1587532803226" />
     <state width="2455" height="413" key="GridCell.Tab.0.bottom" timestamp="1587105533369">
       <screen x="62" y="0" width="2498" height="1440" />
     </state>

@@ -37,13 +37,16 @@ db.create_all()
 def path_list():
     paths = Path.query.all()
     print(paths)
+    north_boundary = request.args.get('n', default=90, type=float)
+    south_boundary = request.args.get('s', default=-90, type=float)
+    east_boundary = request.args.get('e', default=180, type=float)
+    west_boundary = request.args.get('w', default=-180, type=float)
     in_range_paths = []
-    # for path in paths:
-    #     lat = path.starting_point.get("latitude")
-    #     print(lat)
-    #     print("-27.269831")
-    #     if lat == "-27.269831":
-    #         in_range_paths.append(path)
+    for path in paths:
+        lat = path.starting_point[0]
+        lat = path.starting_point[1]
+        if lat == "-27.269831":
+            in_range_paths.append(path)
     path_list_schema = PathSchema(many=True)
     output = path_list_schema.dump(paths).data
     return jsonify({"paths": output})
