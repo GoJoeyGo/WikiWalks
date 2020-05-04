@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request, Blueprint
 from schemas import *
 import datetime
 
-posts = Blueprint('blueprint', __name__, template_folder='templates')
+posts = Blueprint('posts_blueprint', __name__, template_folder='templates')
 
 
 def get_submitter(device):
@@ -20,7 +20,7 @@ def get_time():
     time = int(datetime.datetime.now().timestamp())
     return time
 
-
+	
 @posts.route("/paths/new", methods=["POST"])
 def add_path():
     try:
