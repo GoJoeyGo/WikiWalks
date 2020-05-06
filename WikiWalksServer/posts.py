@@ -199,3 +199,104 @@ def toggle_group_walk_attendance(group_walk_id):
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
+
+
+@posts.route("/pois/<poi_id>/review/add", methods=["POST"])
+def add_poi_review(poi_id):
+    try:
+        poi_review_schema = PointOfInterestReviewSchema()
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        new_poi_review = PointOfInterestReview(point_of_interest_id=poi_id, submitter=user.id, created_time=request_json["time"], text=poi_review_schema.text, rating=poi_review_schema.rating)
+        db.session.add(new_poi_review)
+        db.session.commit()
+        return jsonify({"status": "success", "poi_review": poi_review_schema.dump(new_poi_review)}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
+
+
+@posts.route("/pois/<poi_id>/<poi_review_id>/review/edit", methods=["POST"])
+def edit_poi_review(poi_review_id,poi_id):
+    try:
+        poi_review_schema = PointOfInterestReviewSchema()
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        poi_review = PointOfInterestReview.query.filter_by(id=poi_review_id, point_of_interest_id=poi_id)
+        if poi_review.first() in user.poi_reviews:
+            poi_review.update(dict(poi_review_schema.load(request_json, partial=True)))
+            db.session.commit()
+        else:
+            return jsonify({"status": "failed"}), 403
+        return jsonify({"status": "success"}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 50
+
+
+@posts.route("/pois/<poi_id>/<poi_review_id>/review/delete", methods=["POST"])
+def delete_poi_review(poi_id, poi_review_id):
+    try:
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        poi_review = PointOfInterestReview.query.get(poi_id, poi_review_id)
+        if poi_review in user.poi_reviews:
+            db.session.delete(poi_review)
+            db.session.commit()
+        else:
+            return jsonify({"status": "failed"}), 403
+        return jsonify({"status": "success"}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
+
+
+@posts.route("/paths/<path_id>/review/add", methods=["POST"])
+def add_path_review(path_id,text,rating):
+
+    try:
+        path_review_schema = PathReviewSchema()
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        new_path_review = PathReview(path_id=path_id, submitter=user.id, created_time=request_json["time"], text=text, rating=rating)
+        db.session.add(new_path_review)
+        db.session.commit()
+        return jsonify({"status": "success", "path_review": path_review_schema.dump(new_path_review)}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
+
+
+@posts.route("/paths/<path_id>/<path_review_id>/review/edit", methods=["POST"])
+def edit_path_review(path_review_id, path_id):
+    try:
+        path_review_schema = PathReviewSchema()
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        path_review = PathReview.query.filter_by(id=path_review_id, path_id=path_id)
+        if path_review.first() in user.path_reviews:
+            path_review.update(dict(path_review_schema.load(request_json, partial=True)))
+            db.session.commit()
+        else:
+            return jsonify({"status": "failed"}), 403
+        return jsonify({"status": "success"}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 50
+
+
+@posts.route("/paths/<path_id>/<path_review_id>/review/delete", methods=["POST"])
+def delete_path_review(path_id, path_review_id):
+    try:
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        path_review = PathReview.query.get(path_id, path_review_id)
+        if path_review in user.path_reviews:
+            db.session.delete(path_review)
+            db.session.commit()
+        else:
+            return jsonify({"status": "failed"}), 403
+        return jsonify({"status": "success"}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
