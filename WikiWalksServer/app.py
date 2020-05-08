@@ -1,6 +1,6 @@
 from posts import *
 from gets import *
-from flask import Flask, render_template
+from flask import Flask
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
@@ -12,6 +12,9 @@ ma.init_app(app)
 
 app.register_blueprint(posts)
 app.register_blueprint(gets)
+
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
-    

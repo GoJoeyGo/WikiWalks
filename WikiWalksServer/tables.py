@@ -35,6 +35,7 @@ class Path(db.Model):
     parent_path = db.Column(db.Integer, (db.ForeignKey("path.id")))
     latitudes = db.Column(db.JSON, nullable=False)
     longitudes = db.Column(db.JSON, nullable=False)
+    boundaries = db.Column(db.JSON, nullable=False)
     walk_count = db.Column(db.Integer, default=1, nullable=False)
     starting_point = db.Column(db.JSON, nullable=False)
     ending_point = db.Column(db.JSON, nullable=False)
@@ -126,3 +127,4 @@ class PointOfInterestReview(db.Model):
     __mapper_args__ = {
         'confirm_deleted_rows': False
     }
+

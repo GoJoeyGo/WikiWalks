@@ -1,12 +1,27 @@
 import json
-from flask import Flask, jsonify, request, Blueprint
+
+from flask import jsonify, request, Blueprint
 from schemas import *
 import datetime
 import os
-
+from PIL import Image
+import uuid
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 posts = Blueprint('posts_blueprint', __name__, template_folder='templates')
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
+
+
+def process_picture(file):
+    filename = str(uuid.uuid1()) + ".jpg"
+    image = Image.open(file.stream)
+    if image.mode in ("RGBA", "P"):
+        image = image.convert("RGB")
+    image.thumbnail((1920, 1920), Image.LANCZOS)
+    return image, filename
 
 
 def get_submitter(device):
@@ -23,7 +38,7 @@ def get_time():
     time = int(datetime.datetime.now().timestamp())
     return time
 
-	
+
 @posts.route("/paths/new", methods=["POST"])
 def add_path():
     try:
@@ -31,21 +46,31 @@ def add_path():
         request_json = request.get_json(force=True)["attributes"]
         if len(request_json["latitudes"]) == len(request_json["longitudes"]) and len(request_json["latitudes"]) > 2:
             request_json["created_time"] = get_time()
-            request_json["starting_point"] = [request_json["latitudes"][0], request_json["longitudes"][0]]
-            request_json["ending_point"] = [request_json["latitudes"][len(request_json["latitudes"]) - 1],
-                                            request_json["longitudes"][len(request_json["longitudes"]) - 1]]
+            starting_point = [request_json["latitudes"][0], request_json["longitudes"][0]]
+            ending_point = [request_json["latitudes"][len(request_json["latitudes"]) - 1],
+                            request_json["longitudes"][len(request_json["longitudes"]) - 1]]
+            boundaries = [min(request_json["latitudes"]), min(request_json["longitudes"]),
+                          max(request_json["latitudes"]), max(request_json["longitudes"])]
             user = get_submitter(request_json["device_id"])
-            data = path_schema.load(request_json)
-            new_path = Path(**data, submitter=user.id, walk_count=1)
+            data = path_schema.load(request_json, partial=True)
+            new_path = Path(**data, submitter=user.id, walk_count=1, starting_point=starting_point,
+                            ending_point=ending_point, boundaries=boundaries)
             db.session.add(new_path)
             if "parent_path" in request_json:
-                parent_path = Path.query.get(request_json["parent_path"])
-                parent_path.children.append(new_path)
+                parent = Path.query.filter_by(id=request_json["parent_path"]).first()
+                if parent is not None and request_json["parent_path"] is not new_path.id:
+                    parent.boundaries = [min(parent.boundaries[0], boundaries[0]),
+                                         min(parent.boundaries[1], boundaries[1]),
+                                         max(parent.boundaries[2], boundaries[2]),
+                                         max(parent.boundaries[3], boundaries[3])]
+                    parent.children.append(new_path)
+                else:
+                    return jsonify({"status": "failed"}), 422
             db.session.commit()
             return jsonify({"status": "success", "path": path_schema.dump(new_path)}), 201
         return jsonify({"status": "failed"}), 422
     except Exception as e:
-        print(e)
+        print(e.with_traceback())
         return jsonify({"status": "failed"}), 500
 
 
@@ -204,13 +229,15 @@ def toggle_group_walk_attendance(group_walk_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/pois/<poi_id>/review/add", methods=["POST"])
-def add_poi_review(poi_id,text,rating):
+@posts.route("/pois/<poi_id>/reviews/new", methods=["POST"])
+def add_poi_review(poi_id):
     try:
         poi_review_schema = PointOfInterestReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        new_poi_review = PointOfInterestReview(point_of_interest_id=poi_id, submitter=user.id, created_time=request_json["time"], text=text, rating=rating)
+        data = poi_review_schema.load(request_json)
+        new_poi_review = PointOfInterestReview(**data, point_of_interest_id=poi_id, submitter=user.id,
+                                               created_time=get_time())
         db.session.add(new_poi_review)
         db.session.commit()
         return jsonify({"status": "success", "poi_review": poi_review_schema.dump(new_poi_review)}), 201
@@ -219,13 +246,13 @@ def add_poi_review(poi_id,text,rating):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/pois/<poi_id>/<poi_review_id>/review/edit", methods=["POST"])
-def edit_poi_review(poi_review_id,poi_id):
+@posts.route("/pois/<poi_id>/reviews/<poi_review_id>/edit", methods=["POST"])
+def edit_poi_review(poi_review_id):
     try:
         poi_review_schema = PointOfInterestReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        poi_review = PointOfInterestReview.query.filter_by(id=poi_review_id, point_of_interest_id=poi_id)
+        poi_review = PointOfInterestReview.query.filter_by(id=poi_review_id)
         if poi_review.first() in user.poi_reviews:
             poi_review.update(dict(poi_review_schema.load(request_json, partial=True)))
             db.session.commit()
@@ -234,15 +261,15 @@ def edit_poi_review(poi_review_id,poi_id):
         return jsonify({"status": "success"}), 201
     except Exception as e:
         print(e)
-        return jsonify({"status": "failed"}), 50
+        return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/pois/<poi_id>/<poi_review_id>/review/delete", methods=["POST"])
-def delete_poi_review(poi_id, poi_review_id):
+@posts.route("/pois/<poi_id>/reviews/<poi_review_id>/delete", methods=["POST"])
+def delete_poi_review(poi_review_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        poi_review = PointOfInterestReview.query.get(poi_id, poi_review_id)
+        poi_review = PointOfInterestReview.query.get(poi_review_id)
         if poi_review in user.poi_reviews:
             db.session.delete(poi_review)
             db.session.commit()
@@ -254,14 +281,14 @@ def delete_poi_review(poi_id, poi_review_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/review/add", methods=["POST"])
-def add_path_review(path_id,text,rating):
-
+@posts.route("/paths/<path_id>/review/new", methods=["POST"])
+def add_path_review(path_id):
     try:
         path_review_schema = PathReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        new_path_review = PathReview(path_id=path_id, submitter=user.id, created_time=request_json["time"], text=text, rating=rating)
+        data = path_review_schema.load(request_json)
+        new_path_review = PathReview(**data, path_id=path_id, submitter=user.id, created_time=get_time())
         db.session.add(new_path_review)
         db.session.commit()
         return jsonify({"status": "success", "path_review": path_review_schema.dump(new_path_review)}), 201
@@ -270,13 +297,13 @@ def add_path_review(path_id,text,rating):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/<path_review_id>/review/edit", methods=["POST"])
-def edit_path_review(path_review_id, path_id):
+@posts.route("/paths/<path_id>/reviews/<path_review_id>/edit", methods=["POST"])
+def edit_path_review(path_review_id):
     try:
         path_review_schema = PathReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        path_review = PathReview.query.filter_by(id=path_review_id, path_id=path_id)
+        path_review = PathReview.query.filter_by(id=path_review_id)
         if path_review.first() in user.path_reviews:
             path_review.update(dict(path_review_schema.load(request_json, partial=True)))
             db.session.commit()
@@ -285,15 +312,15 @@ def edit_path_review(path_review_id, path_id):
         return jsonify({"status": "success"}), 201
     except Exception as e:
         print(e)
-        return jsonify({"status": "failed"}), 50
+        return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/<path_review_id>/review/delete", methods=["POST"])
-def delete_path_review(path_id, path_review_id):
+@posts.route("/paths/<path_id>/reviews/<path_review_id>/delete", methods=["POST"])
+def delete_path_review(path_review_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        path_review = PathReview.query.get(path_id, path_review_id)
+        path_review = PathReview.query.get(path_review_id)
         if path_review in user.path_reviews:
             db.session.delete(path_review)
             db.session.commit()
@@ -305,39 +332,57 @@ def delete_path_review(path_id, path_review_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/picture/add", methods=["GET", "POST"])
-def add_path_picture(path_id,description):
-
+@posts.route("/paths/<path_id>/pictures/new", methods=["POST"])
+def add_path_picture(path_id):
     try:
+        if 'image' not in request.files:
+            return jsonify({"status": "no file found"}), 500
         path_picture_schema = PathPictureSchema()
-        request_json = request.get_json(force=True)["attributes"]
-        user = get_submitter(request_json["device_id"])
+        image = request.files["image"]
+        if allowed_file(image.filename):
+            processed_image = process_picture(image)
+            user = get_submitter(request.form["device_id"])
+            new_path_picture = PathPicture(path_id=path_id, submitter=user.id, created_time=get_time(),
+                                           description=request.form["description"], url=processed_image[1])
+            image[0].save("./images/" + image[1], 'JPEG', quality=80)
+            db.session.add(new_path_picture)
+            db.session.commit()
 
-        if request.files:
-            image = request.files["image"]
-            target = os.path.join(APP_ROOT,"/","/path/pictures")
-            image.save(os.path.join(target,"/",path_id))
-            url = request.url
-
-        new_path_picture = PathPicture(path_id=path_id, submitter=user.id, created_time=request_json["time"], description=description, url=url)
-        db.session.add(new_path_picture)
-        db.session.commit()
-
-
-        return jsonify({"status": "success", "path_picture": path_picture_schema.dump(new_path_picture)}), 201
+            return jsonify({"status": "success", "path_picture": path_picture_schema.dump(new_path_picture)}), 201
+        else:
+            return jsonify({"status": "invalid file type"}), 403
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/picture/delete", methods=["POST"])
-def delete_path_picture(path_id, picture_id):
+@posts.route("/paths/<path_id>/reviews/<path_picture_id>/edit", methods=["POST"])
+def edit_path_picture(path_picture_id):
+    try:
+        path_picture_schema = PathPictureSchema()
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        path_picture = PathPicture.query.filter_by(id=path_picture_id)
+        if path_picture.first() in user.path_pictures:
+            path_picture.update(dict(path_picture_schema.load(request_json, partial=True), url=path_picture.url))
+            db.session.commit()
+        else:
+            return jsonify({"status": "failed"}), 403
+        return jsonify({"status": "success"}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
+
+
+@posts.route("/paths/<path_id>/pictures/<path_picture_id>/delete", methods=["POST"])
+def delete_path_picture(path_picture_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        path_picture = PathPicture.query.get(path_id, picture_id)
+        path_picture = PathPicture.query.get(path_picture_id)
         if path_picture in user.path_pictures:
-            os.remove(path_picture.url)
+            if os.path.isfile("./images/" + path_picture.url):
+                os.remove("./images/" + path_picture.url)
             db.session.delete(path_picture)
             db.session.commit()
         else:
@@ -348,40 +393,39 @@ def delete_path_picture(path_id, picture_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/pois/<poi_id>/picture/add", methods=["POST"])
-def add_poi_review(poi_id,description):
-
+@posts.route("/pois/<poi_id>/pictures/new", methods=["POST"])
+def add_poi_picture(poi_id):
     try:
-        pois_picture_schema = PointOfInterestPictureSchema()
-        request_json = request.get_json(force=True)["attributes"]
-        user = get_submitter(request_json["device_id"])
+        if 'image' not in request.files:
+            return jsonify({"status": "no file found"}), 500
+        poi_picture_schema = PointOfInterestPictureSchema()
+        image = request.files["image"]
+        if allowed_file(image.filename):
+            processed_image = process_picture(image)
+            user = get_submitter(request.form["device_id"])
+            new_poi_picture = PointOfInterestPicture(poi_id=poi_id, submitter=user.id, created_time=get_time(),
+                                                     description=request.form["description"], url=processed_image[1])
+            image[0].save("./images/" + image[1], 'JPEG', quality=80)
+            db.session.add(new_poi_picture)
+            db.session.commit()
 
-        if request.files:
-            image = request.files["image"]
-            target = os.path.join(APP_ROOT,"/","/pois/pictures")
-            image.save(os.path.join(target,"/",poi_id))
-            url = request.url
-
-        new_poi_picture = PathPicture(poi_id=poi_id, submitter=user.id, created_time=request_json["time"], description=description, url=url)
-        db.session.add(new_poi_picture)
-        db.session.commit()
-
-        return jsonify({"status": "success", "path_picture": pois_picture_schema.dump(new_poi_picture)}), 201
+            return jsonify({"status": "success", "poi_picture": poi_picture_schema.dump(new_poi_picture)}), 201
+        else:
+            return jsonify({"status": "invalid file type"}), 403
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/pois/<poi_id>/<poi_review_id>/picture/delete", methods=["POST"])
-def delete_poi_review(poi_id, picture_id):
-
+@posts.route("/paths/<poi_id>/reviews/<poi_picture_id>/edit", methods=["POST"])
+def edit_poi_picture(poi_picture_id):
     try:
+        poi_picture_schema = PointOfInterestPictureSchema()
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        pois_picture = PathPicture.query.get(poi_id, picture_id)
-        if pois_picture in user.path_pictures:
-            os.remove(pois_picture.url)
-            db.session.delete(pois_picture)
+        poi_picture = PointOfInterestPicture.query.filter_by(id=poi_picture_id)
+        if poi_picture.first() in user.path_pictures:
+            poi_picture.update(dict(poi_picture_schema.load(request_json, partial=True), url=poi_picture.url))
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
@@ -391,3 +435,20 @@ def delete_poi_review(poi_id, picture_id):
         return jsonify({"status": "failed"}), 500
 
 
+@posts.route("/pois/<poi_id>/pictures/<poi_picture_id>/delete", methods=["POST"])
+def delete_poi_picture(poi_picture_id):
+    try:
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        poi_picture = PointOfInterestPicture.query.get(poi_picture_id)
+        if poi_picture in user.path_pictures:
+            if os.path.isfile("./images/" + poi_picture.url):
+                os.remove("./images/" + poi_picture.url)
+            db.session.delete(poi_picture)
+            db.session.commit()
+        else:
+            return jsonify({"status": "failed"}), 403
+        return jsonify({"status": "success"}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
