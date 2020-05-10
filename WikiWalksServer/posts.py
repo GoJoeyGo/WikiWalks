@@ -248,6 +248,8 @@ def add_poi_review(poi_id):
     try:
         poi_review_schema = PointOfInterestReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
+        if request_json["rating"] > 5 or request_json["rating"] < 0:
+            return jsonify({"status": "failed"}), 403
         poi = PointOfInterest.query.filter_by(id=poi_id).first()
         if poi.rating_count == 0:
             poi.average_rating = request_json["rating"]
@@ -273,6 +275,8 @@ def edit_poi_review(poi_id, poi_review_id):
     try:
         poi_review_schema = PointOfInterestReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
+        if request_json["rating"] > 5 or request_json["rating"] < 0:
+            return jsonify({"status": "failed"}), 403
         user = get_submitter(request_json["device_id"])
         poi_review = PointOfInterestReview.query.filter_by(id=poi_review_id)
         if poi_review.first() in user.poi_reviews:
@@ -317,6 +321,8 @@ def add_path_review(path_id):
     try:
         path_review_schema = PathReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
+        if request_json["rating"] > 5 or request_json["rating"] < 0:
+            return jsonify({"status": "failed"}), 403
         path = Path.query.filter_by(id=path_id).first()
         if path.rating_count == 0:
             path.average_rating = request_json["rating"]
@@ -341,6 +347,8 @@ def edit_path_review(path_id, path_review_id):
     try:
         path_review_schema = PathReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
+        if request_json["rating"] > 5 or request_json["rating"] < 0:
+            return jsonify({"status": "failed"}), 403
         user = get_submitter(request_json["device_id"])
         path_review = PathReview.query.filter_by(id=path_review_id)
         if path_review.first() in user.path_reviews:
