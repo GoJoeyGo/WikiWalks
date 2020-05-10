@@ -1,6 +1,8 @@
 import json
 
 from flask import jsonify, request, Blueprint
+from sqlalchemy import func
+
 from schemas import *
 import datetime
 import os
@@ -267,17 +269,17 @@ def add_poi_review(poi_id):
 
 
 @posts.route("/pois/<poi_id>/reviews/<poi_review_id>/edit", methods=["POST"])
-def edit_poi_review(poi_review_id):
+def edit_poi_review(poi_id, poi_review_id):
     try:
         poi_review_schema = PointOfInterestReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         poi_review = PointOfInterestReview.query.filter_by(id=poi_review_id)
         if poi_review.first() in user.poi_reviews:
-            poi = PointOfInterest.query.filter_by(id=poi_review.point_of_interest_id).first()
-            poi.average_rating = ((poi.average_rating * poi.rating_count) - poi_review.rating +
-                                  request_json["rating"]) / poi.rating_count
+            poi = PointOfInterest.query.filter_by(id=poi_review.first().point_of_interest_id).first()
             poi_review.update(dict(poi_review_schema.load(request_json, partial=True)))
+            poi.average_rating = db.session.query(func.avg(PointOfInterestReview.rating)).filter_by(
+                point_of_interest_id=poi.id).scalar()
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
@@ -288,17 +290,19 @@ def edit_poi_review(poi_review_id):
 
 
 @posts.route("/pois/<poi_id>/reviews/<poi_review_id>/delete", methods=["POST"])
-def delete_poi_review(poi_review_id):
+def delete_poi_review(poi_id, poi_review_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         poi_review = PointOfInterestReview.query.get(poi_review_id)
         if poi_review in user.poi_reviews:
             poi = PointOfInterest.query.filter_by(id=poi_review.point_of_interest_id).first()
-            poi.average_rating = ((poi.average_rating * poi.rating_count) -
-                                  poi_review.rating) / (poi.rating_count - 1)
-            poi.rating_count = poi.rating_count - 1
             db.session.delete(poi_review)
+            poi.rating_count = poi.rating_count - 1
+            if poi.rating_count != 0:
+                poi.average_rating = db.session.query(func.avg(PointOfInterestReview.rating)).filter_by(point_of_interest_id=poi.id).scalar()
+            else:
+                poi.average_rating = 0
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
@@ -333,38 +337,40 @@ def add_path_review(path_id):
 
 
 @posts.route("/paths/<path_id>/reviews/<path_review_id>/edit", methods=["POST"])
-def edit_path_review(path_review_id):
+def edit_path_review(path_id, path_review_id):
     try:
         path_review_schema = PathReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         path_review = PathReview.query.filter_by(id=path_review_id)
         if path_review.first() in user.path_reviews:
-            path = Path.query.filter_by(id=path_review.path_id).first()
-            path.average_rating = ((path.average_rating * path.rating_count) - path_review.rating +
-                                   request_json["rating"]) / path.rating_count
+            path = Path.query.filter_by(id=path_review.first().path_id).first()
             path_review.update(dict(path_review_schema.load(request_json, partial=True)))
+            path.average_rating = db.session.query(func.avg(PathReview.rating)).filter_by(
+                path_id=path.id).scalar()
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
         return jsonify({"status": "success"}), 201
     except Exception as e:
-        print(e)
+        print(e.with_traceback())
         return jsonify({"status": "failed"}), 500
 
 
 @posts.route("/paths/<path_id>/reviews/<path_review_id>/delete", methods=["POST"])
-def delete_path_review(path_review_id):
+def delete_path_review(path_id, path_review_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         path_review = PathReview.query.get(path_review_id)
         if path_review in user.path_reviews:
             path = Path.query.filter_by(id=path_review.path_id).first()
-            path.average_rating = ((path.average_rating * path.rating_count) -
-                                   path_review.rating) / (path.rating_count - 1)
-            path.rating_count = path.rating_count - 1
             db.session.delete(path_review)
+            path.rating_count = path.rating_count - 1
+            if path.rating_count != 0:
+                path.average_rating = db.session.query(func.avg(PathReview.rating)).filter_by(path_id=path.id).scalar()
+            else:
+                path.average_rating = 0
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
@@ -399,7 +405,7 @@ def add_path_picture(path_id):
 
 
 @posts.route("/paths/<path_id>/reviews/<path_picture_id>/edit", methods=["POST"])
-def edit_path_picture(path_picture_id):
+def edit_path_picture(path_id, path_picture_id):
     try:
         path_picture_schema = PathPictureSchema()
         request_json = request.get_json(force=True)["attributes"]
@@ -417,7 +423,7 @@ def edit_path_picture(path_picture_id):
 
 
 @posts.route("/paths/<path_id>/pictures/<path_picture_id>/delete", methods=["POST"])
-def delete_path_picture(path_picture_id):
+def delete_path_picture(path_id, path_picture_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
@@ -460,7 +466,7 @@ def add_poi_picture(poi_id):
 
 
 @posts.route("/paths/<poi_id>/reviews/<poi_picture_id>/edit", methods=["POST"])
-def edit_poi_picture(poi_picture_id):
+def edit_poi_picture(poi_id, poi_picture_id):
     try:
         poi_picture_schema = PointOfInterestPictureSchema()
         request_json = request.get_json(force=True)["attributes"]
@@ -478,7 +484,7 @@ def edit_poi_picture(poi_picture_id):
 
 
 @posts.route("/pois/<poi_id>/pictures/<poi_picture_id>/delete", methods=["POST"])
-def delete_poi_picture(poi_picture_id):
+def delete_poi_picture(poi_id, poi_picture_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
