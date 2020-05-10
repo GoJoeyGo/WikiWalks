@@ -25,11 +25,12 @@ def get_paths():
     in_range_paths = []
     for path in paths:
         if ((north_boundary >= path.boundaries[2] >= south_boundary or
-            south_boundary <= path.boundaries[0] <= north_boundary or
-            path.boundaries[0] < south_boundary < north_boundary < path.boundaries[2]) and
+             south_boundary <= path.boundaries[0] <= north_boundary or
+             path.boundaries[0] < south_boundary < north_boundary < path.boundaries[2]) and
             (east_boundary >= path.boundaries[3] >= west_boundary or
              west_boundary <= path.boundaries[1] <= east_boundary or
-             path.boundaries[1] < west_boundary < east_boundary < path.boundaries[3])):
+             path.boundaries[1] < west_boundary < east_boundary < path.boundaries[3] or
+             (east_boundary < west_boundary <= path.boundaries[3] <= 180 + (180 - east_boundary)))):
             in_range_paths.append(path)
             for child in path.children:
                 if child not in in_range_paths:
