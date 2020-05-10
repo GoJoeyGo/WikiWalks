@@ -39,11 +39,12 @@ class Path(db.Model):
     walk_count = db.Column(db.Integer, default=1, nullable=False)
     starting_point = db.Column(db.JSON, nullable=False)
     ending_point = db.Column(db.JSON, nullable=False)
+    average_rating = db.Column(db.Float)
+    rating_count = db.Column(db.Integer)
     points_of_interest = db.relationship("PointOfInterest", cascade="delete")
     reviews = db.relationship("PathReview", cascade="delete")
     pictures = db.relationship("PathPicture", cascade="delete")
     group_walks = db.relationship("GroupWalk", cascade="delete")
-
     __mapper_args__ = {
         'confirm_deleted_rows': False
     }
@@ -57,6 +58,8 @@ class PointOfInterest(db.Model):
     path = db.Column(db.Integer, db.ForeignKey("path.id"), nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
+    average_rating = db.Column(db.Float)
+    rating_count = db.Column(db.Integer)
     reviews = db.relationship("PointOfInterestReview", cascade="delete")
     pictures = db.relationship("PointOfInterestPicture", cascade="delete")
 

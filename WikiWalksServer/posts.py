@@ -24,10 +24,14 @@ def process_picture(file):
     return image, filename
 
 
-def update_boundaries(parent_id, boundaries):
+def update_boundaries(parent_id):
     parent = Path.query.filter_by(id=parent_id).first()
-    parent.boundaries = [min(parent.boundaries[0], boundaries[0]), min(parent.boundaries[1], boundaries[1]),
-                         max(parent.boundaries[2], boundaries[2]), max(parent.boundaries[3], boundaries[3])]
+    parent.boundaries = [min(parent.latitudes), min(parent.longitudes), max(parent.latitudes), max(parent.longitudes)]
+    for child in parent.children:
+        parent.boundaries = [min(parent.boundaries[0], child.boundaries[0]),
+                             min(parent.boundaries[1], child.boundaries[1]),
+                             max(parent.boundaries[2], child.boundaries[2]),
+                             max(parent.boundaries[3], child.boundaries[3])]
     db.session.commit()
     if parent.parent_path is not None:
         update_boundaries(parent.parent_path, parent.boundaries)
@@ -63,13 +67,13 @@ def add_path():
             user = get_submitter(request_json["device_id"])
             data = path_schema.load(request_json, partial=True)
             new_path = Path(**data, submitter=user.id, walk_count=1, starting_point=starting_point,
-                            ending_point=ending_point, boundaries=boundaries)
+                            ending_point=ending_point, boundaries=boundaries, rating_count=0)
             db.session.add(new_path)
             db.session.commit()
             if "parent_path" in request_json:
                 parent = Path.query.filter_by(id=request_json["parent_path"]).first()
                 if parent is not None and request_json["parent_path"] is not new_path.id:
-                    update_boundaries(request_json["parent_path"], boundaries)
+                    update_boundaries(request_json["parent_path"])
                     parent.children.append(new_path)
                 else:
                     return jsonify({"status": "failed"}), 422
@@ -106,6 +110,8 @@ def delete_path(path_id):
         path = Path.query.get(path_id)
         if path in user.paths:
             db.session.delete(path)
+            if path.parent_path is not None:
+                update_boundaries(path.parent_path)
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
@@ -123,7 +129,7 @@ def add_poi():
         request_json["created_time"] = get_time()
         user = get_submitter(request_json["device_id"])
         data = poi_schema.load(request_json)
-        new_poi = PointOfInterest(**data, submitter=user.id, path=request_json["path"])
+        new_poi = PointOfInterest(**data, submitter=user.id, path=request_json["path"], rating_count=0)
         db.session.add(new_poi)
         db.session.commit()
         return jsonify({"status": "success", "poi": poi_schema.dump(new_poi)}), 201
@@ -240,6 +246,14 @@ def add_poi_review(poi_id):
     try:
         poi_review_schema = PointOfInterestReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
+        poi = PointOfInterest.query.filter_by(id=poi_id).first()
+        if poi.rating_count == 0:
+            poi.average_rating = request_json["rating"]
+            poi.rating_count = 1
+        else:
+            poi.average_rating = ((poi.average_rating * poi.rating_count) + request_json["rating"]) / \
+                                 (poi.rating_count + 1)
+            poi.rating_count = poi.rating_count + 1
         user = get_submitter(request_json["device_id"])
         data = poi_review_schema.load(request_json)
         new_poi_review = PointOfInterestReview(**data, point_of_interest_id=poi_id, submitter=user.id,
@@ -260,6 +274,9 @@ def edit_poi_review(poi_review_id):
         user = get_submitter(request_json["device_id"])
         poi_review = PointOfInterestReview.query.filter_by(id=poi_review_id)
         if poi_review.first() in user.poi_reviews:
+            poi = PointOfInterest.query.filter_by(id=poi_review.point_of_interest_id).first()
+            poi.average_rating = ((poi.average_rating * poi.rating_count) - poi_review.rating +
+                                  request_json["rating"]) / poi.rating_count
             poi_review.update(dict(poi_review_schema.load(request_json, partial=True)))
             db.session.commit()
         else:
@@ -277,6 +294,10 @@ def delete_poi_review(poi_review_id):
         user = get_submitter(request_json["device_id"])
         poi_review = PointOfInterestReview.query.get(poi_review_id)
         if poi_review in user.poi_reviews:
+            poi = PointOfInterest.query.filter_by(id=poi_review.point_of_interest_id).first()
+            poi.average_rating = ((poi.average_rating * poi.rating_count) -
+                                  poi_review.rating) / (poi.rating_count - 1)
+            poi.rating_count = poi.rating_count - 1
             db.session.delete(poi_review)
             db.session.commit()
         else:
@@ -287,13 +308,21 @@ def delete_poi_review(poi_review_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/review/new", methods=["POST"])
+@posts.route("/paths/<path_id>/reviews/new", methods=["POST"])
 def add_path_review(path_id):
     try:
         path_review_schema = PathReviewSchema()
         request_json = request.get_json(force=True)["attributes"]
+        path = Path.query.filter_by(id=path_id).first()
+        if path.rating_count == 0:
+            path.average_rating = request_json["rating"]
+            path.rating_count = 1
+        else:
+            path.average_rating = ((path.average_rating * path.rating_count) + request_json["rating"]) / \
+                                  (path.rating_count + 1)
+            path.rating_count = path.rating_count + 1
         user = get_submitter(request_json["device_id"])
-        data = path_review_schema.load(request_json)
+        data = path_review_schema.load(request_json, partial=True)
         new_path_review = PathReview(**data, path_id=path_id, submitter=user.id, created_time=get_time())
         db.session.add(new_path_review)
         db.session.commit()
@@ -311,6 +340,9 @@ def edit_path_review(path_review_id):
         user = get_submitter(request_json["device_id"])
         path_review = PathReview.query.filter_by(id=path_review_id)
         if path_review.first() in user.path_reviews:
+            path = Path.query.filter_by(id=path_review.path_id).first()
+            path.average_rating = ((path.average_rating * path.rating_count) - path_review.rating +
+                                   request_json["rating"]) / path.rating_count
             path_review.update(dict(path_review_schema.load(request_json, partial=True)))
             db.session.commit()
         else:
@@ -328,6 +360,10 @@ def delete_path_review(path_review_id):
         user = get_submitter(request_json["device_id"])
         path_review = PathReview.query.get(path_review_id)
         if path_review in user.path_reviews:
+            path = Path.query.filter_by(id=path_review.path_id).first()
+            path.average_rating = ((path.average_rating * path.rating_count) -
+                                   path_review.rating) / (path.rating_count - 1)
+            path.rating_count = path.rating_count - 1
             db.session.delete(path_review)
             db.session.commit()
         else:
