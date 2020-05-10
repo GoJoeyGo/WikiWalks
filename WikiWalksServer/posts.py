@@ -24,6 +24,15 @@ def process_picture(file):
     return image, filename
 
 
+def update_boundaries(parent_id, boundaries):
+    parent = Path.query.filter_by(id=parent_id).first()
+    parent.boundaries = [min(parent.boundaries[0], boundaries[0]), min(parent.boundaries[1], boundaries[1]),
+                         max(parent.boundaries[2], boundaries[2]), max(parent.boundaries[3], boundaries[3])]
+    db.session.commit()
+    if parent.parent_path is not None:
+        update_boundaries(parent.parent_path, parent.boundaries)
+
+
 def get_submitter(device):
     user = User.query.filter_by(device_id=device).first()
     if user is None:
@@ -56,17 +65,14 @@ def add_path():
             new_path = Path(**data, submitter=user.id, walk_count=1, starting_point=starting_point,
                             ending_point=ending_point, boundaries=boundaries)
             db.session.add(new_path)
+            db.session.commit()
             if "parent_path" in request_json:
                 parent = Path.query.filter_by(id=request_json["parent_path"]).first()
                 if parent is not None and request_json["parent_path"] is not new_path.id:
-                    parent.boundaries = [min(parent.boundaries[0], boundaries[0]),
-                                         min(parent.boundaries[1], boundaries[1]),
-                                         max(parent.boundaries[2], boundaries[2]),
-                                         max(parent.boundaries[3], boundaries[3])]
+                    update_boundaries(request_json["parent_path"], boundaries)
                     parent.children.append(new_path)
                 else:
                     return jsonify({"status": "failed"}), 422
-            db.session.commit()
             return jsonify({"status": "success", "path": path_schema.dump(new_path)}), 201
         return jsonify({"status": "failed"}), 422
     except Exception as e:

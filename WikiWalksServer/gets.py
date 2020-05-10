@@ -17,7 +17,7 @@ def get_path(path_id):
 
 @gets.route("/paths/", methods=["GET"])
 def get_paths():
-    paths = Path.query.all()
+    paths = Path.query.filter(Path.parent_path.is_(None))
     north_boundary = request.args.get('n', default=90, type=float)
     south_boundary = request.args.get('s', default=-90, type=float)
     east_boundary = request.args.get('e', default=180, type=float)
