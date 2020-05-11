@@ -69,7 +69,7 @@ def add_path():
             user = get_submitter(request_json["device_id"])
             data = path_schema.load(request_json, partial=True)
             new_path = Path(**data, submitter=user.id, walk_count=1, starting_point=starting_point,
-                            ending_point=ending_point, boundaries=boundaries, rating_count=0)
+                            ending_point=ending_point, boundaries=boundaries, rating_count=0, average_rating=0.0)
             db.session.add(new_path)
             db.session.commit()
             if "parent_path" in request_json:
