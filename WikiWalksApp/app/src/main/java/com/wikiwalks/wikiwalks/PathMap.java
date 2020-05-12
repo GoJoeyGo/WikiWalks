@@ -9,6 +9,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,16 +33,18 @@ public class PathMap {
         return instance;
     }
 
-    public void updatePaths(float northBoundary, float westBoundary, float southBoundary, float eastBoundary, Activity activity, final PathCallback callback) {
+    public void updatePaths(GoogleMap map, Activity activity, final PathCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
-        final JsonObjectRequest paths = new JsonObjectRequest(Request.Method.GET, "http://192.168.0.50:5000/paths/", null, new Response.Listener<JSONObject>() {
+        LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
+        final JsonObjectRequest paths = new JsonObjectRequest(Request.Method.GET, String.format("http://192.168.0.50:5000/paths/?s=%f&w=%f&n=%f&e=%f", bounds.southwest.latitude, bounds.southwest.longitude, bounds.northeast.latitude, bounds.northeast.longitude), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+
                     JSONArray array = response.getJSONArray("paths");
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject pathJson = array.getJSONObject(i);
-                        if (pathJson.isNull("parent_path") || pathList.containsKey(pathJson.getInt("parent_path"))) {
+                        if (!pathList.containsKey(pathJson.getInt("id"))) {
                             pathList.put(pathJson.getInt("id"), new Path(pathJson));
                         }
                     }
