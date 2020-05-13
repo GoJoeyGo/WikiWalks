@@ -33,6 +33,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     Context context;
     FusedLocationProviderClient fusedLocationProviderClient;
     HashMap<Integer,Polyline> polylines = new HashMap<>();
+    boolean hasFailed = false;
 
     public static MapsFragment newInstance() {
         Bundle args = new Bundle();
@@ -88,7 +89,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
                     @Override
                     public void onFailure(String result) {
-                        Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
+                        if (!hasFailed) {
+                            hasFailed = true;
+                            Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }
