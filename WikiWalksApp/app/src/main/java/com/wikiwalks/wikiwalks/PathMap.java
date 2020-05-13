@@ -1,5 +1,6 @@
 package com.wikiwalks.wikiwalks;
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -23,6 +24,7 @@ public class PathMap {
 
     private static PathMap instance = null;
     private HashMap<Integer,Path> pathList = new HashMap<>();
+    private Context context;
 
     private PathMap() {};
 
@@ -36,7 +38,9 @@ public class PathMap {
     public void updatePaths(GoogleMap map, Activity activity, final PathCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
         LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
-        final JsonObjectRequest paths = new JsonObjectRequest(Request.Method.GET, String.format("http://192.168.0.50:5000/paths/?s=%f&w=%f&n=%f&e=%f", bounds.southwest.latitude, bounds.southwest.longitude, bounds.northeast.latitude, bounds.northeast.longitude), null, new Response.Listener<JSONObject>() {
+        String url = R.string.local_url + "/paths/?s=%f&w=%f&n=%f&e=%f";
+        Log.e("TEST", url);
+        final JsonObjectRequest paths = new JsonObjectRequest(Request.Method.GET, String.format(activity.getString(R.string.local_url) + "/paths/?s=%f&w=%f&n=%f&e=%f", bounds.southwest.latitude, bounds.southwest.longitude, bounds.northeast.latitude, bounds.northeast.longitude), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
