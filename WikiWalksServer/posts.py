@@ -36,7 +36,7 @@ def update_boundaries(parent_id):
                              max(parent.boundaries[3], child.boundaries[3])]
     db.session.commit()
     if parent.parent_path is not None:
-        update_boundaries(parent.parent_path, parent.boundaries)
+        update_boundaries(parent.parent_path)
 
 
 def get_submitter(device):
@@ -131,7 +131,8 @@ def add_poi():
         request_json["created_time"] = get_time()
         user = get_submitter(request_json["device_id"])
         data = poi_schema.load(request_json)
-        new_poi = PointOfInterest(**data, submitter=user.id, path=request_json["path"], rating_count=0)
+        new_poi = PointOfInterest(**data, submitter=user.id, path=request_json["path"], rating_count=0,
+                                  average_rating=0.0)
         db.session.add(new_poi)
         db.session.commit()
         return jsonify({"status": "success", "poi": poi_schema.dump(new_poi)}), 201
