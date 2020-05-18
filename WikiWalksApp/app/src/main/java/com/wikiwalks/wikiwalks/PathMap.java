@@ -38,8 +38,6 @@ public class PathMap {
     public void updatePaths(GoogleMap map, Activity activity, final PathCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(activity);
         LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
-        String url = R.string.local_url + "/paths/?s=%f&w=%f&n=%f&e=%f";
-        Log.e("TEST", url);
         final JsonObjectRequest paths = new JsonObjectRequest(Request.Method.GET, String.format(activity.getString(R.string.local_url) + "/paths/?s=%f&w=%f&n=%f&e=%f", bounds.southwest.latitude, bounds.southwest.longitude, bounds.northeast.latitude, bounds.northeast.longitude), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {

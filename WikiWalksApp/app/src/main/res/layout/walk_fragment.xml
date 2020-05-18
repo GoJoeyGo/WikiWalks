@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/walk_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorBackgroundFloating"
+        android:elevation="4dp"
+        app:contentInsetEnd="16dp"
+        app:contentInsetStart="16dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/walk_toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="@string/app_name"
+            android:textColor="?attr/colorOnBackground"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <fragment
+        android:id="@+id/walk_map_frag"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@id/walk_toolbar"
+        app:layout_constraintVertical_bias="1.0"
+        tools:context=".ui.main.MapsFragment" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/out_of_range_banner"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/banner_background"
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/walk_toolbar">
+
+        <TextView
+            android:id="@+id/off_track_static_text"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:text="You are off the track!"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingTop="10dp"/>
+
+        <TextView
+            android:id="@+id/off_track_variable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/off_track_static_text"
+            android:text="You are 0m off track!"/>
+
+        <ImageView
+            android:id="@+id/off_track_direction_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_arrow_upward_black_24dp"
+            tools:ignore="VectorDrawableCompat"
+            android:paddingBottom="10dp"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/button_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/split_path_button"
+            android:layout_width="167.5dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginBottom="25dp"
+            android:fontFamily="monospace"
+            android:text="SPLIT PATH"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/mark_poi_button"
+            android:layout_width="167.5dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginBottom="25dp"
+            android:fontFamily="monospace"
+            android:text="MARK POINT"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

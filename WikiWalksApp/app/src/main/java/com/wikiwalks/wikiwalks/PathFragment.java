@@ -46,8 +46,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback {
         walkPathButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText( getContext(),"Test" , Toast.LENGTH_SHORT)
-                        .show();
+                getFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path)).addToBackStack(null).commit();
             }
         });
         pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);

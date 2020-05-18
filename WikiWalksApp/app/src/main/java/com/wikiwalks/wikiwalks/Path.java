@@ -129,6 +129,22 @@ public class Path {
         return poiList;
     }
 
+    public ArrayList<Double> getAllLatitudes() {
+        ArrayList<Double> latitudeList = new ArrayList<>(latitudes);
+        for (Path child : childPaths) {
+            latitudeList.addAll(child.getAllLatitudes());
+        }
+        return latitudeList;
+    }
+
+    public ArrayList<Double> getAllLongitudes() {
+        ArrayList<Double> longitudeList = new ArrayList<>(longitudes);
+        for (Path child : childPaths) {
+            longitudeList.addAll(child.getAllLongitudes());
+        }
+        return longitudeList;
+    }
+
     public ArrayList<Double> getLatitudes() {
         return latitudes;
     }

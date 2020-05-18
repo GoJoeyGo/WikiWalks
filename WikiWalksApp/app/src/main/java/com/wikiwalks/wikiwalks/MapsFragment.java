@@ -14,6 +14,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -28,12 +29,11 @@ import java.util.Map;
 public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
-    Button createPathButton;
-    SupportMapFragment mapFragment;
-    Context context;
-    FusedLocationProviderClient fusedLocationProviderClient;
-    HashMap<Integer,Polyline> polylines = new HashMap<>();
-    boolean hasFailed = false;
+    private SupportMapFragment mapFragment;
+    private Context context;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private HashMap<Integer,Polyline> polylines = new HashMap<>();
+    private boolean hasFailed = false;
 
     public static MapsFragment newInstance() {
         Bundle args = new Bundle();
@@ -55,6 +55,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
@@ -62,6 +63,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
             }
         });
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
         final PathMap pathMap = PathMap.getInstance();
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
@@ -102,10 +105,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public boolean onMarkerClick(Marker marker) {
         Path path = PathMap.getInstance().getPathList().get(marker.getTag());
-        getFragmentManager().beginTransaction()
-                    .add(R.id.main_frame, PathFragment.newInstance(path)).addToBackStack(null)
-                    .commit();
-
+        getFragmentManager().beginTransaction().add(R.id.main_frame, PathFragment.newInstance(path)).addToBackStack(null).commit();
         return true;
     }
 
