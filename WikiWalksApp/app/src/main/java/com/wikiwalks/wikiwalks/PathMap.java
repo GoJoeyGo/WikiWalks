@@ -24,7 +24,6 @@ public class PathMap {
 
     private static PathMap instance = null;
     private HashMap<Integer,Path> pathList = new HashMap<>();
-    private Context context;
 
     private PathMap() {};
 
@@ -62,6 +61,14 @@ public class PathMap {
             }
         });
         requestQueue.add(paths);
+    }
+
+    public void addPath(Path path) {
+        pathList.put(path.getId(), path);
+    }
+
+    public void deletePath(Path path) {
+        pathList.remove(path.getId());
     }
 
     public HashMap<Integer,Path> getPathList() {
