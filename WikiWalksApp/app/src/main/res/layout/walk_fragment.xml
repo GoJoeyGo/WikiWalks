@@ -38,7 +38,7 @@
 
         app:layout_constraintTop_toBottomOf="@id/walk_toolbar"
         app:layout_constraintVertical_bias="1.0"
-        tools:context=".ui.main.MapsFragment" />
+        tools:context=".ui.main.WalkFragment" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/out_of_range_banner"

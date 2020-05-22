@@ -59,7 +59,8 @@ def add_path():
     try:
         path_schema = PathSchema()
         request_json = request.get_json(force=True)["attributes"]
-        if len(request_json["latitudes"]) == len(request_json["longitudes"]) and len(request_json["latitudes"]) > 2:
+        if len(request_json["latitudes"]) == len(request_json["longitudes"]) == len(request_json["altitudes"]) \
+                and len(request_json["latitudes"]) > 5:
             request_json["created_time"] = get_time()
             starting_point = [request_json["latitudes"][0], request_json["longitudes"][0]]
             ending_point = [request_json["latitudes"][len(request_json["latitudes"]) - 1],

@@ -36,7 +36,8 @@ import java.util.ArrayList;
 
 public class WalkFragment extends Fragment implements OnMapReadyCallback {
 
-
+    private boolean inRange = false;
+    private int closestPoint;
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private Context context;
@@ -46,6 +47,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     private ConstraintLayout outOfRangeBanner;
     TextView offTrackVariable;
     ImageView offTrackDirectionIndicator;
+    Button splitPathButton;
 
     public static WalkFragment newInstance(Path path) {
         Bundle args = new Bundle();
@@ -64,6 +66,20 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         outOfRangeBanner = rootView.findViewById(R.id.out_of_range_banner);
         offTrackVariable = rootView.findViewById(R.id.off_track_variable);
         offTrackDirectionIndicator = rootView.findViewById(R.id.off_track_direction_indicator);
+        splitPathButton = rootView.findViewById(R.id.split_path_button);
+        splitPathButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (closestPoint >= 0) {
+                    fusedLocationProviderClient.removeLocationUpdates(new LocationCallback());
+                    Double[] startingCoords = {path.getAllLatitudes().get(closestPoint), path.getAllLongitudes().get(closestPoint), path.getAllAltitudes().get(closestPoint)};
+                    getFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path, startingCoords)).addToBackStack(null).commit();
+                }
+                else {
+                    Toast.makeText(context, "You are too far away!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         context = getContext();
         return rootView;
     }
@@ -110,12 +126,13 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     private void onLocationChanged(Location location) {
         CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).bearing(location.getBearing()).zoom(20).build();
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
-        boolean inRange = false;
+        inRange = false;
         float shortestDistance[] = new float[3];
         ArrayList<Double> pathLatitudes = path.getAllLatitudes();
         ArrayList<Double> pathLongitudes = path.getAllLongitudes();
         for (int i = 0; i < pathLatitudes.size(); i++) {
             if (pathLatitudes.get(i) - 0.00005 < location.getLatitude() && location.getLatitude() < pathLatitudes.get(i) + 0.00005 && pathLongitudes.get(i) - 0.00005 < location.getLongitude() && location.getLongitude() < pathLongitudes.get(i) + 0.00005) {
+                closestPoint = i;
                 inRange = true;
                 break;
             }
@@ -130,6 +147,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
                     shortestDistance[1] = bearing;
                     shortestDistance[2] = i;
                 }
+                closestPoint = -1;
             }
         }
         if (!inRange) {

@@ -33,6 +33,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private HashMap<Integer,Polyline> polylines = new HashMap<>();
+    private Button createPath;
     private boolean hasFailed = false;
 
     public static MapsFragment newInstance() {
@@ -46,6 +47,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         super.onCreateView(inflater, container, savedInstanceState);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
+        createPath = rootView.findViewById(R.id.create_path_button);
+        createPath.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(null, null)).addToBackStack(null).commit();
+            }
+        });
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);
         mapFragment.getMapAsync(this);
         context = getContext();

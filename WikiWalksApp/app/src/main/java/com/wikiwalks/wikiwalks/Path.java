@@ -41,6 +41,7 @@ public class Path {
         for (int i = 0; i < pathJson.getJSONArray("latitudes").length(); i++) {
             latitudes.add(pathJson.getJSONArray("latitudes").getDouble(i));
             longitudes.add(pathJson.getJSONArray("longitudes").getDouble(i));
+            altitudes.add(pathJson.getJSONArray("altitudes").getDouble(i));
         }
         double south_bound = pathJson.getJSONArray("boundaries").getDouble(0);
         double west_bound = pathJson.getJSONArray("boundaries").getDouble(1);
@@ -143,6 +144,14 @@ public class Path {
             longitudeList.addAll(child.getAllLongitudes());
         }
         return longitudeList;
+    }
+
+    public ArrayList<Double> getAllAltitudes() {
+        ArrayList<Double> altitudeList = new ArrayList<>(altitudes);
+        for (Path child : childPaths) {
+            altitudeList.addAll(child.getAllLongitudes());
+        }
+        return altitudeList;
     }
 
     public ArrayList<Double> getLatitudes() {
