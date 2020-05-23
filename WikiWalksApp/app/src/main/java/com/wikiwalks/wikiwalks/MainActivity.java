@@ -5,8 +5,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,5 +64,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             finish();
         }
+    }
+
+    public static String getDeviceId(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences("preferences", MODE_PRIVATE);
+        if (!preferences.contains("device_id")) {
+            preferences.edit().putString("device_id", UUID.randomUUID().toString()).commit();
+        }
+        return preferences.getString("device_id", null);
     }
 }
