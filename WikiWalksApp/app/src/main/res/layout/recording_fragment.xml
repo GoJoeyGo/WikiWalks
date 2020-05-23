@@ -38,6 +38,7 @@
 
         app:layout_constraintTop_toBottomOf="@id/recording_toolbar"
         app:layout_constraintVertical_bias="1.0"
+        android:layout_marginBottom="?attr/actionBarSize"
         tools:context=".ui.main.RecordingFragment" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -118,6 +118,15 @@ public class Path {
         return childPaths;
     }
 
+    public ArrayList<Path> getAllChildPaths() {
+        ArrayList<Path> pathList = new ArrayList<>();
+        pathList.addAll(childPaths);
+        for (Path child : childPaths) {
+            pathList.addAll(child.getAllChildPaths());
+        }
+        return pathList;
+    }
+
     public ArrayList<PointOfInterest> getPointsOfInterest() {
         return pointsOfInterest;
     }
@@ -187,5 +196,14 @@ public class Path {
         else polyline.setColor(0xff000000);
         polyline.setWidth(20);
         return polyline;
+    }
+
+    public ArrayList<Polyline> makeAllPolyLines(GoogleMap map) {
+        ArrayList<Polyline> polylines = new ArrayList<>();
+        polylines.add(makePolyLine(map));
+        for (Path child : childPaths) {
+            polylines.addAll(child.makeAllPolyLines(map));
+        }
+        return polylines;
     }
 }

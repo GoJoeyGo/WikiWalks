@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -34,10 +35,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
-public class WalkFragment extends Fragment implements OnMapReadyCallback {
+public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleGestureDetector.OnScaleGestureListener {
 
     private boolean inRange = false;
-    private int closestPoint;
+    private boolean isRoute;
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private Context context;
@@ -47,13 +48,15 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     private ConstraintLayout outOfRangeBanner;
     TextView offTrackVariable;
     ImageView offTrackDirectionIndicator;
-    Button splitPathButton;
+    private ArrayList<Double> pathLatitudes;
+    private ArrayList<Double> pathLongitudes;
 
-    public static WalkFragment newInstance(Path path) {
+    public static WalkFragment newInstance(Path path, boolean isRoute) {
         Bundle args = new Bundle();
         WalkFragment fragment = new WalkFragment();
         fragment.setArguments(args);
         fragment.setPath(path);
+        fragment.setRoute(isRoute);
         return fragment;
     }
 
@@ -66,20 +69,6 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         outOfRangeBanner = rootView.findViewById(R.id.out_of_range_banner);
         offTrackVariable = rootView.findViewById(R.id.off_track_variable);
         offTrackDirectionIndicator = rootView.findViewById(R.id.off_track_direction_indicator);
-        splitPathButton = rootView.findViewById(R.id.split_path_button);
-        splitPathButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (closestPoint >= 0) {
-                    fusedLocationProviderClient.removeLocationUpdates(new LocationCallback());
-                    Double[] startingCoords = {path.getAllLatitudes().get(closestPoint), path.getAllLongitudes().get(closestPoint), path.getAllAltitudes().get(closestPoint)};
-                    getFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path, startingCoords)).addToBackStack(null).commit();
-                }
-                else {
-                    Toast.makeText(context, "You are too far away!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
         context = getContext();
         return rootView;
     }
@@ -91,14 +80,26 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setAllGesturesEnabled(false);
-        path.makePolyLine(mMap);
-        for (Path child : path.getChildPaths()) {
-            child.makePolyLine(mMap);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setScrollGesturesEnabledDuringRotateOrZoom(false);
+        mMap.getUiSettings().setCompassEnabled(false);
+        if (isRoute) {
+            path.makePolyLine(mMap);
+            pathLatitudes = path.getLatitudes();
+            pathLongitudes = path.getLongitudes();
+        } else {
+            Path parent = path;
+            while (parent.getParentPath() != null) {
+                parent = parent.getParentPath();
+            }
+            parent.makeAllPolyLines(mMap);
+            pathLatitudes = parent.getAllLatitudes();
+            pathLongitudes = parent.getAllLongitudes();
         }
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20));
             }
         });
         startLocationUpdates();
@@ -124,15 +125,12 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void onLocationChanged(Location location) {
-        CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).bearing(location.getBearing()).zoom(20).build();
+        CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom).bearing(location.getBearing()).build();
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
         inRange = false;
         float shortestDistance[] = new float[3];
-        ArrayList<Double> pathLatitudes = path.getAllLatitudes();
-        ArrayList<Double> pathLongitudes = path.getAllLongitudes();
         for (int i = 0; i < pathLatitudes.size(); i++) {
             if (pathLatitudes.get(i) - 0.00005 < location.getLatitude() && location.getLatitude() < pathLatitudes.get(i) + 0.00005 && pathLongitudes.get(i) - 0.00005 < location.getLongitude() && location.getLongitude() < pathLongitudes.get(i) + 0.00005) {
-                closestPoint = i;
                 inRange = true;
                 break;
             }
@@ -147,7 +145,6 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
                     shortestDistance[1] = bearing;
                     shortestDistance[2] = i;
                 }
-                closestPoint = -1;
             }
         }
         if (!inRange) {
@@ -158,5 +155,24 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         else {
             outOfRangeBanner.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public boolean onScale(ScaleGestureDetector detector) {
+        return false;
+    }
+
+    @Override
+    public boolean onScaleBegin(ScaleGestureDetector detector) {
+        return false;
+    }
+
+    @Override
+    public void onScaleEnd(ScaleGestureDetector detector) {
+
+    }
+
+    public void setRoute(boolean route) {
+        isRoute = route;
     }
 }

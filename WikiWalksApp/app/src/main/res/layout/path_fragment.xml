@@ -118,32 +118,50 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/path_frag_constraint"
+        android:id="@+id/walk_path_option_selector"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:background="@drawable/button_background"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="40dp">
+        android:padding="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
 
         <Button
-            android:id="@+id/walk_path_button"
+            android:id="@+id/select_route_button"
             android:layout_width="360dp"
             android:layout_height="50dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_marginBottom="25dp"
             android:fontFamily="monospace"
-            android:text="WALK PATH"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="SELECT ROUTE"
+            style="@style/ButtonTheme"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/new_route_button"
+            android:layout_width="360dp"
+            android:layout_height="50dp"
+            android:fontFamily="monospace"
+            android:text="RECORD NEW ROUTE"
+            style="@style/ButtonTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/select_route_button" />
+
+        <Button
+            android:id="@+id/explore_button"
+            android:layout_width="360dp"
+            android:layout_height="50dp"
+            android:fontFamily="monospace"
+            android:text="EXPLORE"
+            style="@style/ButtonTheme"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/new_route_button" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

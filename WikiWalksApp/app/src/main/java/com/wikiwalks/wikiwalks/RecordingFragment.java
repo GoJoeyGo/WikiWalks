@@ -1,6 +1,7 @@
 package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -26,12 +29,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
 public class RecordingFragment extends Fragment implements OnMapReadyCallback, SubmissionDialog.SubmissionDialogListener {
 
-    private Double[] startingPoint;
     private boolean recording = true;
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
@@ -47,12 +50,11 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private Location lastLocation;
 
-    public static RecordingFragment newInstance(Path path, Double[] startingPoint) {
+    public static RecordingFragment newInstance(Path path) {
         Bundle args = new Bundle();
         RecordingFragment fragment = new RecordingFragment();
         fragment.setArguments(args);
         fragment.setParentPath(path);
-        fragment.setStartingPoint(startingPoint);
         return fragment;
     }
 
@@ -68,10 +70,46 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
                     fusedLocationProviderClient.removeLocationUpdates(new LocationCallback());
                     recording = false;
                     stopRecordingButton.setText("RESUME RECORDING");
-                    showSubmissionDialog();
+                    if (parentPath != null) {
+                        boolean inRange = false;
+                        float shortestDistance[] = new float[3];
+                        ArrayList<Double> pathLatitudes = parentPath.getAllLatitudes();
+                        ArrayList<Double> pathLongitudes = parentPath.getAllLongitudes();
+                        for (int i = 0; i < pathLatitudes.size(); i++) {
+                            if (pathLatitudes.get(i) - 0.00005 < lastLocation.getLatitude() && lastLocation.getLatitude() < pathLatitudes.get(i) + 0.00005 && pathLongitudes.get(i) - 0.00005 < lastLocation.getLongitude() && lastLocation.getLongitude() < pathLongitudes.get(i) + 0.00005) {
+                                inRange = true;
+                                break;
+                            }
+                        }
+                        if (!inRange) {
+                            new MaterialAlertDialogBuilder(context).setTitle("Make new path?").setMessage("Your route does not connect to the path and cannot be submitted. Make it a new path instead?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    parentPath = null;
+                                    showSubmissionDialog();
+                                }
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            }).show();
+                        } else showSubmissionDialog();
+                    } else showSubmissionDialog();
+
                 } else {
-                    stopRecordingButton.setText("STOP RECORDING");
-                    startLocationUpdates();
+                    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location.distanceTo(lastLocation) < 15) {
+                                stopRecordingButton.setText("STOP RECORDING");
+                                startLocationUpdates();
+                            } else {
+                                Toast.makeText(context, "Too far away from last point to resume!", Toast.LENGTH_SHORT);
+                            }
+                        }
+                    });
+
                 }
             }
         });
@@ -86,28 +124,27 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setAllGesturesEnabled(false);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setScrollGesturesEnabledDuringRotateOrZoom(false);
+        mMap.getUiSettings().setCompassEnabled(false);
         if (parentPath != null) {
-            latitudes.add(startingPoint[0]);
-            longitudes.add(startingPoint[1]);
-            altitudes.add(startingPoint[2]);
-            latLngs.add(new LatLng(startingPoint[0], startingPoint[1]));
             parentPath.makePolyLine(mMap);
-            Path parentParent = parentPath.getParentPath();
-            while (parentParent != null) {
-                parentParent.makePolyLine(mMap);
-                parentParent = parentParent.getParentPath();
-            }
-            for (Path child : parentPath.getChildPaths()) {
-                child.makePolyLine(mMap);
-            }
+            if (parentPath.getParentPath() != null) {
+                Path parentParent = parentPath.getParentPath();
+                while (parentParent.getParentPath() != null) {
+                    parentParent = parentParent.getParentPath();
+                }
+                parentParent.makeAllPolyLines(mMap);
+            } else parentPath.makeAllPolyLines(mMap);
         }
         polyline = mMap.addPolyline(new PolylineOptions());
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20));
             }
         });
         startLocationUpdates();
@@ -144,7 +181,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         }
 
 
-        CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).bearing(location.getBearing()).zoom(20).build();
+        CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom).bearing(location.getBearing()).build();
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
 
         polyline.setPoints(latLngs);
@@ -168,9 +205,5 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     @Override
     public void onNegativeClick() {
 
-    }
-
-    public void setStartingPoint(Double[] startingPoint) {
-        this.startingPoint = startingPoint;
     }
 }

@@ -11,6 +11,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,10 +23,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class PathFragment extends Fragment implements OnMapReadyCallback {
 
-    Button walkPathButton;
+    Button selectRouteButton;
+    Button recordRouteButton;
+    Button exploreButton;
     SupportMapFragment mapFragment;
     private GoogleMap pathPreviewMap;
     Path path;
+    ConstraintLayout walkPathOptions;
     Button pointOfInterestButton;
     RatingBar ratingBar;
 
@@ -42,11 +46,29 @@ public class PathFragment extends Fragment implements OnMapReadyCallback {
         final View rootView = inflater.inflate(R.layout.path_fragment, container, false);
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
         mapFragment.getMapAsync(this);
-        walkPathButton = rootView.findViewById(R.id.walk_path_button);
-        walkPathButton.setOnClickListener(new View.OnClickListener() {
+        walkPathOptions = rootView.findViewById(R.id.walk_path_option_selector);
+        selectRouteButton = rootView.findViewById(R.id.select_route_button);
+        if (path.getChildPaths().size() == 0) selectRouteButton.setText("WALK PATH");
+        selectRouteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path)).addToBackStack(null).commit();
+                if (path.getChildPaths().size() == 0) {
+                    getFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path, true)).addToBackStack(null).commit();
+                } else getFragmentManager().beginTransaction().add(R.id.main_frame, RouteListFragment.newInstance(path)).addToBackStack(null).commit();
+            }
+        });
+        recordRouteButton = rootView.findViewById(R.id.new_route_button);
+        recordRouteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path)).addToBackStack(null).commit();
+            }
+        });
+        exploreButton = rootView.findViewById(R.id.explore_button);
+        exploreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path, false)).addToBackStack(null).commit();
             }
         });
         pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);

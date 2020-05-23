@@ -51,7 +51,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         createPath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(null, null)).addToBackStack(null).commit();
+                getFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(null)).addToBackStack(null).commit();
             }
         });
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);
@@ -64,7 +64,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
