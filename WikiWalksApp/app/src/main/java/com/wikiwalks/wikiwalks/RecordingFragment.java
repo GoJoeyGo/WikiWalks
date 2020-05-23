@@ -50,6 +50,14 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private Location lastLocation;
 
+    LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            super.onLocationResult(locationResult);
+            onLocationChanged(locationResult.getLastLocation());
+        }
+    };
+
     public static RecordingFragment newInstance(Path path) {
         Bundle args = new Bundle();
         RecordingFragment fragment = new RecordingFragment();
@@ -67,7 +75,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
             @Override
             public void onClick(View v) {
                 if (recording) {
-                    fusedLocationProviderClient.removeLocationUpdates(new LocationCallback());
+                    fusedLocationProviderClient.removeLocationUpdates(locationCallback);
                     recording = false;
                     stopRecordingButton.setText("RESUME RECORDING");
                     if (parentPath != null) {
@@ -75,10 +83,16 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
                         float shortestDistance[] = new float[3];
                         ArrayList<Double> pathLatitudes = parentPath.getAllLatitudes();
                         ArrayList<Double> pathLongitudes = parentPath.getAllLongitudes();
+                        ArrayList<Double> pathAltitudes = parentPath.getAllAltitudes();
                         for (int i = 0; i < pathLatitudes.size(); i++) {
-                            if (pathLatitudes.get(i) - 0.00005 < lastLocation.getLatitude() && lastLocation.getLatitude() < pathLatitudes.get(i) + 0.00005 && pathLongitudes.get(i) - 0.00005 < lastLocation.getLongitude() && lastLocation.getLongitude() < pathLongitudes.get(i) + 0.00005) {
-                                inRange = true;
-                                break;
+                            for (int j = 0; j < latitudes.size(); j++) {
+                                if (pathLatitudes.get(i) - 0.00005 < latitudes.get(j) && latitudes.get(j) < pathLatitudes.get(i) + 0.00005 && pathLongitudes.get(i) - 0.00005 < longitudes.get(j) && longitudes.get(j) < pathLongitudes.get(i) + 0.00005) {
+                                    latitudes.add(j, pathLatitudes.get(i));
+                                    longitudes.add(j, pathLongitudes.get(i));
+                                    altitudes.add(j, pathAltitudes.get(i));
+                                    inRange = true;
+                                    break;
+                                }
                             }
                         }
                         if (!inRange) {
@@ -158,16 +172,10 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         recording = true;
         locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(3000);
+        locationRequest.setInterval(3000);
+        locationRequest.setFastestInterval(1000);
 
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                onLocationChanged(locationResult.getLastLocation());
-            }
-        }, Looper.myLooper());
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
     }
 
     private void onLocationChanged(Location location) {
@@ -199,7 +207,8 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
             title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
         }
         Toast.makeText(context, title, Toast.LENGTH_SHORT).show();
-
+        Path newPath = new Path(title, latitudes, longitudes, altitudes, parentPath);
+        newPath.submit(context);
     }
 
     @Override

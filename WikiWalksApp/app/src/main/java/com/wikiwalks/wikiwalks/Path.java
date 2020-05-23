@@ -50,6 +50,7 @@ public class Path {
         this.altitudes = altitudes;
         this.isNew = true;
         this.parentPath = parentPath;
+        isNew = true;
     }
 
     public Path(JSONObject pathJson) throws JSONException {
@@ -242,7 +243,7 @@ public class Path {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         final Path path = this;
         String url =  context.getString(R.string.local_url);
-        url = (isNew) ? url + String.format("/paths/%d/edit", id) : url + "/paths/new";
+        url = (!isNew) ? url + String.format("/paths/%d/edit", id) : url + "/paths/new";
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
