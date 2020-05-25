@@ -64,12 +64,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
-            }
-        });
+        setMapLocation();
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
@@ -114,6 +109,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         Path path = PathMap.getInstance().getPathList().get(marker.getTag());
         getFragmentManager().beginTransaction().add(R.id.main_frame, PathFragment.newInstance(path)).addToBackStack(null).commit();
         return true;
+    }
+
+    public void setMapLocation() {
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                else setMapLocation();
+            }
+        });
     }
 
 }
