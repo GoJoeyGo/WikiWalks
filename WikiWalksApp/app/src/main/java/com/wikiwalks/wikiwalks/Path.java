@@ -239,7 +239,8 @@ public class Path {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void submit(final Context context) {
+    public void submit(final RecordingFragment recordingFragment) {
+        final Context context = recordingFragment.getContext();
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         final Path path = this;
         String url =  context.getString(R.string.local_url);
@@ -274,6 +275,7 @@ public class Path {
                         }
                         PathMap.getInstance().addPath(path);
                         Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
+                        recordingFragment.getActivity().getSupportFragmentManager().popBackStackImmediate();
                     } catch (JSONException e) {
                         Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                         Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));

@@ -3,6 +3,7 @@ package com.wikiwalks.wikiwalks;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -80,20 +81,22 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
                     stopRecordingButton.setText("RESUME RECORDING");
                     if (parentPath != null) {
                         boolean inRange = false;
-                        float shortestDistance[] = new float[3];
                         ArrayList<Double> pathLatitudes = parentPath.getAllLatitudes();
                         ArrayList<Double> pathLongitudes = parentPath.getAllLongitudes();
-                        ArrayList<Double> pathAltitudes = parentPath.getAllAltitudes();
                         for (int i = 0; i < pathLatitudes.size(); i++) {
+                            Location pathLocation = new Location(LocationManager.GPS_PROVIDER);
+                            pathLocation.setLatitude(pathLatitudes.get(i));
+                            pathLocation.setLongitude(pathLongitudes.get(i));
                             for (int j = 0; j < latitudes.size(); j++) {
-                                if (pathLatitudes.get(i) - 0.00005 < latitudes.get(j) && latitudes.get(j) < pathLatitudes.get(i) + 0.00005 && pathLongitudes.get(i) - 0.00005 < longitudes.get(j) && longitudes.get(j) < pathLongitudes.get(i) + 0.00005) {
-                                    latitudes.add(j, pathLatitudes.get(i));
-                                    longitudes.add(j, pathLongitudes.get(i));
-                                    altitudes.add(j, pathAltitudes.get(i));
+                                Location newLocation = new Location(LocationManager.GPS_PROVIDER);
+                                newLocation.setLatitude(latitudes.get(j));
+                                newLocation.setLongitude(longitudes.get(j));
+                                if (pathLocation.distanceTo(newLocation) < 10) {
                                     inRange = true;
                                     break;
                                 }
                             }
+                            if (inRange) break;
                         }
                         if (!inRange) {
                             new MaterialAlertDialogBuilder(context).setTitle("Make new path?").setMessage("Your route does not connect to the path and cannot be submitted. Make it a new path instead?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -206,9 +209,8 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         if (title.equals("")) {
             title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
         }
-        Toast.makeText(context, title, Toast.LENGTH_SHORT).show();
         Path newPath = new Path(title, latitudes, longitudes, altitudes, parentPath);
-        newPath.submit(context);
+        newPath.submit(this);
     }
 
     @Override
