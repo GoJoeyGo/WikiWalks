@@ -1,0 +1,57 @@
+Changelog:
+
+Bullet point refix code:
+- Tyler
+* Joey
+~ Sanjay
+
+Architecture:
+- Fixed grammar
+- Reworded goals and philosophies as it did not clearly explain 
+- Removed reference to waterfall as that's not what we're using
+- Made architectural goal reasoning more clear as it was worded confusingly
+- Changed phone in assumptions to device, as it will also work on tablets
+- Added adding paths to the database to significant requirements
+- Improved wording of rejecting bad path data
+- Removed setting POI as destination as that is not a priority and could be too difficult to implement in a proper way in the timeframe
+- Clarified that the database will be SQLite
+- Clarified GitHub usage as it was too vague
+- Reworded low power decision as it was worded confusingly
+- Changed "navigate to" feature to just selecting different pre-recorded routes as a proper "navigate to" feature may take too long to implement properly
+- Changed references to the database storing PathMaps to just paths as PathMap will instead be a local class for storing paths on the app
+- Completely reworded backups section as it was not accurate
+- Changed why removing paths will be implemented
+- Reworded security reasoning as it wasn't written clearly
+- Changed front-end and back-end definitions as they are not used as described, and instead just synonyms for the app and the server
+- Removed PathMap from abstraction as it is no longer mentioned, and removed app because it's obvious
+- Changed key labelling
+
+Master Test Plan:
+- Changed testing schedule for adding and getting paths to final iteration of LCAM
+- Added additional path data tests to plan
+
+Project Plan:
+- Added that Joey is team leader
+- Changed roles to experience as there's not really specific roles when it comes to the programming
+- Removed Isaac as scribe as he's no longer in the team
+- Changed "one or two week" iterations to just two weeks as there will not be single week iterations
+- Reworded iteration monitoring as it was unclear
+- Made back-end deployment more clear as it was very vague
+- Added phase status assessments to iteration table
+- Added walking UI to iteration table
+- Added basic user acceptance tests to iteration table
+- Changed server dependency to be more specific
+
+Risk List:
+Unchanged
+
+Requirement Model:
+Unchanged
+
+Vision:
+- Clarified more on information saved as it was not detailed
+- Clarified task cycles length as it was not clear
+- Reworded constraints as the grammar was way off
+- Gave specific integrations for the back-end instead of a "such as"
+- Removed specific roles for back/front-end as this didn't end up being the case and all team members are working on all parts
+- Included points of interest in features
