@@ -32,15 +32,12 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final Path path = routeList.get(position);
         holder.button.setText(path.getName());
-        holder.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (Button button : buttons) {
-                    button.setBackgroundColor(0x00000000);
-                }
-                holder.button.setBackgroundColor(0xFF777777);
-                context.selectRoute(position);
+        holder.button.setOnClickListener(v -> {
+            for (Button button : buttons) {
+                button.setBackgroundColor(0x00000000);
             }
+            holder.button.setBackgroundColor(0xFF777777);
+            context.selectRoute(position);
         });
         buttons.add(holder.button);
     }

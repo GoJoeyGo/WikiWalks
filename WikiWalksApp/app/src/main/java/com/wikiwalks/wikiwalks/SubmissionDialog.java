@@ -21,8 +21,8 @@ import com.google.android.material.textview.MaterialTextView;
 public class SubmissionDialog extends DialogFragment {
 
     public interface SubmissionDialogListener {
-        public void onPositiveClick(String title);
-        public void onNegativeClick();
+        void onPositiveClick(String title);
+        void onNegativeClick();
     }
 
     SubmissionDialogListener listener;
@@ -38,20 +38,14 @@ public class SubmissionDialog extends DialogFragment {
         View view = inflater.inflate(R.layout.submission_popup, null);
         title = view.findViewById(R.id.submit_path_name);
         submitButton = view.findViewById(R.id.submit_popup_submit_button);
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SubmissionDialog.this.getDialog().dismiss();
-                listener.onPositiveClick(title.getEditText().getText().toString());
-            }
+        submitButton.setOnClickListener(v -> {
+            SubmissionDialog.this.getDialog().dismiss();
+            listener.onPositiveClick(title.getEditText().getText().toString());
         });
         cancelButton = view.findViewById(R.id.submit_popup_cancel_button);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SubmissionDialog.this.getDialog().cancel();
-                listener.onNegativeClick();
-            }
+        cancelButton.setOnClickListener(v -> {
+            SubmissionDialog.this.getDialog().cancel();
+            listener.onNegativeClick();
         });
         builder.setView(view);
         return builder.create();

@@ -16,10 +16,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class RouteListFragment extends Fragment implements OnMapReadyCallback {
@@ -83,11 +81,6 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
         }
         polylines.get(position).setVisible(true);
         selectRouteButton.setEnabled(true);
-        selectRouteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(pathList.get(position), true)).addToBackStack(null).commit();
-            }
-        });
+        selectRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(pathList.get(position), true)).addToBackStack(null).commit());
     }
 }

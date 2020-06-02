@@ -1,22 +1,21 @@
 package com.wikiwalks.wikiwalks;
 
+import android.Manifest;
 import android.content.Context;
-import android.hardware.GeomagneticField;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,21 +29,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
 public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleGestureDetector.OnScaleGestureListener {
 
-    private boolean inRange = false;
     private boolean isRoute;
     private GoogleMap mMap;
-    private SupportMapFragment mapFragment;
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
-    private LocationRequest locationRequest;
     private ConstraintLayout outOfRangeBanner;
     TextView offTrackVariable;
     ImageView offTrackDirectionIndicator;
@@ -64,7 +58,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleG
         super.onCreateView(inflater, container, savedInstanceState);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.walk_fragment, container, false);
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
+        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
         mapFragment.getMapAsync(this);
         outOfRangeBanner = rootView.findViewById(R.id.out_of_range_banner);
         offTrackVariable = rootView.findViewById(R.id.off_track_variable);
@@ -78,6 +72,10 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleG
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setAllGesturesEnabled(false);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
@@ -96,12 +94,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleG
             pathLatitudes = parent.getAllLatitudes();
             pathLongitudes = parent.getAllLongitudes();
         }
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20));
-            }
-        });
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20)));
         startLocationUpdates();
     }
 
@@ -110,16 +103,19 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleG
     }
 
     private void startLocationUpdates() {
-        locationRequest = new LocationRequest();
+        LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(1000);
         locationRequest.setFastestInterval(500);
 
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-               onLocationChanged(locationResult.getLastLocation());
+                onLocationChanged(locationResult.getLastLocation());
             }
         }, Looper.myLooper());
     }
@@ -127,8 +123,8 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleG
     private void onLocationChanged(Location location) {
         CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom).bearing(location.getBearing()).build();
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
-        inRange = false;
-        float shortestDistance[] = new float[3];
+        boolean inRange = false;
+        float[] shortestDistance = new float[3];
         for (int i = 0; i < pathLatitudes.size(); i++) {
             if (pathLatitudes.get(i) - 0.00005 < location.getLatitude() && location.getLatitude() < pathLatitudes.get(i) + 0.00005 && pathLongitudes.get(i) - 0.00005 < location.getLongitude() && location.getLongitude() < pathLongitudes.get(i) + 0.00005) {
                 inRange = true;

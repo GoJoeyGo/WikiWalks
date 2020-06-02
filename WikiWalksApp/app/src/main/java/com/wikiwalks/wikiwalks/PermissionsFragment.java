@@ -28,13 +28,7 @@ public class PermissionsFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.permissions_fragment, container, false);
         permissionsButton = rootView.findViewById(R.id.permissions_button);
-        permissionsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName())));
-
-            }
-        });
+        permissionsButton.setOnClickListener(v -> startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()))));
         return rootView;
     }
 
@@ -43,14 +37,7 @@ public class PermissionsFragment extends Fragment {
         super.onResume();
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Handler handler = new Handler();
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    getFragmentManager().beginTransaction()
-                            .replace(R.id.main_frame, MapsFragment.newInstance())
-                            .commitNow();
-                }
-            });
+            handler.post(() -> getParentFragmentManager().beginTransaction().replace(R.id.main_frame, MapsFragment.newInstance()).commitNow());
         }
     }
 

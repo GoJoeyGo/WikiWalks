@@ -1,7 +1,6 @@
 package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -12,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -29,20 +26,17 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
-public class RecordingFragment extends Fragment implements OnMapReadyCallback, SubmissionDialog.SubmissionDialogListener {
+public class RecordingFragment extends Fragment implements OnMapReadyCallback, SubmissionDialog.SubmissionDialogListener, PathCallback {
 
     private boolean recording = true;
-    private GoogleMap mMap;
-    private SupportMapFragment mapFragment;
+    GoogleMap mMap;
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path parentPath;
-    private LocationRequest locationRequest;
     private Button stopRecordingButton;
     private Polyline polyline;
     private ArrayList<Double> latitudes = new ArrayList<>();
@@ -50,6 +44,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     private ArrayList<Double> altitudes = new ArrayList<>();
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private Location lastLocation;
+    Path newPath;
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -72,65 +67,53 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.recording_fragment, container, false);
         stopRecordingButton = rootView.findViewById(R.id.stop_recording_button);
-        stopRecordingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (recording) {
-                    fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-                    recording = false;
-                    stopRecordingButton.setText("RESUME RECORDING");
-                    if (parentPath != null) {
-                        boolean inRange = false;
-                        ArrayList<Double> pathLatitudes = parentPath.getAllLatitudes();
-                        ArrayList<Double> pathLongitudes = parentPath.getAllLongitudes();
-                        for (int i = 0; i < pathLatitudes.size(); i++) {
-                            Location pathLocation = new Location(LocationManager.GPS_PROVIDER);
-                            pathLocation.setLatitude(pathLatitudes.get(i));
-                            pathLocation.setLongitude(pathLongitudes.get(i));
-                            for (int j = 0; j < latitudes.size(); j++) {
-                                Location newLocation = new Location(LocationManager.GPS_PROVIDER);
-                                newLocation.setLatitude(latitudes.get(j));
-                                newLocation.setLongitude(longitudes.get(j));
-                                if (pathLocation.distanceTo(newLocation) < 10) {
-                                    inRange = true;
-                                    break;
-                                }
+        stopRecordingButton.setOnClickListener(v -> {
+            if (recording) {
+                fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+                recording = false;
+                stopRecordingButton.setText("RESUME RECORDING");
+                if (parentPath != null) {
+                    boolean inRange = false;
+                    ArrayList<Double> pathLatitudes = parentPath.getAllLatitudes();
+                    ArrayList<Double> pathLongitudes = parentPath.getAllLongitudes();
+                    for (int i = 0; i < pathLatitudes.size(); i++) {
+                        Location pathLocation = new Location(LocationManager.GPS_PROVIDER);
+                        pathLocation.setLatitude(pathLatitudes.get(i));
+                        pathLocation.setLongitude(pathLongitudes.get(i));
+                        for (int j = 0; j < latitudes.size(); j++) {
+                            Location newLocation = new Location(LocationManager.GPS_PROVIDER);
+                            newLocation.setLatitude(latitudes.get(j));
+                            newLocation.setLongitude(longitudes.get(j));
+                            if (pathLocation.distanceTo(newLocation) < 10) {
+                                inRange = true;
+                                break;
                             }
-                            if (inRange) break;
                         }
-                        if (!inRange) {
-                            new MaterialAlertDialogBuilder(context).setTitle("Make new path?").setMessage("Your route does not connect to the path and cannot be submitted. Make it a new path instead?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    parentPath = null;
-                                    showSubmissionDialog();
-                                }
-                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                        if (inRange) break;
+                    }
+                    if (!inRange) {
+                        new MaterialAlertDialogBuilder(context).setTitle("Make new path?").setMessage("Your route does not connect to the path and cannot be submitted. Make it a new path instead?").setPositiveButton("Yes", (dialog, which) -> {
+                            parentPath = null;
+                            showSubmissionDialog();
+                        }).setNegativeButton("No", (dialog, which) -> {
 
-                                }
-                            }).show();
-                        } else showSubmissionDialog();
+                        }).show();
                     } else showSubmissionDialog();
+                } else showSubmissionDialog();
+            } else {
+                MainActivity.checkLocationPermission(this.getActivity());
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                    if (location.distanceTo(lastLocation) < 15) {
+                        stopRecordingButton.setText("STOP RECORDING");
+                        startLocationUpdates();
+                    } else {
+                        Toast.makeText(context, "Too far away from last point to resume!", Toast.LENGTH_SHORT);
+                    }
+                });
 
-                } else {
-                    fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location.distanceTo(lastLocation) < 15) {
-                                stopRecordingButton.setText("STOP RECORDING");
-                                startLocationUpdates();
-                            } else {
-                                Toast.makeText(context, "Too far away from last point to resume!", Toast.LENGTH_SHORT);
-                            }
-                        }
-                    });
-
-                }
             }
         });
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
+        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
         mapFragment.getMapAsync(this);
         context = getContext();
         return rootView;
@@ -141,7 +124,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-
+        MainActivity.checkLocationPermission(this.getActivity());
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setAllGesturesEnabled(false);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
@@ -158,12 +141,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
             } else parentPath.makeAllPolyLines(mMap);
         }
         polyline = mMap.addPolyline(new PolylineOptions());
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20));
-            }
-        });
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20)));
         startLocationUpdates();
     }
 
@@ -173,16 +151,24 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
 
     private void startLocationUpdates() {
         recording = true;
-        locationRequest = new LocationRequest();
+        LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(3000);
         locationRequest.setFastestInterval(1000);
-
+        MainActivity.checkLocationPermission(this.getActivity());
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
     }
 
-    private void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location) {
+        addLocation(location);
 
+        CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom).bearing(location.getBearing()).build();
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+
+        polyline.setPoints(latLngs);
+    }
+
+    public void addLocation(Location location) {
         if (lastLocation == null || location.distanceTo(lastLocation) > 2) {
             latitudes.add(location.getLatitude());
             longitudes.add(location.getLongitude());
@@ -190,12 +176,14 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
             latLngs.add(new LatLng(location.getLatitude(), location.getLongitude()));
             lastLocation = location;
         }
+    }
 
-
-        CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom).bearing(location.getBearing()).build();
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
-
-        polyline.setPoints(latLngs);
+    public Path createPath(String title) {
+        if (title.equals("")) {
+            title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
+        }
+        newPath = new Path(title, latitudes, longitudes, altitudes, parentPath);
+        return newPath;
     }
 
     public void showSubmissionDialog() {
@@ -206,15 +194,22 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
 
     @Override
     public void onPositiveClick(String title) {
-        if (title.equals("")) {
-            title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
-        }
-        Path newPath = new Path(title, latitudes, longitudes, altitudes, parentPath);
-        newPath.submit(this);
+        createPath(title);
+        newPath.submit(this.getContext(), this);
     }
 
     @Override
     public void onNegativeClick() {
 
+    }
+
+    @Override
+    public void onSuccess(String result) {
+        getParentFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onFailure(String result) {
+        Toast.makeText(getContext(), "Failed to submit...", Toast.LENGTH_SHORT).show();
     }
 }
