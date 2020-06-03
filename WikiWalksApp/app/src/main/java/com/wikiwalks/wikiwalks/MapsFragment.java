@@ -24,7 +24,7 @@ import com.google.android.gms.maps.model.Polyline;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, PathMap.PathMapListener {
 
     GoogleMap mMap;
     private SupportMapFragment mapFragment;
@@ -63,34 +63,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
         final PathMap pathMap = PathMap.getInstance();
-        mMap.setOnCameraIdleListener(() -> pathMap.updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getActivity(), new PathCallback() {
-            @Override
-            public void onSuccess(String result) {
-                HashMap<Integer, Path> paths = pathMap.getPathList();
-                for (Map.Entry<Integer, Path> pathEntry : paths.entrySet()) {
-                    if (!polylines.containsKey(pathEntry.getKey())) {
-                        Path path = pathEntry.getValue();
-                        LatLng startingPoint = new LatLng(path.getLatitudes().get(0), path.getLongitudes().get(0));
-                        Polyline polyline = path.makePolyLine(mMap);
-                        polylines.put(pathEntry.getKey(), polyline);
-                        if (path.getParentPath() == null) {
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(startingPoint));
-                            marker.setTag(path.getId());
-                            marker.setTitle(path.getName());
-                        }
-                    }
-
-                }
-            }
-
-            @Override
-            public void onFailure(String result) {
-                if (!hasFailed) {
-                    hasFailed = true;
-                    Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
-                }
-            }
-        }));
+        pathMap.addListener(this);
+        mMap.setOnCameraIdleListener(() -> pathMap.updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getActivity()));
     }
 
     @Override
@@ -108,4 +82,31 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         });
     }
 
+    @Override
+    public void OnPathMapChange() {
+        PathMap pathMap = PathMap.getInstance();
+        HashMap<Integer, Path> paths = pathMap.getPathList();
+        for (Map.Entry<Integer, Path> pathEntry : paths.entrySet()) {
+            if (!polylines.containsKey(pathEntry.getKey())) {
+                Path path = pathEntry.getValue();
+                LatLng startingPoint = new LatLng(path.getLatitudes().get(0), path.getLongitudes().get(0));
+                Polyline polyline = path.makePolyLine(mMap);
+                polylines.put(pathEntry.getKey(), polyline);
+                if (path.getParentPath() == null) {
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(startingPoint));
+                    marker.setTag(path.getId());
+                    marker.setTitle(path.getName());
+                }
+            }
+
+        }
+    }
+
+    @Override
+    public void OnPathMapUpdateFailure() {
+        if (!hasFailed) {
+            hasFailed = true;
+            Toast.makeText(getContext(), "Failed to get paths...", Toast.LENGTH_LONG).show();
+        }
+    }
 }

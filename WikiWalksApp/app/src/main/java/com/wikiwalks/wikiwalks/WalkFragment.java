@@ -32,7 +32,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
-public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleGestureDetector.OnScaleGestureListener {
+public class WalkFragment extends Fragment implements OnMapReadyCallback {
 
     private boolean isRoute;
     private GoogleMap mMap;
@@ -151,21 +151,6 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, ScaleG
         else {
             outOfRangeBanner.setVisibility(View.INVISIBLE);
         }
-    }
-
-    @Override
-    public boolean onScale(ScaleGestureDetector detector) {
-        return false;
-    }
-
-    @Override
-    public boolean onScaleBegin(ScaleGestureDetector detector) {
-        return false;
-    }
-
-    @Override
-    public void onScaleEnd(ScaleGestureDetector detector) {
-
     }
 
     public void setRoute(boolean route) {

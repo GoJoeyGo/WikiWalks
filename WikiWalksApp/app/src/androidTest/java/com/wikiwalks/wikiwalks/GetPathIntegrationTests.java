@@ -47,7 +47,7 @@ public class GetPathIntegrationTests {
     @Test
     public void getAllPaths() throws InterruptedException {
         bounds = new LatLngBounds(new LatLng(-90, -180), new LatLng(90, 179));
-        pathMap.updatePaths(bounds, appContext, mock(PathCallback.class));
+        pathMap.updatePaths(bounds, appContext);
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         assertTrue(bounds.northeast.longitude == 180);
     }
@@ -55,7 +55,7 @@ public class GetPathIntegrationTests {
     @Test
     public void getSomePaths() throws InterruptedException {
         bounds = new LatLngBounds(new LatLng(-28, 152), new LatLng(-27, 153));
-        pathMap.updatePaths(bounds, appContext, mock(PathCallback.class));
+        pathMap.updatePaths(bounds, appContext);
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         boolean inRange = true;
         for (Map.Entry<Integer, Path> pathEntry : pathMap.getPathList().entrySet()) {

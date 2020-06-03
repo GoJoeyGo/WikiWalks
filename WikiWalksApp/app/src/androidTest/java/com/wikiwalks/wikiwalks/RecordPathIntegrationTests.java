@@ -24,9 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockingDetails;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -67,7 +64,7 @@ public class RecordPathIntegrationTests {
         fragment.addLocation(exampleLocations[1]);
         fragment.addLocation(exampleLocations[2]);
         Path path = fragment.createPath("Test Path");
-        path.submit(appContext, mock(PathCallback.class));
+        path.submit(appContext, mock(Path.PathRequestCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         assertTrue(path.getName().equals("Test Path") && path.getLatitudes().get(1).equals(exampleLocations[1].getLatitude()) && PathMap.getInstance().getPathList().containsValue(path));
     }
@@ -79,7 +76,7 @@ public class RecordPathIntegrationTests {
         fragment.addLocation(exampleLocations[1]);
         fragment.addLocation(exampleLocations[2]);
         Path path = fragment.createPath("Test Path");
-        path.submit(appContext, mock(PathCallback.class));
+        path.submit(appContext, mock(Path.PathRequestCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         assertTrue(path.getName().equals("Test Path") && path.getLatitudes().get(1).equals(exampleLocations[1].getLatitude()) && PathMap.getInstance().getPathList().containsValue(path) && path.getParentPath() == parentPath);
     }

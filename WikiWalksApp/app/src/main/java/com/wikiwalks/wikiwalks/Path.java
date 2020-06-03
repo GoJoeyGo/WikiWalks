@@ -40,6 +40,11 @@ public class Path {
     private LatLngBounds bounds;
     private ArrayList<Polyline> polylines = new ArrayList<>();
 
+    public interface PathRequestCallback {
+        void OnSuccess();
+        void OnFailure();
+    }
+
     public Path(String name, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, Path parentPath) {
         if (latitudes.size() == longitudes.size() && latitudes.size() == altitudes.size()) {
             this.name = name;
@@ -232,7 +237,7 @@ public class Path {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void submit(Context context, PathCallback callback) {
+    public void submit(Context context, PathRequestCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         final Path path = this;
         String url =  context.getString(R.string.local_url);
@@ -264,7 +269,7 @@ public class Path {
                         parentPath.update(context);
                     }
                     PathMap.getInstance().addPath(path);
-                    callback.onSuccess("");
+                    callback.OnSuccess();
                 } catch (JSONException e) {
                     Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                     Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
@@ -272,17 +277,17 @@ public class Path {
             }, error -> {
                 Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                 Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
-                callback.onFailure("");
+                callback.OnFailure();
             });
             requestQueue.add(jsonObjectRequest);
         } catch (JSONException e) {
             Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
             Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
-            callback.onFailure("");
+            callback.OnFailure();
         }
     }
 
-    public void delete(final Context context) {
+    public void delete(final Context context, PathRequestCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         final Path path = this;
         JSONObject request = new JSONObject();
