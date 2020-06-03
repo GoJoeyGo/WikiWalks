@@ -1,4 +1,4 @@
-from flask_marshmallow import Marshmallow
+from flask_marshmallow import Marshmallow, fields
 from marshmallow import EXCLUDE
 
 from tables import *
@@ -16,6 +16,7 @@ class PointOfInterestSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PointOfInterest
         unknown = EXCLUDE
+    editable = fields.fields.Boolean(default=False)
 
 
 class PathSchema(ma.SQLAlchemyAutoSchema):
@@ -24,6 +25,7 @@ class PathSchema(ma.SQLAlchemyAutoSchema):
         unknown = EXCLUDE
         include_fk = True
     points_of_interest = ma.Nested(PointOfInterestSchema, many=True)
+    editable = fields.fields.Boolean(default=False)
 
 
 class GroupWalkSchema(ma.SQLAlchemyAutoSchema):
@@ -31,6 +33,7 @@ class GroupWalkSchema(ma.SQLAlchemyAutoSchema):
         model = GroupWalk
         unknown = EXCLUDE
     attendees = ma.Nested(UserSchema, exclude=["device_id"], many=True)
+    editable = fields.fields.Boolean(default=False)
 
 
 class PathPictureSchema(ma.SQLAlchemyAutoSchema):
@@ -38,6 +41,7 @@ class PathPictureSchema(ma.SQLAlchemyAutoSchema):
         model = PathPicture
         unknown = EXCLUDE
     submitter = ma.Nested(UserSchema, exclude=["device_id"])
+    editable = fields.fields.Boolean(default=False)
 
 
 class PointOfInterestPictureSchema(ma.SQLAlchemyAutoSchema):
@@ -45,6 +49,7 @@ class PointOfInterestPictureSchema(ma.SQLAlchemyAutoSchema):
         model = PointOfInterestPicture
         unknown = EXCLUDE
     submitter = ma.Nested(UserSchema, exclude=["device_id"])
+    editable = fields.fields.Boolean(default=False)
 
 
 class PathReviewSchema(ma.SQLAlchemyAutoSchema):
@@ -52,6 +57,7 @@ class PathReviewSchema(ma.SQLAlchemyAutoSchema):
         model = PathReview
         unknown = EXCLUDE
     submitter = ma.Nested(UserSchema, exclude=["device_id"])
+    editable = fields.fields.Boolean(default=False)
 
 
 class PointOfInterestReviewSchema(ma.SQLAlchemyAutoSchema):
@@ -59,3 +65,4 @@ class PointOfInterestReviewSchema(ma.SQLAlchemyAutoSchema):
         model = PointOfInterestReview
         unknown = EXCLUDE
     submitter = ma.Nested(UserSchema, exclude=["device_id"])
+    editable = fields.fields.Boolean(default=False)
