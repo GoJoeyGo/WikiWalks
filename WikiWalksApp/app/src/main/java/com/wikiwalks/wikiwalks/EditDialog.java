@@ -16,12 +16,12 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class EditDialog extends DialogFragment {
 
-    public interface SubmissionDialogListener {
+    public interface EditDialogListener {
         void onEdit(String title);
         void onDelete();
     }
 
-    SubmissionDialogListener listener;
+    EditDialogListener listener;
     TextInputLayout title;
     Button editButton;
     Button deleteButton;
@@ -54,6 +54,6 @@ public class EditDialog extends DialogFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        listener = (SubmissionDialogListener) getTargetFragment();
+        listener = (EditDialogListener) getTargetFragment();
     }
 }

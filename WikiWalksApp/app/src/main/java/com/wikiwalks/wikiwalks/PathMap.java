@@ -89,6 +89,10 @@ public class PathMap {
         changeListeners.add(pathMapChangeListener);
     }
 
+    public void removeListener(PathMapListener pathMapChangeListener) {
+        changeListeners.remove(pathMapChangeListener);
+    }
+
     public void addPath(Path path) {
         pathList.put(path.getId(), path);
         triggerChangeListeners();

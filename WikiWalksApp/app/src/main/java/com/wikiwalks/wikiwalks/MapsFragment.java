@@ -88,11 +88,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         for (Map.Entry<Integer, Polyline> polylineEntry : polylines.entrySet()) {
             if (!paths.containsKey(polylineEntry.getKey())) {
                 polylineEntry.getValue().remove();
+                polylines.remove(polylineEntry);
             }
         }
         for (Map.Entry<Integer, Marker> markerEntry : markers.entrySet()) {
             if (!paths.containsKey(markerEntry.getKey())) {
                 markerEntry.getValue().remove();
+                markers.remove(markerEntry);
             }
         }
         for (Map.Entry<Integer, Path> pathEntry : paths.entrySet()) {
