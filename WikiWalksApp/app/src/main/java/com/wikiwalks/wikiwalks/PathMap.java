@@ -41,26 +41,36 @@ public class PathMap {
 
     public void updatePaths(LatLngBounds bounds, Context context) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
-        final JsonObjectRequest paths = new JsonObjectRequest(Request.Method.GET, String.format(context.getString(R.string.local_url) + "/paths/?s=%f&w=%f&n=%f&e=%f", bounds.southwest.latitude, bounds.southwest.longitude, bounds.northeast.latitude, bounds.northeast.longitude), null, response -> {
-            try {
-                JSONArray array = response.getJSONArray("paths");
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject pathJson = array.getJSONObject(i);
-                    if (!pathList.containsKey(pathJson.getInt("id"))) {
-                        pathList.put(pathJson.getInt("id"), new Path(pathJson));
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+            attributes.put("device_id", MainActivity.getDeviceId(context));
+            request.put("attributes", attributes);
+            final JsonObjectRequest paths = new JsonObjectRequest(Request.Method.POST, String.format(context.getString(R.string.local_url) + "/paths/?s=%f&w=%f&n=%f&e=%f", bounds.southwest.latitude, bounds.southwest.longitude, bounds.northeast.latitude, bounds.northeast.longitude), request, response -> {
+                try {
+                    JSONArray array = response.getJSONArray("paths");
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject pathJson = array.getJSONObject(i);
+                        if (!pathList.containsKey(pathJson.getInt("id"))) {
+                            pathList.put(pathJson.getInt("id"), new Path(pathJson));
+                        }
                     }
-                }
-                triggerChangeListeners();
-            } catch (JSONException e) {
-                triggerFailedListeners();
-                Log.e("PATH_UPDATE", Arrays.toString(e.getStackTrace()));
+                    triggerChangeListeners();
+                } catch (JSONException e) {
+                    triggerFailedListeners();
+                    Log.e("PATH_UPDATE", Arrays.toString(e.getStackTrace()));
 
-            }
-        }, error -> {
+                }
+            }, error -> {
+                triggerFailedListeners();
+                Log.e("PATH_UPDATE", Arrays.toString(error.getStackTrace()));
+            });
+            requestQueue.add(paths);
+        } catch (JSONException e) {
             triggerFailedListeners();
-            Log.e("PATH_UPDATE", Arrays.toString(error.getStackTrace()));
-        });
-        requestQueue.add(paths);
+            Log.e("PATH_UPDATE", Arrays.toString(e.getStackTrace()));
+        }
+
     }
 
     private void triggerChangeListeners() {

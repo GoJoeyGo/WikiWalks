@@ -10,6 +10,8 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -23,6 +25,7 @@ import java.util.LinkedList;
 
 public class Path {
     private boolean isNew = false;
+    private boolean editable;
 
     int id;
     private String name;
@@ -38,11 +41,17 @@ public class Path {
     private ArrayList<Double> altitudes = new ArrayList<>();
 
     private LatLngBounds bounds;
-    private ArrayList<Polyline> polylines = new ArrayList<>();
 
-    public interface PathRequestCallback {
-        void OnSuccess();
-        void OnFailure();
+    public interface PathSubmitCallback {
+        void onSuccess();
+        void onFailure();
+    }
+
+    public interface PathChangeCallback {
+        void onEditSuccess();
+        void onEditFailure();
+        void onDeleteSuccess();
+        void onDeleteFailure();
     }
 
     public Path(String name, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, Path parentPath) {
@@ -51,9 +60,9 @@ public class Path {
             this.latitudes = latitudes;
             this.longitudes = longitudes;
             this.altitudes = altitudes;
-            this.isNew = true;
             this.parentPath = parentPath;
             isNew = true;
+            editable = true;
         }
         else throw new IllegalArgumentException("Latitude, longitude, and altitude must be the same size");
     }
@@ -63,6 +72,7 @@ public class Path {
         name = pathJson.getString("name");
         walkCount = pathJson.getInt("walk_count");
         rating = pathJson.getDouble("average_rating");
+        editable = pathJson.getBoolean("editable");
         for (int i = 0; i < pathJson.getJSONArray("latitudes").length(); i++) {
             latitudes.add(pathJson.getJSONArray("latitudes").getDouble(i));
             longitudes.add(pathJson.getJSONArray("longitudes").getDouble(i));
@@ -94,6 +104,10 @@ public class Path {
 
     public void addPointOfInterest(PointOfInterest pointOfInterest) {
         pointsOfInterest.add(pointOfInterest);
+    }
+
+    public boolean isEditable() {
+        return editable;
     }
 
     public int getId() {
@@ -184,13 +198,19 @@ public class Path {
         this.bounds = bounds;
     }
 
+    public Marker makeMarker(GoogleMap map) {
+        Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(latitudes.get(0), longitudes.get(0))));
+        marker.setTag(id);
+        marker.setTitle(name);
+        return marker;
+    }
+
     public Polyline makePolyLine(GoogleMap map) {
         LinkedList<LatLng> points = new LinkedList<>();
         for (int i = 0; i < getLatitudes().size(); i++) {
             points.add(new LatLng(getLatitudes().get(i), getLongitudes().get(i)));
         }
         Polyline polyline = map.addPolyline(new PolylineOptions().clickable(true).addAll(points));
-        polylines.add(polyline);
         int walkCount = getWalkCount();
         if (walkCount < 10) polyline.setColor(0xffffe49c);
         else if (walkCount < 100) polyline.setColor(0xffff9100);
@@ -201,12 +221,12 @@ public class Path {
     }
 
     public ArrayList<Polyline> makeAllPolyLines(GoogleMap map) {
-        ArrayList<Polyline> polylines = new ArrayList<>();
-        polylines.add(makePolyLine(map));
+        ArrayList<Polyline> allPolylines = new ArrayList<>();
+        allPolylines.add(makePolyLine(map));
         for (Path child : childPaths) {
-            polylines.addAll(child.makeAllPolyLines(map));
+            allPolylines.addAll(child.makeAllPolyLines(map));
         }
-        return polylines;
+        return allPolylines;
     }
 
     public void update(final Context context) {
@@ -237,11 +257,9 @@ public class Path {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void submit(Context context, PathRequestCallback callback) {
+    public void submit(Context context, PathSubmitCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
-        final Path path = this;
-        String url =  context.getString(R.string.local_url);
-        url = (!isNew) ? url + String.format("/paths/%d/edit", id) : url + "/paths/new";
+        String url =  context.getString(R.string.local_url) + "/paths/new";
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -265,11 +283,11 @@ public class Path {
                     double east_bound = responseJson.getJSONArray("boundaries").getDouble(3);
                     bounds = new LatLngBounds(new LatLng(south_bound, west_bound), new LatLng(north_bound, east_bound));
                     if (parentPath != null) {
-                        parentPath.addChild(path);
+                        parentPath.addChild(this);
                         parentPath.update(context);
                     }
-                    PathMap.getInstance().addPath(path);
-                    callback.OnSuccess();
+                    PathMap.getInstance().addPath(this);
+                    callback.onSuccess();
                 } catch (JSONException e) {
                     Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                     Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
@@ -277,17 +295,40 @@ public class Path {
             }, error -> {
                 Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                 Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
-                callback.OnFailure();
+                callback.onFailure();
             });
             requestQueue.add(jsonObjectRequest);
         } catch (JSONException e) {
             Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
             Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
-            callback.OnFailure();
+            callback.onFailure();
         }
     }
 
-    public void delete(final Context context, PathRequestCallback callback) {
+    public void edit(Context context, String title, PathChangeCallback callback) {
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        String url =  context.getString(R.string.local_url) + String.format("/paths/%d/edit", id);
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+            attributes.put("name", title);
+            attributes.put("device_id", MainActivity.getDeviceId(context));
+            request.put("attributes", attributes);
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
+                this.name = title;
+                callback.onEditSuccess();
+            }, error -> {
+                Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
+                callback.onEditFailure();
+            });
+            requestQueue.add(jsonObjectRequest);
+        } catch (JSONException e) {
+            Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
+            callback.onEditFailure();
+        }
+    }
+
+    public void delete(final Context context, PathChangeCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         final Path path = this;
         JSONObject request = new JSONObject();
@@ -303,16 +344,15 @@ public class Path {
                 PathMap pathMap = PathMap.getInstance();
                 for (Path child : childPaths) pathMap.deletePath(child);
                 pathMap.deletePath(path);
-                for (Polyline polyline : polylines) polyline.remove();
-                Toast.makeText(context, "Successfully deleted path!", Toast.LENGTH_SHORT).show();
+                callback.onDeleteSuccess();
             }, error -> {
-                Toast.makeText(context, "Failed to delete path...", Toast.LENGTH_SHORT).show();
                 Log.e("DELETE_PATH", Arrays.toString(error.getStackTrace()));
+                callback.onDeleteFailure();
             });
             requestQueue.add(jsonObjectRequest);
         } catch (JSONException e) {
-            Toast.makeText(context, "Failed to delete path...", Toast.LENGTH_SHORT).show();
             Log.e("DELETE_PATH", Arrays.toString(e.getStackTrace()));
+            callback.onDeleteFailure();
         }
     }
 }

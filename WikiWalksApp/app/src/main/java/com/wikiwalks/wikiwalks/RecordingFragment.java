@@ -30,7 +30,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
-public class RecordingFragment extends Fragment implements OnMapReadyCallback, SubmissionDialog.SubmissionDialogListener, Path.PathRequestCallback {
+public class RecordingFragment extends Fragment implements OnMapReadyCallback, SubmissionDialog.SubmissionDialogListener, Path.PathSubmitCallback {
 
     private boolean recording = true;
     GoogleMap mMap;
@@ -204,12 +204,12 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     }
 
     @Override
-    public void OnSuccess() {
+    public void onSuccess() {
         getParentFragmentManager().popBackStack();
     }
 
     @Override
-    public void OnFailure() {
+    public void onFailure() {
         Toast.makeText(getContext(), "Failed to submit...", Toast.LENGTH_SHORT).show();
     }
 }

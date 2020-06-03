@@ -4,19 +4,15 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.android.dx.command.Main;
 import com.google.android.gms.maps.GoogleMap;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -64,7 +60,7 @@ public class RecordPathIntegrationTests {
         fragment.addLocation(exampleLocations[1]);
         fragment.addLocation(exampleLocations[2]);
         Path path = fragment.createPath("Test Path");
-        path.submit(appContext, mock(Path.PathRequestCallback.class));
+        path.submit(appContext, mock(Path.PathSubmitCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         assertTrue(path.getName().equals("Test Path") && path.getLatitudes().get(1).equals(exampleLocations[1].getLatitude()) && PathMap.getInstance().getPathList().containsValue(path));
     }
@@ -76,7 +72,7 @@ public class RecordPathIntegrationTests {
         fragment.addLocation(exampleLocations[1]);
         fragment.addLocation(exampleLocations[2]);
         Path path = fragment.createPath("Test Path");
-        path.submit(appContext, mock(Path.PathRequestCallback.class));
+        path.submit(appContext, mock(Path.PathSubmitCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         assertTrue(path.getName().equals("Test Path") && path.getLatitudes().get(1).equals(exampleLocations[1].getLatitude()) && PathMap.getInstance().getPathList().containsValue(path) && path.getParentPath() == parentPath);
     }

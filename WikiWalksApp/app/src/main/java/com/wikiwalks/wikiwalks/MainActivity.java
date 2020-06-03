@@ -36,20 +36,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_ASK_PERMISSIONS:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (savedInstanceState == null) {
-                        initialiseMap();
-                    }
-                } else {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.main_frame, PermissionsFragment.newInstance())
-                            .commitNow();
+        if (requestCode == REQUEST_CODE_ASK_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (savedInstanceState == null) {
+                    initialiseMap();
                 }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            } else {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_frame, PermissionsFragment.newInstance())
+                        .commitNow();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

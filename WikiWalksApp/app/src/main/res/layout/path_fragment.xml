@@ -159,9 +159,21 @@
             android:fontFamily="monospace"
             android:text="EXPLORE"
             style="@style/ButtonTheme"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/new_route_button" />
+
+        <Button
+            android:id="@+id/edit_button"
+            android:layout_width="360dp"
+            android:layout_height="50dp"
+            android:fontFamily="monospace"
+            android:text="EDIT"
+            style="@style/ButtonTheme"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/explore_button"
+            android:visibility="gone"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

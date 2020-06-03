@@ -36,7 +36,6 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
 
     private boolean isRoute;
     private GoogleMap mMap;
-    private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
     private ConstraintLayout outOfRangeBanner;
@@ -63,7 +62,6 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         outOfRangeBanner = rootView.findViewById(R.id.out_of_range_banner);
         offTrackVariable = rootView.findViewById(R.id.off_track_variable);
         offTrackDirectionIndicator = rootView.findViewById(R.id.off_track_direction_indicator);
-        context = getContext();
         return rootView;
     }
 

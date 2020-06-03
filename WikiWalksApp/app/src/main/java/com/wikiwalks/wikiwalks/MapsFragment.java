@@ -28,9 +28,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     GoogleMap mMap;
     private SupportMapFragment mapFragment;
-    private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private HashMap<Integer, Polyline> polylines = new HashMap<>();
+    private HashMap<Integer, Marker> markers = new HashMap<>();
     private Button createPath;
     private boolean hasFailed = false;
 
@@ -49,7 +49,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(null)).addToBackStack(null).commit());
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);
         mapFragment.getMapAsync(this);
-        context = getContext();
         return rootView;
     }
 
@@ -86,19 +85,26 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void OnPathMapChange() {
         PathMap pathMap = PathMap.getInstance();
         HashMap<Integer, Path> paths = pathMap.getPathList();
+        for (Map.Entry<Integer, Polyline> polylineEntry : polylines.entrySet()) {
+            if (!paths.containsKey(polylineEntry.getKey())) {
+                polylineEntry.getValue().remove();
+            }
+        }
+        for (Map.Entry<Integer, Marker> markerEntry : markers.entrySet()) {
+            if (!paths.containsKey(markerEntry.getKey())) {
+                markerEntry.getValue().remove();
+            }
+        }
         for (Map.Entry<Integer, Path> pathEntry : paths.entrySet()) {
             if (!polylines.containsKey(pathEntry.getKey())) {
                 Path path = pathEntry.getValue();
-                LatLng startingPoint = new LatLng(path.getLatitudes().get(0), path.getLongitudes().get(0));
                 Polyline polyline = path.makePolyLine(mMap);
                 polylines.put(pathEntry.getKey(), polyline);
                 if (path.getParentPath() == null) {
-                    Marker marker = mMap.addMarker(new MarkerOptions().position(startingPoint));
-                    marker.setTag(path.getId());
-                    marker.setTitle(path.getName());
+                    Marker marker = path.makeMarker(mMap);
+                    markers.put(pathEntry.getKey(), marker);
                 }
             }
-
         }
     }
 
