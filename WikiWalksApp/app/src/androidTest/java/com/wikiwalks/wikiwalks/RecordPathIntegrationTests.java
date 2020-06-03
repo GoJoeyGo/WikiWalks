@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -75,5 +76,29 @@ public class RecordPathIntegrationTests {
         path.submit(appContext, mock(Path.PathSubmitCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         assertTrue(path.getName().equals("Test Path") && path.getLatitudes().get(1).equals(exampleLocations[1].getLatitude()) && PathMap.getInstance().getPathList().containsValue(path) && path.getParentPath() == parentPath);
+    }
+
+    @Test
+    public void editPath() throws InterruptedException {
+        fragment.addLocation(exampleLocations[0]);
+        fragment.addLocation(exampleLocations[1]);
+        fragment.addLocation(exampleLocations[2]);
+        Path path = fragment.createPath("Test Path");
+        path.submit(appContext, mock(Path.PathSubmitCallback.class));
+        path.edit(appContext, "Test Edited Title", mock(Path.PathChangeCallback.class));
+        new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
+        assertTrue(path.getName().equals("Test Edited Title"));
+    }
+
+    @Test
+    public void deletePath() throws InterruptedException {
+        fragment.addLocation(exampleLocations[0]);
+        fragment.addLocation(exampleLocations[1]);
+        fragment.addLocation(exampleLocations[2]);
+        Path path = fragment.createPath("Test Path");
+        path.submit(appContext, mock(Path.PathSubmitCallback.class));
+        path.delete(appContext, mock(Path.PathChangeCallback.class));
+        new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
+        assertFalse(PathMap.getInstance().getPathList().containsValue(path));
     }
 }

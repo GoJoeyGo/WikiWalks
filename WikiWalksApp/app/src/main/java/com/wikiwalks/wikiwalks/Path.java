@@ -330,7 +330,6 @@ public class Path {
 
     public void delete(final Context context, PathChangeCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
-        final Path path = this;
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -338,12 +337,12 @@ public class Path {
             request.put("attributes", attributes);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, context.getString(R.string.local_url) + String.format("/paths/%d/delete", id), request, response -> {
                 if (parentPath != null) {
-                    parentPath.removeChild(path);
+                    parentPath.removeChild(this);
                     parentPath.update(context);
                 }
                 PathMap pathMap = PathMap.getInstance();
                 for (Path child : childPaths) pathMap.deletePath(child);
-                pathMap.deletePath(path);
+                pathMap.deletePath(this);
                 callback.onDeleteSuccess();
             }, error -> {
                 Log.e("DELETE_PATH", Arrays.toString(error.getStackTrace()));
