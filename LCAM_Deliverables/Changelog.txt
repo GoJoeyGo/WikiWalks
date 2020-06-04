@@ -43,8 +43,8 @@ Project Plan:
 - Changed server dependency to be more specific
 
 Risk List:
-Unchanged
-
+* Added risk of server going down and mitigation for the issue
+* Added risk of loss of data on server mitigation for the issue
 Requirement Model:
 Unchanged
 
