@@ -25,6 +25,7 @@ Architecture:
 - Changed front-end and back-end definitions as they are not used as described, and instead just synonyms for the app and the server
 - Removed PathMap from abstraction as it is no longer mentioned, and removed app because it's obvious
 - Changed key labelling
+- Updated class model to use display classes more accurate to what's been implemented
 
 Master Test Plan:
 - Changed testing schedule for adding and getting paths to final iteration of LCAM
@@ -48,7 +49,8 @@ Risk List:
 - Closed Google Maps and UI compatibility issues as these have been addressed
 
 Requirement Model:
-Unchanged
+- Added changing a specific route
+- Updated domain model to use display classes more accurate to what's been implemented
 
 Vision:
 - Clarified more on information saved as it was not detailed
