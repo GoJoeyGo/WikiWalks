@@ -45,6 +45,8 @@ Project Plan:
 Risk List:
 * Added risk of server going down and mitigation for the issue
 * Added risk of loss of data on server mitigation for the issue
+- Closed Google Maps and UI compatibility issues as these have been addressed
+
 Requirement Model:
 Unchanged
 
