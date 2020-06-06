@@ -144,12 +144,18 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, E
             getParentFragmentManager().popBackStack();
             getParentFragmentManager().popBackStack();
         } else {
-            recyclerViewAdapter.buttons.remove(position);
-            recyclerViewAdapter.notifyItemRemoved(position);
             PathFragment parent = (PathFragment) getTargetFragment();
             parent.polylines.get(pathList.get(position).id).remove();
             parent.polylines.remove(pathList.get(position).id);
+            polylines.get(position).remove();
             polylines.remove(position);
+            for (Polyline polyline : polylines) {
+                polyline.setVisible(true);
+            }
+            pathList.remove(pathList.get(position));
+            recyclerViewAdapter.buttons.remove(position);
+            recyclerViewAdapter.notifyItemRemoved(position);
+            recyclerViewAdapter.notifyItemRangeChanged(position, pathList.size());
         }
         Toast.makeText(getContext(), "Successfully deleted route!", Toast.LENGTH_SHORT).show();
     }
