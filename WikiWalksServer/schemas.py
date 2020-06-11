@@ -19,11 +19,19 @@ class PointOfInterestSchema(ma.SQLAlchemyAutoSchema):
     editable = fields.fields.Boolean(default=False)
 
 
+class RouteSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Route
+        unknown = EXCLUDE
+    editable = fields.fields.Boolean(default=False)
+
+
 class PathSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Path
         unknown = EXCLUDE
         include_fk = True
+    routes = ma.Nested(RouteSchema, many=True)
     points_of_interest = ma.Nested(PointOfInterestSchema, many=True)
     editable = fields.fields.Boolean(default=False)
 

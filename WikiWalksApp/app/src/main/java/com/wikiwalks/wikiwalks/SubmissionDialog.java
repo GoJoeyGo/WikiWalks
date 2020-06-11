@@ -29,6 +29,11 @@ public class SubmissionDialog extends DialogFragment {
     TextInputLayout title;
     Button submitButton;
     Button cancelButton;
+    boolean isNew;
+
+    public SubmissionDialog(boolean isNew) {
+        this.isNew = isNew;
+    }
 
     @NonNull
     @Override
@@ -37,6 +42,7 @@ public class SubmissionDialog extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.submission_popup, null);
         title = view.findViewById(R.id.submit_path_name);
+        if (!isNew) title.setVisibility(View.GONE);
         submitButton = view.findViewById(R.id.submit_popup_submit_button);
         submitButton.setOnClickListener(v -> {
             SubmissionDialog.this.getDialog().dismiss();

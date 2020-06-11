@@ -12,6 +12,7 @@ class User(db.Model):
     device_id = db.Column(db.String, nullable=False, unique=True)
     nickname = db.Column(db.String, unique=True)
     paths = db.relationship("Path", cascade="delete")
+    routes = db.relationship("Route", cascade="delete")
     points_of_interest = db.relationship("PointOfInterest", cascade="delete")
     group_walks = db.relationship("GroupWalk", cascade="delete")
     path_pictures = db.relationship("PathPicture", cascade="delete")
@@ -31,21 +32,29 @@ class Path(db.Model):
     name = db.Column(db.String, nullable=False)
     submitter = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_time = db.Column(db.Integer, nullable=False)
-    children = db.relationship("Path", cascade="delete")
-    parent_path = db.Column(db.Integer, (db.ForeignKey("path.id")))
-    latitudes = db.Column(db.JSON, nullable=False)
-    longitudes = db.Column(db.JSON, nullable=False)
-    altitudes = db.Column(db.JSON, nullable=False)
+    routes = db.relationship("Route", cascade="delete")
     boundaries = db.Column(db.JSON, nullable=False)
+    marker_point = db.Column(db.JSON, nullable=False)
     walk_count = db.Column(db.Integer, default=1, nullable=False)
-    starting_point = db.Column(db.JSON, nullable=False)
-    ending_point = db.Column(db.JSON, nullable=False)
     average_rating = db.Column(db.Float)
     rating_count = db.Column(db.Integer)
     points_of_interest = db.relationship("PointOfInterest", cascade="delete")
     reviews = db.relationship("PathReview", cascade="delete")
     pictures = db.relationship("PathPicture", cascade="delete")
     group_walks = db.relationship("GroupWalk", cascade="delete")
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
+
+
+class Route(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    submitter = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_time = db.Column(db.Integer, nullable=False)
+    path = db.Column(db.Integer, (db.ForeignKey("path.id")))
+    latitudes = db.Column(db.JSON, nullable=False)
+    longitudes = db.Column(db.JSON, nullable=False)
+    altitudes = db.Column(db.JSON, nullable=False)
     __mapper_args__ = {
         'confirm_deleted_rows': False
     }

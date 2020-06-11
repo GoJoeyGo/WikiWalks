@@ -29,6 +29,10 @@ def get_path(path_id):
         for poi in pois:
             if poi in user.points_of_interest:
                 poi.editable = True
+        routes = Route.query.filter_by(path=path.id)
+        for route in routes:
+            if route in user.routes:
+                route.editable = True
     path_schema = PathSchema()
     output = path_schema.dump(path)
     return jsonify({"path": output})
@@ -36,7 +40,7 @@ def get_path(path_id):
 
 @gets.route("/paths/", methods=["GET", "POST"])
 def get_paths():
-    paths = Path.query.filter(Path.parent_path.is_(None))
+    paths = Path.query.filter()
     north_boundary = request.args.get('n', default=90, type=float)
     south_boundary = request.args.get('s', default=-90, type=float)
     east_boundary = request.args.get('e', default=180, type=float)
@@ -51,9 +55,6 @@ def get_paths():
              path.boundaries[1] < west_boundary < east_boundary < path.boundaries[3] or
              (east_boundary < west_boundary <= path.boundaries[3] <= 180 + (180 - east_boundary)))):
             in_range_paths.append(path)
-            for child in path.children:
-                if child not in in_range_paths:
-                    in_range_paths.append(child)
     if request.method == "POST":
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
@@ -64,6 +65,10 @@ def get_paths():
             for poi in pois:
                 if poi in user.points_of_interest:
                     poi.editable = True
+            routes = Route.query.filter_by(path=path.id)
+            for route in routes:
+                if route in user.routes:
+                    route.editable = True
     path_schema = PathSchema(many=True)
     output = path_schema.dump(in_range_paths)
     return jsonify({"paths": output})

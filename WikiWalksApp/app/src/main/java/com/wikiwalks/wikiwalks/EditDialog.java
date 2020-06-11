@@ -18,13 +18,11 @@ public class EditDialog extends DialogFragment {
 
     public interface EditDialogListener {
         void onEdit(String title);
-        void onDelete();
     }
 
     EditDialogListener listener;
     TextInputLayout title;
     Button editButton;
-    Button deleteButton;
     Button cancelButton;
 
     @NonNull
@@ -37,11 +35,6 @@ public class EditDialog extends DialogFragment {
         editButton = view.findViewById(R.id.edit_popup_edit_button);
         editButton.setOnClickListener(v -> {
             listener.onEdit(title.getEditText().getText().toString());
-        });
-        deleteButton = view.findViewById(R.id.edit_popup_delete_button);
-        deleteButton.setOnClickListener(v -> {
-            this.dismiss();
-            listener.onDelete();
         });
         cancelButton = view.findViewById(R.id.edit_popup_cancel_button);
         cancelButton.setOnClickListener(v -> {

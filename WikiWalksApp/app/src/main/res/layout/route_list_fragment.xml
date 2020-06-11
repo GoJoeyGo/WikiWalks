@@ -83,7 +83,7 @@
             android:layout_width="360dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="EDIT ROUTE"
+            android:text="DELETE ROUTE"
             style="@style/ButtonTheme"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -53,8 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initialiseMap() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_frame, MapsFragment.newInstance())
-                .commitNow();
+                .replace(R.id.main_frame, MapsFragment.newInstance()).commitNow();
     }
 
     @Override
@@ -80,4 +79,11 @@ public class MainActivity extends AppCompatActivity {
             fragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, PermissionsFragment.newInstance()).commitNow();
         }
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
 }

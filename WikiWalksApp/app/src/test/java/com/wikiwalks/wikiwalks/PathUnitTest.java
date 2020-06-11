@@ -23,9 +23,9 @@ public class PathUnitTest {
         ArrayList<Double> altitudes = new ArrayList<Double>();
         altitudes.add(7.61);
 
-        Path testpath = new Path(name,latitudes,longitudes,altitudes,mockpath);
+        Route testpath = new Route(-1,mockpath,true,latitudes,longitudes,altitudes);
 
-        assertEquals(testpath.getName(),"Testpath");
+        assertEquals(testpath.getId(),-1);
         assertEquals(latitudes.get(0),new Double(152.1));
         assertEquals(longitudes.get(0),new Double(154.2));
         assertEquals(altitudes.get(0),new Double(7.61));

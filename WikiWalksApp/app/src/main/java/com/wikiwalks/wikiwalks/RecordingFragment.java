@@ -30,13 +30,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
-public class RecordingFragment extends Fragment implements OnMapReadyCallback, SubmissionDialog.SubmissionDialogListener, Path.PathSubmitCallback {
+public class RecordingFragment extends Fragment implements OnMapReadyCallback, SubmissionDialog.SubmissionDialogListener, Route.RouteSubmitCallback {
 
     private boolean recording = true;
     GoogleMap mMap;
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Path parentPath;
+    private Path path;
     private Button stopRecordingButton;
     private Polyline polyline;
     private ArrayList<Double> latitudes = new ArrayList<>();
@@ -44,7 +44,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     private ArrayList<Double> altitudes = new ArrayList<>();
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private Location lastLocation;
-    Path newPath;
+    Route newRoute;
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -58,7 +58,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         Bundle args = new Bundle();
         RecordingFragment fragment = new RecordingFragment();
         fragment.setArguments(args);
-        fragment.setParentPath(path);
+        fragment.setPath(path);
         return fragment;
     }
 
@@ -72,10 +72,10 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
                 fusedLocationProviderClient.removeLocationUpdates(locationCallback);
                 recording = false;
                 stopRecordingButton.setText("RESUME RECORDING");
-                if (parentPath != null) {
+                if (path != null) {
                     boolean inRange = false;
-                    ArrayList<Double> pathLatitudes = parentPath.getAllLatitudes();
-                    ArrayList<Double> pathLongitudes = parentPath.getAllLongitudes();
+                    ArrayList<Double> pathLatitudes = path.getAllLatitudes();
+                    ArrayList<Double> pathLongitudes = path.getAllLongitudes();
                     for (int i = 0; i < pathLatitudes.size(); i++) {
                         Location pathLocation = new Location(LocationManager.GPS_PROVIDER);
                         pathLocation.setLatitude(pathLatitudes.get(i));
@@ -93,7 +93,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
                     }
                     if (!inRange) {
                         new MaterialAlertDialogBuilder(context).setTitle("Make new path?").setMessage("Your route does not connect to the path and cannot be submitted. Make it a new path instead?").setPositiveButton("Yes", (dialog, which) -> {
-                            parentPath = null;
+                            path = null;
                             showSubmissionDialog();
                         }).setNegativeButton("No", (dialog, which) -> {
 
@@ -130,23 +130,19 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setScrollGesturesEnabledDuringRotateOrZoom(false);
         mMap.getUiSettings().setCompassEnabled(false);
-        if (parentPath != null) {
-            parentPath.makePolyLine(mMap);
-            if (parentPath.getParentPath() != null) {
-                Path parentParent = parentPath.getParentPath();
-                while (parentParent.getParentPath() != null) {
-                    parentParent = parentParent.getParentPath();
-                }
-                parentParent.makeAllPolyLines(mMap);
-            } else parentPath.makeAllPolyLines(mMap);
+        if (path != null) {
+            for (Route route : path.getRoutes()) {
+                route.makePolyline(mMap);
+            }
         }
         polyline = mMap.addPolyline(new PolylineOptions());
+        polyline.setWidth(20);
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20)));
         startLocationUpdates();
     }
 
-    public void setParentPath(Path parentPath) {
-        this.parentPath = parentPath;
+    public void setPath(Path path) {
+        this.path = path;
     }
 
     private void startLocationUpdates() {
@@ -178,24 +174,24 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         }
     }
 
-    public Path createPath(String title) {
-        if (title.equals("")) {
-            title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
-        }
-        newPath = new Path(title, latitudes, longitudes, altitudes, parentPath);
-        return newPath;
-    }
-
     public void showSubmissionDialog() {
-        SubmissionDialog dialog = new SubmissionDialog();
+        SubmissionDialog dialog = new SubmissionDialog(path == null);
         dialog.setTargetFragment(this, 0);
         dialog.show(getActivity().getSupportFragmentManager(), "SubmissionPopup");
     }
 
+    public Route generateRoute() {
+        newRoute = new Route(-1, path, true, latitudes, longitudes, altitudes);
+        return newRoute;
+    }
+
     @Override
     public void onPositiveClick(String title) {
-        createPath(title);
-        newPath.submit(this.getContext(), this);
+        if (title.equals("")) {
+            title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
+        }
+        newRoute = generateRoute();
+        newRoute.submit(this.getContext(), title, this);
     }
 
     @Override

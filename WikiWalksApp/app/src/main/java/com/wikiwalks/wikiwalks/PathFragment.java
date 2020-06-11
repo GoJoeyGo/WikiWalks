@@ -7,11 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
@@ -19,35 +21,31 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class PathFragment extends Fragment implements OnMapReadyCallback, EditDialog.EditDialogListener, Path.PathChangeCallback, PathMap.PathMapListener {
 
+    Toolbar toolbar;
     Button selectRouteButton;
     Button recordRouteButton;
     Button exploreButton;
-    Button editButton;
+    ImageButton editButton;
     SupportMapFragment mapFragment;
     Path path;
     ConstraintLayout walkPathOptions;
     Button pointOfInterestButton;
     RatingBar ratingBar;
     EditDialog editDialog;
-    AlertDialog confirmationDialog;
-    TextView title;
-    HashMap<Integer, Polyline> polylines = new HashMap();
+    ArrayList<Polyline> polylines = new ArrayList<>();
     GoogleMap mMap;
 
-    public static PathFragment newInstance(Path path) {
+    public static PathFragment newInstance(int pathId) {
         Bundle args = new Bundle();
         PathFragment fragment = new PathFragment();
         fragment.setArguments(args);
-        fragment.setPath(path);
+        fragment.setPath(PathMap.getInstance().getPathList().get(pathId));
         PathMap.getInstance().addListener(fragment);
         return fragment;
     }
@@ -57,38 +55,29 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
         final View rootView = inflater.inflate(R.layout.path_fragment, container, false);
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
         mapFragment.getMapAsync(this);
-        title = rootView.findViewById(R.id.path_frag_title);
         walkPathOptions = rootView.findViewById(R.id.walk_path_option_selector);
+        toolbar = rootView.findViewById(R.id.path_frag_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(path.getName());
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
-        if (path.getChildPaths().size() == 0) selectRouteButton.setText("WALK PATH");
         selectRouteButton.setOnClickListener(view -> {
-            if (path.getChildPaths().size() == 0) {
-                getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path, true)).addToBackStack(null).commit();
-            } else {
-                RouteListFragment routeListFragment = RouteListFragment.newInstance(path);
-                routeListFragment.setTargetFragment(this, 0);
-                getParentFragmentManager().beginTransaction().add(R.id.main_frame, routeListFragment).addToBackStack(null).commit();
-            }
+            RouteListFragment routeListFragment = RouteListFragment.newInstance(path);
+            routeListFragment.setTargetFragment(this, 0);
+            getParentFragmentManager().beginTransaction().add(R.id.main_frame, routeListFragment).addToBackStack(null).commit();
         });
         recordRouteButton = rootView.findViewById(R.id.new_route_button);
         recordRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path)).addToBackStack(null).commit());
         exploreButton = rootView.findViewById(R.id.explore_button);
-        exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path, false)).addToBackStack(null).commit());
-        editButton = rootView.findViewById(R.id.edit_button);
-        if (path.isEditable()) {
-            editButton.setVisibility(View.VISIBLE);
-            editDialog = new EditDialog();
-            editDialog.setTargetFragment(this, 0);
-            editButton.setOnClickListener(v -> editDialog.show(getActivity().getSupportFragmentManager(), "EditPopup"));
-        }
+        exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path, null)).addToBackStack(null).commit());
+        editButton = rootView.findViewById(R.id.edit_title_button);
+        editDialog = new EditDialog();
+        editDialog.setTargetFragment(this, 0);
+        editButton.setOnClickListener(v -> editDialog.show(getActivity().getSupportFragmentManager(), "EditPopup"));
         pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);
-        if (path.getAllPointsOfInterest().size() == 0) {
-            pointOfInterestButton.setVisibility(View.GONE);
-        }
+
         ratingBar = rootView.findViewById(R.id.path_frag_rating_bar);
         ratingBar.setRating((float)path.getRating());
-        TextView title = rootView.findViewById(R.id.path_frag_title);
-        title.setText(path.getName());
         TextView walkCount = rootView.findViewById(R.id.path_frag_walk_count);
         String walkCountString;
         if (path.getWalkCount() == 1) {
@@ -104,12 +93,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng startingPoint = new LatLng(path.getLatitudes().get(0), path.getLongitudes().get(0));
-        polylines.put(path.getId(), path.makePolyLine(googleMap));
-        for (Path child : path.getChildPaths()) {
-            polylines.put(child.getId(), child.makePolyLine(googleMap));
-        }
-        googleMap.addMarker(new MarkerOptions().position(startingPoint));
+        for (Route route : path.getRoutes()) polylines.add(route.makePolyline(googleMap));
         googleMap.getUiSettings().setAllGesturesEnabled(false);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10 ));
     }
@@ -121,25 +105,15 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
     @Override
     public void onEdit(String title) {
         if (title.equals("")) {
-            title = String.format("Path at %f, %f", path.getLatitudes().get(0), path.getLongitudes().get(0));
+            title = String.format("Path at %f, %f", path.getMarkerPoint().latitude, path.getMarkerPoint().longitude);
         }
         path.edit(getContext(), title, this);
     }
 
     @Override
-    public void onDelete() {
-        confirmationDialog = new AlertDialog.Builder(getContext())
-                .setTitle("Confirm Deletion")
-                .setMessage("Are you sure you want to delete this path?")
-                .setPositiveButton("Yes", (dialog, which) ->  path.delete(getContext(), this))
-                .setNegativeButton("No", (dialog, which) -> confirmationDialog.dismiss()).create();
-        confirmationDialog.show();
-    }
-
-    @Override
     public void onEditSuccess() {
         editDialog.dismiss();
-        title.setText(path.getName());
+        toolbar.setTitle(path.getName());
     }
 
     @Override
@@ -148,36 +122,16 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
     }
 
     @Override
-    public void onDeleteSuccess() {
-        getParentFragmentManager().popBackStack();
-        Toast.makeText(getContext(), "Successfully deleted path!", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onDeleteFailure() {
-        Toast.makeText(getContext(), "Failed to delete path...", Toast.LENGTH_SHORT).show();
-        confirmationDialog.dismiss();
-    }
-
-    @Override
     public void OnPathMapChange() {
-        if (path.getChildPaths().size() == 0) selectRouteButton.setText("WALK PATH");
-        else selectRouteButton.setText("SELECT ROUTE");
-        selectRouteButton.setOnClickListener(view -> {
-            if (path.getChildPaths().size() == 0) {
-                getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path, true)).addToBackStack(null).commit();
-            } else {
-                RouteListFragment routeListFragment = RouteListFragment.newInstance(path);
-                routeListFragment.setTargetFragment(this, 0);
-                getParentFragmentManager().beginTransaction().add(R.id.main_frame, routeListFragment).addToBackStack(null).commit();
+        path = PathMap.getInstance().getPathList().get(path.id);
+        if (path != null) {
+            for (Polyline polyline : polylines) {
+                polyline.remove();
             }
-        });
-        for (HashMap.Entry<Integer,Polyline> polylineEntry : polylines.entrySet()) {
-            polylineEntry.getValue().remove();
-        }
-        polylines.put(path.getId(), path.makePolyLine(mMap));
-        for (Path child : path.getChildPaths()) {
-            polylines.put(child.getId(), child.makePolyLine(mMap));
+            polylines = new ArrayList<>();
+            for (Route route : path.getRoutes()) {
+                polylines.add(route.makePolyline(mMap));
+            }
         }
     }
 

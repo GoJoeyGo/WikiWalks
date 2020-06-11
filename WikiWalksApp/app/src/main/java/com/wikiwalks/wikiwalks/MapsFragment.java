@@ -43,10 +43,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        PathMap.getInstance().addListener(this);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
         createPath = rootView.findViewById(R.id.create_path_button);
-        createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(null)).addToBackStack(null).commit());
+        createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(null)).addToBackStack("Map").commit());
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);
         mapFragment.getMapAsync(this);
         return rootView;
@@ -68,8 +69,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Path path = PathMap.getInstance().getPathList().get(marker.getTag());
-        getParentFragmentManager().beginTransaction().add(R.id.main_frame, PathFragment.newInstance(path)).addToBackStack(null).commit();
+        getParentFragmentManager().beginTransaction().add(R.id.main_frame, PathFragment.newInstance((Integer) marker.getTag())).addToBackStack("Map").commit();
         return true;
     }
 
@@ -86,27 +86,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         PathMap pathMap = PathMap.getInstance();
         HashMap<Integer, Path> paths = pathMap.getPathList();
         for (Map.Entry<Integer, Polyline> polylineEntry : polylines.entrySet()) {
-            if (!paths.containsKey(polylineEntry.getKey())) {
-                polylineEntry.getValue().remove();
-                polylines.remove(polylineEntry);
-            }
+            polylineEntry.getValue().remove();
+            polylines.remove(polylineEntry);
         }
         for (Map.Entry<Integer, Marker> markerEntry : markers.entrySet()) {
-            if (!paths.containsKey(markerEntry.getKey())) {
-                markerEntry.getValue().remove();
-                markers.remove(markerEntry);
-            }
+            markerEntry.getValue().remove();
+            markers.remove(markerEntry);
         }
         for (Map.Entry<Integer, Path> pathEntry : paths.entrySet()) {
-            if (!polylines.containsKey(pathEntry.getKey())) {
-                Path path = pathEntry.getValue();
-                Polyline polyline = path.makePolyLine(mMap);
-                polylines.put(pathEntry.getKey(), polyline);
-                if (path.getParentPath() == null) {
-                    Marker marker = path.makeMarker(mMap);
-                    markers.put(pathEntry.getKey(), marker);
-                }
+            Path path = pathEntry.getValue();
+            for (Route route : path.getRoutes()) {
+                Polyline polyline = route.makePolyline(mMap);
+                polylines.put(route.getId(), polyline);
             }
+            Marker marker = path.makeMarker(mMap);
+            markers.put(pathEntry.getKey(), marker);
         }
     }
 

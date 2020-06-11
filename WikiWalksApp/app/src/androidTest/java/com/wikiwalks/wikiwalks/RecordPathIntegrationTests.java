@@ -8,19 +8,29 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -28,10 +38,10 @@ import static org.mockito.Mockito.mock;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RecordPathIntegrationTests {
     Location[] exampleLocations;
     RecordingFragment fragment;
-    Path parentPath;
     Context appContext;
 
     @Mock GoogleMap map;
@@ -41,8 +51,6 @@ public class RecordPathIntegrationTests {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         fragment = RecordingFragment.newInstance(null);
         fragment.mMap = map;
-        parentPath = new Path("Parent", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null);
-        parentPath.id = 1;
         exampleLocations = new Location[]{new Location(LocationManager.GPS_PROVIDER), new Location(LocationManager.GPS_PROVIDER), new Location(LocationManager.GPS_PROVIDER)};
         exampleLocations[0].setLatitude(1);
         exampleLocations[0].setLongitude(1);
@@ -56,49 +64,41 @@ public class RecordPathIntegrationTests {
     }
 
     @Test
-    public void recordPath() throws InterruptedException {
+    public void A_recordRoute() throws InterruptedException {
+        int initialSize = PathMap.getInstance().getPathList().size();
         fragment.addLocation(exampleLocations[0]);
         fragment.addLocation(exampleLocations[1]);
         fragment.addLocation(exampleLocations[2]);
-        Path path = fragment.createPath("Test Path");
-        path.submit(appContext, mock(Path.PathSubmitCallback.class));
+        Route route = fragment.generateRoute();
+        Route.RouteSubmitCallback callback = mock(Route.RouteSubmitCallback.class);
+        route.submit(appContext, "Test Title", callback);
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(path.getName().equals("Test Path") && path.getLatitudes().get(1).equals(exampleLocations[1].getLatitude()) && PathMap.getInstance().getPathList().containsValue(path));
+        verify(callback).onSuccess();
+        assertTrue(PathMap.getInstance().getPathList().size() > initialSize);
     }
 
     @Test
-    public void recordChildPath() throws InterruptedException {
-        fragment.setParentPath(parentPath);
-        fragment.addLocation(exampleLocations[0]);
-        fragment.addLocation(exampleLocations[1]);
-        fragment.addLocation(exampleLocations[2]);
-        Path path = fragment.createPath("Test Path");
-        path.submit(appContext, mock(Path.PathSubmitCallback.class));
+    public void B_editPath() throws InterruptedException {
+        Path testPath = null;
+        for (Map.Entry<Integer,Path> entry : PathMap.getInstance().getPathList().entrySet()) {
+            testPath = entry.getValue();
+        }
+        testPath.edit(appContext, "Test Edited Title", mock(Path.PathChangeCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(path.getName().equals("Test Path") && path.getLatitudes().get(1).equals(exampleLocations[1].getLatitude()) && PathMap.getInstance().getPathList().containsValue(path) && path.getParentPath() == parentPath);
+        assertEquals("Test Edited Title", testPath.getName());
     }
 
     @Test
-    public void editPath() throws InterruptedException {
-        fragment.addLocation(exampleLocations[0]);
-        fragment.addLocation(exampleLocations[1]);
-        fragment.addLocation(exampleLocations[2]);
-        Path path = fragment.createPath("Test Path");
-        path.submit(appContext, mock(Path.PathSubmitCallback.class));
-        path.edit(appContext, "Test Edited Title", mock(Path.PathChangeCallback.class));
+    public void C_deleteRoute() throws InterruptedException {
+        Path testPath = null;
+        for (Map.Entry<Integer,Path> entry : PathMap.getInstance().getPathList().entrySet()) {
+            testPath = entry.getValue();
+        }
+        assertTrue(PathMap.getInstance().getPathList().containsValue(testPath));
+        testPath.getRoutes().get(0).delete(appContext, mock(Route.RouteSubmitCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(path.getName().equals("Test Edited Title"));
+        assertFalse(PathMap.getInstance().getPathList().containsValue(testPath));
     }
 
-    @Test
-    public void deletePath() throws InterruptedException {
-        fragment.addLocation(exampleLocations[0]);
-        fragment.addLocation(exampleLocations[1]);
-        fragment.addLocation(exampleLocations[2]);
-        Path path = fragment.createPath("Test Path");
-        path.submit(appContext, mock(Path.PathSubmitCallback.class));
-        path.delete(appContext, mock(Path.PathChangeCallback.class));
-        new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertFalse(PathMap.getInstance().getPathList().containsValue(path));
-    }
+
 }

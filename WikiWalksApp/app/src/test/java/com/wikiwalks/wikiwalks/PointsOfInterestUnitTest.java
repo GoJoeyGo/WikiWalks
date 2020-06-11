@@ -26,7 +26,7 @@ public class PointsOfInterestUnitTest {
         ArrayList<Double> altitudes = new ArrayList<Double>();
         altitudes.add(7.61);
 
-        Path testpath = new Path(name,latitudes,longitudes,altitudes,mockpath);
+        Path testpath = new Path();
 
         int id = 1;
         String poiName = "lookout";

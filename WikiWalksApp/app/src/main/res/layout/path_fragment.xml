@@ -15,7 +15,8 @@
             android:fitsSystemWindows="true"
             app:expandedTitleMarginEnd="56dp"
             app:expandedTitleMarginStart="40dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:titleEnabled="false">
 
             <fragment
                 android:id="@+id/map_path_preview_frag"
@@ -32,17 +33,34 @@
                 android:id="@+id/path_frag_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:contentInsetEnd="16dp"
+                app:contentInsetStart="16dp"
                 android:background="#00FFFFFF"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="@android:color/primary_text_light" />
+                app:titleTextColor="@android:color/primary_text_light"
+                app:layout_collapseMode="pin"
+                >
 
+                <ImageButton
+                    android:id="@+id/edit_title_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|right"
+                    android:background="#00FFFFFF"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_baseline_edit_24" />
+            </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
+
+
+
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:background="?attr/colorBackgroundFloating">
 
@@ -51,22 +69,14 @@
             android:layout_height="match_parent"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/path_frag_title"
-                android:layout_width="282dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
 
             <TextView
                 android:id="@+id/path_frag_walk_count"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/path_frag_title" />
-
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/path_frag_rating_bar"/>
 
             <RatingBar
                 android:id="@+id/path_frag_rating_bar"
@@ -75,8 +85,7 @@
                 android:layout_height="wrap_content"
                 android:isIndicator="true"
                 android:numStars="5"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                app:layout_constraintStart_toEndOf="@id/path_frag_walk_count"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -125,14 +134,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:background="@drawable/button_background"
-        android:padding="25dp"
+        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
 
         <Button
             android:id="@+id/select_route_button"
-            android:layout_width="360dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="SELECT ROUTE"
@@ -143,7 +152,7 @@
 
         <Button
             android:id="@+id/new_route_button"
-            android:layout_width="360dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="RECORD NEW ROUTE"
@@ -154,7 +163,7 @@
 
         <Button
             android:id="@+id/explore_button"
-            android:layout_width="360dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="EXPLORE"
@@ -162,18 +171,5 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/new_route_button" />
-
-        <Button
-            android:id="@+id/edit_button"
-            android:layout_width="360dp"
-            android:layout_height="50dp"
-            android:fontFamily="monospace"
-            android:text="EDIT"
-            style="@style/ButtonTheme"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/explore_button"
-            android:visibility="gone"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

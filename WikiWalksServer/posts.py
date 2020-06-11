@@ -1,13 +1,12 @@
-import json
+import datetime
+import os
+import uuid
 
+from PIL import Image
 from flask import jsonify, request, Blueprint
 from sqlalchemy import func
 
 from schemas import *
-import datetime
-import os
-from PIL import Image
-import uuid
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 posts = Blueprint('posts_blueprint', __name__, template_folder='templates')
@@ -26,19 +25,6 @@ def process_picture(file):
     return image, filename
 
 
-def update_boundaries(parent_id):
-    parent = Path.query.filter_by(id=parent_id).first()
-    parent.boundaries = [min(parent.latitudes), min(parent.longitudes), max(parent.latitudes), max(parent.longitudes)]
-    for child in parent.children:
-        parent.boundaries = [min(parent.boundaries[0], child.boundaries[0]),
-                             min(parent.boundaries[1], child.boundaries[1]),
-                             max(parent.boundaries[2], child.boundaries[2]),
-                             max(parent.boundaries[3], child.boundaries[3])]
-    db.session.commit()
-    if parent.parent_path is not None:
-        update_boundaries(parent.parent_path)
-
-
 def get_submitter(device):
     user = User.query.filter_by(device_id=device).first()
     if user is None:
@@ -54,48 +40,75 @@ def get_time():
     return time
 
 
-@posts.route("/paths/new", methods=["POST"])
-def add_path():
+@posts.route("/routes/new", methods=["POST"])
+def add_route():
     try:
         path_schema = PathSchema()
         request_json = request.get_json(force=True)["attributes"]
         if len(request_json["latitudes"]) == len(request_json["longitudes"]) == len(request_json["altitudes"]) \
                 and len(request_json["latitudes"]) > 0:
-            request_json["created_time"] = get_time()
-            starting_point = [request_json["latitudes"][0], request_json["longitudes"][0]]
-            ending_point = [request_json["latitudes"][len(request_json["latitudes"]) - 1],
-                            request_json["longitudes"][len(request_json["longitudes"]) - 1]]
+            user = get_submitter(request_json["device_id"])
+            time = get_time()
             boundaries = [min(request_json["latitudes"]), min(request_json["longitudes"]),
                           max(request_json["latitudes"]), max(request_json["longitudes"])]
-            user = get_submitter(request_json["device_id"])
-            data = path_schema.load(request_json, partial=True)
-            new_path = Path(**data, submitter=user.id, walk_count=1, starting_point=starting_point,
-                            ending_point=ending_point, boundaries=boundaries, rating_count=0, average_rating=0.0)
-            db.session.add(new_path)
-            db.session.commit()
-            if "parent_path" in request_json:
-                parent = Path.query.filter_by(id=request_json["parent_path"]).first()
-                if parent is not None and request_json["parent_path"] is not new_path.id:
-                    update_boundaries(request_json["parent_path"])
-                    parent.children.append(new_path)
+            if "path" in request_json:
+                path = Path.query.filter_by(id=request_json["path"]).first()
+                if path is not None:
+                    current_boundaries = path.boundaries
+                    path.boundaries = [min(current_boundaries[0], boundaries[0]),
+                                       min(current_boundaries[1], boundaries[1]),
+                                       max(current_boundaries[2], boundaries[2]),
+                                       max(current_boundaries[3], boundaries[3])]
                 else:
                     return jsonify({"status": "failed"}), 422
-            return jsonify({"status": "success", "path": path_schema.dump(new_path)}), 201
+            else:
+                marker_point = [request_json["latitudes"][0], request_json["longitudes"][0]]
+                path = Path(name=request_json["name"], submitter=user.id, created_time=time, boundaries=boundaries,
+                            marker_point=marker_point, walk_count=1, average_rating=0.0, rating_count=0)
+                db.session.add(path)
+                db.session.commit()
+            new_route = Route(submitter=user.id, created_time=time, path=path.id, latitudes=request_json["latitudes"],
+                              longitudes=request_json["longitudes"], altitudes=request_json["altitudes"])
+            db.session.add(new_route)
+            db.session.commit()
+            user = get_submitter(request_json["device_id"])
+            if path in user.paths:
+                path.editable = True
+            pois = PointOfInterest.query.filter_by(path=path.id)
+            for poi in pois:
+                if poi in user.points_of_interest:
+                    poi.editable = True
+            routes = Route.query.filter_by(path=path.id)
+            for route in routes:
+                if route in user.routes:
+                    route.editable = True
+            return jsonify({"status": "success", "path": path_schema.dump(path)}), 201
         return jsonify({"status": "failed"}), 422
     except Exception as e:
-        print(e.with_traceback())
+        print(e)
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/edit", methods=["POST"])
-def edit_path(path_id):
+@posts.route("/routes/<route_id>/delete", methods=["POST"])
+def delete_route(route_id):
     try:
-        path_schema = PathSchema()
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        path = Path.query.filter_by(id=path_id)
-        if path.first() in user.paths:
-            path.update(dict(path_schema.load(request_json, partial=True)))
+        route = Route.query.get(route_id)
+        path = Path.query.filter_by(id=route.path).first()
+        if route in user.routes:
+            db.session.delete(route)
+            routes = Route.query.filter_by(path=path.id)
+            if routes.first() is not None:
+                boundaries = [91, 181, -91, -181]
+                for route in routes:
+                    route_boundaries = [min(route.latitudes), min(route.longitudes), max(route.latitudes),
+                                        max(route.longitudes)]
+                    boundaries = [min(route_boundaries[0], boundaries[0]), min(route_boundaries[1], boundaries[1]),
+                                  max(route_boundaries[2], boundaries[2]), max(route_boundaries[3], boundaries[3])]
+                path.boundaries = boundaries
+            else:
+                db.session.delete(path)
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
@@ -105,19 +118,14 @@ def edit_path(path_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/delete", methods=["POST"])
-def delete_path(path_id):
+@posts.route("/paths/<path_id>/edit", methods=["POST"])
+def edit_path(path_id):
     try:
+        path_schema = PathSchema()
         request_json = request.get_json(force=True)["attributes"]
-        user = get_submitter(request_json["device_id"])
-        path = Path.query.get(path_id)
-        if path in user.paths:
-            db.session.delete(path)
-            if path.parent_path is not None:
-                update_boundaries(path.parent_path)
-            db.session.commit()
-        else:
-            return jsonify({"status": "failed"}), 403
+        path = Path.query.filter_by(id=path_id)
+        path.update(dict(path_schema.load(request_json, partial=True)))
+        db.session.commit()
         return jsonify({"status": "success"}), 201
     except Exception as e:
         print(e)
@@ -306,7 +314,8 @@ def delete_poi_review(poi_id, poi_review_id):
             db.session.delete(poi_review)
             poi.rating_count = poi.rating_count - 1
             if poi.rating_count != 0:
-                poi.average_rating = db.session.query(func.avg(PointOfInterestReview.rating)).filter_by(point_of_interest_id=poi.id).scalar()
+                poi.average_rating = db.session.query(func.avg(PointOfInterestReview.rating)).filter_by(
+                    point_of_interest_id=poi.id).scalar()
             else:
                 poi.average_rating = 0
             db.session.commit()
@@ -363,7 +372,7 @@ def edit_path_review(path_id, path_review_id):
             return jsonify({"status": "failed"}), 403
         return jsonify({"status": "success"}), 201
     except Exception as e:
-        print(e.with_traceback())
+        print(e)
         return jsonify({"status": "failed"}), 500
 
 

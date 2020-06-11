@@ -12,12 +12,12 @@ import java.util.ArrayList;
 
 public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteListRecyclerViewAdapter.ViewHolder> {
     ArrayList<Button> buttons = new ArrayList<>();
-    ArrayList<Path> routeList;
+    ArrayList<Route> routeList;
     RouteListFragment context;
 
-    public RouteListRecyclerViewAdapter(RouteListFragment context, ArrayList<Path> pathList) {
+    public RouteListRecyclerViewAdapter(RouteListFragment context, ArrayList<Route> routeList) {
         this.context = context;
-        this.routeList = pathList;
+        this.routeList = routeList;
     }
 
     @NonNull
@@ -30,8 +30,7 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        final Path path = routeList.get(position);
-        holder.button.setText(path.getName());
+        holder.button.setText(String.format("Route %d", position + 1));
         holder.button.setOnClickListener(v -> {
             for (Button button : buttons) {
                 button.setBackgroundColor(0x00000000);

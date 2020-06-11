@@ -1,14 +1,12 @@
 package com.wikiwalks.wikiwalks;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.LayoutInflater;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,7 +32,7 @@ import java.util.ArrayList;
 
 public class WalkFragment extends Fragment implements OnMapReadyCallback {
 
-    private boolean isRoute;
+    private Integer routeNumber;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
@@ -44,12 +42,12 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
 
-    public static WalkFragment newInstance(Path path, boolean isRoute) {
+    public static WalkFragment newInstance(Path path, Integer routeNumber) {
         Bundle args = new Bundle();
         WalkFragment fragment = new WalkFragment();
         fragment.setArguments(args);
         fragment.setPath(path);
-        fragment.setRoute(isRoute);
+        fragment.setRoute(routeNumber);
         return fragment;
     }
 
@@ -79,18 +77,14 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setScrollGesturesEnabledDuringRotateOrZoom(false);
         mMap.getUiSettings().setCompassEnabled(false);
-        if (isRoute) {
-            path.makePolyLine(mMap);
-            pathLatitudes = path.getLatitudes();
-            pathLongitudes = path.getLongitudes();
+        if (routeNumber != null) {
+            path.getRoutes().get(routeNumber).makePolyline(mMap);
+            pathLatitudes = path.getRoutes().get(routeNumber).getLatitudes();
+            pathLongitudes = path.getRoutes().get(routeNumber).getLongitudes();
         } else {
-            Path parent = path;
-            while (parent.getParentPath() != null) {
-                parent = parent.getParentPath();
-            }
-            parent.makeAllPolyLines(mMap);
-            pathLatitudes = parent.getAllLatitudes();
-            pathLongitudes = parent.getAllLongitudes();
+            for (Route route : path.getRoutes()) route.makePolyline(mMap);
+            pathLatitudes = path.getAllLatitudes();
+            pathLongitudes = path.getAllLongitudes();
         }
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20)));
         startLocationUpdates();
@@ -151,7 +145,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void setRoute(boolean route) {
-        isRoute = route;
+    public void setRoute(Integer routeNumber) {
+        this.routeNumber = routeNumber;
     }
 }

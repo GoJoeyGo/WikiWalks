@@ -17,11 +17,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class PathMap {
 
     private static PathMap instance = null;
-    private HashMap<Integer, Path> pathList = new HashMap<>();
+    private LinkedHashMap<Integer, Path> pathList = new LinkedHashMap<>();
 
     public interface PathMapListener {
         void OnPathMapChange();
@@ -58,17 +59,17 @@ public class PathMap {
                     triggerChangeListeners();
                 } catch (JSONException e) {
                     triggerFailedListeners();
-                    Log.e("PATH_UPDATE", Arrays.toString(e.getStackTrace()));
+                    Log.e("PATH_UPDATE1", Arrays.toString(e.getStackTrace()));
 
                 }
             }, error -> {
                 triggerFailedListeners();
-                Log.e("PATH_UPDATE", Arrays.toString(error.getStackTrace()));
+                Log.e("PATH_UPDATE2", Arrays.toString(error.getStackTrace()));
             });
             requestQueue.add(paths);
         } catch (JSONException e) {
             triggerFailedListeners();
-            Log.e("PATH_UPDATE", Arrays.toString(e.getStackTrace()));
+            Log.e("PATH_UPDATE3", Arrays.toString(e.getStackTrace()));
         }
 
     }

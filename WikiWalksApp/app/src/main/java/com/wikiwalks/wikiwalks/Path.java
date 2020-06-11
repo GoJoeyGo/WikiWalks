@@ -32,40 +32,27 @@ public class Path {
     private int walkCount;
     private double rating;
 
-    private Path parentPath;
-    private ArrayList<Path> childPaths = new ArrayList<>();
+    private ArrayList<Route> routeList = new ArrayList<>();
     private ArrayList<PointOfInterest> pointsOfInterest = new ArrayList<>();
 
-    private ArrayList<Double> latitudes = new ArrayList<>();
-    private ArrayList<Double> longitudes = new ArrayList<>();
-    private ArrayList<Double> altitudes = new ArrayList<>();
-
+    private ArrayList<Marker> markers = new ArrayList<>();
+    private LatLng markerPoint;
     private LatLngBounds bounds;
-
-    public interface PathSubmitCallback {
-        void onSuccess();
-        void onFailure();
-    }
 
     public interface PathChangeCallback {
         void onEditSuccess();
         void onEditFailure();
-        void onDeleteSuccess();
-        void onDeleteFailure();
     }
 
-    public Path(String name, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, Path parentPath) {
-        if (latitudes.size() == longitudes.size() && latitudes.size() == altitudes.size()) {
-            this.name = name;
-            this.latitudes = latitudes;
-            this.longitudes = longitudes;
-            this.altitudes = altitudes;
-            this.parentPath = parentPath;
-            isNew = true;
-            editable = true;
-        }
-        else throw new IllegalArgumentException("Latitude, longitude, and altitude must be the same size");
+    public Path(int id, String name, int walkCount, double rating, double[] bounds) {
+        this.id = id;
+        this.name = name;
+        this.walkCount = walkCount;
+        this.rating = rating;
+        this.bounds = new LatLngBounds(new LatLng(bounds[0], bounds[1]), new LatLng(bounds[2], bounds[3]));
     }
+
+    public Path() {}
 
     public Path(JSONObject pathJson) throws JSONException {
         id = pathJson.getInt("id");
@@ -73,37 +60,37 @@ public class Path {
         walkCount = pathJson.getInt("walk_count");
         rating = pathJson.getDouble("average_rating");
         editable = pathJson.getBoolean("editable");
-        for (int i = 0; i < pathJson.getJSONArray("latitudes").length(); i++) {
-            latitudes.add(pathJson.getJSONArray("latitudes").getDouble(i));
-            longitudes.add(pathJson.getJSONArray("longitudes").getDouble(i));
-            altitudes.add(pathJson.getJSONArray("altitudes").getDouble(i));
-        }
-        double south_bound = pathJson.getJSONArray("boundaries").getDouble(0);
-        double west_bound = pathJson.getJSONArray("boundaries").getDouble(1);
-        double north_bound = pathJson.getJSONArray("boundaries").getDouble(2);
-        double east_bound = pathJson.getJSONArray("boundaries").getDouble(3);
-        bounds = new LatLngBounds(new LatLng(south_bound, west_bound), new LatLng(north_bound, east_bound));
+        markerPoint = new LatLng(pathJson.getJSONArray("marker_point").getDouble(0), pathJson.getJSONArray("marker_point").getDouble(1));
+        JSONArray boundaries = pathJson.getJSONArray("boundaries");
+        bounds = new LatLngBounds(new LatLng(boundaries.getDouble(0), boundaries.getDouble(1)), new LatLng(boundaries.getDouble(2), boundaries.getDouble(3)));
         JSONArray points_of_interest = pathJson.getJSONArray("points_of_interest");
         for (int i = 0; i < points_of_interest.length(); i++) {
             JSONObject pointOfInterest = points_of_interest.getJSONObject(i);
             pointsOfInterest.add(new PointOfInterest(pointOfInterest.getInt("id"), pointOfInterest.getString("name"), pointOfInterest.getDouble("latitude"), pointOfInterest.getDouble("longitude"), this));
         }
-        if (!pathJson.isNull("parent_path")) {
-            parentPath = PathMap.getInstance().getPathList().get(pathJson.getInt("parent_path"));
-            parentPath.addChild(this);
+        JSONArray routes = pathJson.getJSONArray("routes");
+        for (int i = 0; i < routes.length(); i++) {
+            JSONObject route = routes.getJSONObject(i);
+            ArrayList<Double> routeLatitudes = new ArrayList<>();
+            ArrayList<Double> routeLongitudes = new ArrayList<>();
+            ArrayList<Double> routeAltitudes = new ArrayList<>();
+            for (int j = 0; j < route.getJSONArray("latitudes").length(); j++) {
+                routeLatitudes.add(route.getJSONArray("latitudes").getDouble(j));
+                routeLongitudes.add(route.getJSONArray("longitudes").getDouble(j));
+                routeAltitudes.add(route.getJSONArray("altitudes").getDouble(j));
+            }
+            boolean editable = route.getBoolean("editable");
+            int routeId = route.getInt("id");
+            routeList.add(new Route(routeId, this, editable, routeLatitudes, routeLongitudes, routeAltitudes));
         }
-    }
-
-    public void addChild(Path child) {
-        childPaths.add(child);
-    }
-
-    public void removeChild(Path child) {
-        childPaths.remove(child);
     }
 
     public void addPointOfInterest(PointOfInterest pointOfInterest) {
         pointsOfInterest.add(pointOfInterest);
+    }
+
+    public void removeRoute(Route route) {
+        routeList.remove(route);
     }
 
     public boolean isEditable() {
@@ -126,126 +113,56 @@ public class Path {
         return rating;
     }
 
-    public Path getParentPath() {
-        return parentPath;
-    }
-
-    public ArrayList<Path> getChildPaths() {
-        return childPaths;
-    }
-
-    public ArrayList<Path> getAllChildPaths() {
-        ArrayList<Path> pathList = new ArrayList<>(childPaths);
-        for (Path child : childPaths) {
-            pathList.addAll(child.getAllChildPaths());
+    public ArrayList<Double> getAllLatitudes() {
+        ArrayList<Double> allLatitudes = new ArrayList<>();
+        for (Route route : routeList) {
+            allLatitudes.addAll(route.getLatitudes());
         }
-        return pathList;
+        return allLatitudes;
+    }
+
+    public ArrayList<Double> getAllLongitudes() {
+        ArrayList<Double> allLongitudes = new ArrayList<>();
+        for (Route route : routeList) {
+            allLongitudes.addAll(route.getLongitudes());
+        }
+        return allLongitudes;
     }
 
     public ArrayList<PointOfInterest> getPointsOfInterest() {
         return pointsOfInterest;
     }
 
-    public ArrayList<PointOfInterest> getAllPointsOfInterest() {
-        ArrayList<PointOfInterest> poiList = new ArrayList<>(pointsOfInterest);
-        for (Path child : childPaths) {
-            poiList.addAll(child.getAllPointsOfInterest());
-        }
-        return poiList;
+    public ArrayList<Route> getRoutes() {
+        return routeList;
     }
 
-    public ArrayList<Double> getAllLatitudes() {
-        ArrayList<Double> latitudeList = new ArrayList<>(latitudes);
-        for (Path child : childPaths) {
-            latitudeList.addAll(child.getAllLatitudes());
-        }
-        return latitudeList;
-    }
-
-    public ArrayList<Double> getAllLongitudes() {
-        ArrayList<Double> longitudeList = new ArrayList<>(longitudes);
-        for (Path child : childPaths) {
-            longitudeList.addAll(child.getAllLongitudes());
-        }
-        return longitudeList;
-    }
-
-    public ArrayList<Double> getAllAltitudes() {
-        ArrayList<Double> altitudeList = new ArrayList<>(altitudes);
-        for (Path child : childPaths) {
-            altitudeList.addAll(child.getAllLongitudes());
-        }
-        return altitudeList;
-    }
-
-    public ArrayList<Double> getLatitudes() {
-        return latitudes;
-    }
-
-    public ArrayList<Double> getLongitudes() {
-        return longitudes;
-    }
-
-    public ArrayList<Double> getAltitudes() {
-        return altitudes;
+    public LatLng getMarkerPoint() {
+        return markerPoint;
     }
 
     public LatLngBounds getBounds() {
         return bounds;
     }
 
-    public void setBounds(LatLngBounds bounds) {
-        this.bounds = bounds;
+    public ArrayList<Marker> getMarkers() {
+        return markers;
     }
 
     public Marker makeMarker(GoogleMap map) {
-        Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(latitudes.get(0), longitudes.get(0))));
+        Marker marker = map.addMarker(new MarkerOptions().position(markerPoint));
         marker.setTag(id);
         marker.setTitle(name);
+        markers.add(marker);
         return marker;
-    }
-
-    public Polyline makePolyLine(GoogleMap map) {
-        LinkedList<LatLng> points = new LinkedList<>();
-        for (int i = 0; i < getLatitudes().size(); i++) {
-            points.add(new LatLng(getLatitudes().get(i), getLongitudes().get(i)));
-        }
-        Polyline polyline = map.addPolyline(new PolylineOptions().clickable(true).addAll(points));
-        int walkCount = getWalkCount();
-        if (walkCount < 10) polyline.setColor(0xffffe49c);
-        else if (walkCount < 100) polyline.setColor(0xffff9100);
-        else if (walkCount < 1000) polyline.setColor(0xffff1e00);
-        else polyline.setColor(0xff000000);
-        polyline.setWidth(20);
-        return polyline;
-    }
-
-    public ArrayList<Polyline> makeAllPolyLines(GoogleMap map) {
-        ArrayList<Polyline> allPolylines = new ArrayList<>();
-        allPolylines.add(makePolyLine(map));
-        for (Path child : childPaths) {
-            allPolylines.addAll(child.makeAllPolyLines(map));
-        }
-        return allPolylines;
     }
 
     public void update(final Context context) {
         final RequestQueue requestQueue = Volley.newRequestQueue(context);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.GET, context.getString(R.string.local_url) + String.format("/paths/%d", id), null, response -> {
-            JSONObject responseJson;
             try {
-                responseJson = response.getJSONObject("path");
-                name = responseJson.getString("name");
-                walkCount = responseJson.getInt("walk_count");
-                rating = responseJson.getDouble("average_rating");
-                double south_bound = responseJson.getJSONArray("boundaries").getDouble(0);
-                double west_bound = responseJson.getJSONArray("boundaries").getDouble(1);
-                double north_bound = responseJson.getJSONArray("boundaries").getDouble(2);
-                double east_bound = responseJson.getJSONArray("boundaries").getDouble(3);
-                bounds = new LatLngBounds(new LatLng(south_bound, west_bound), new LatLng(north_bound, east_bound));
-                if (parentPath != null) {
-                    parentPath.update(context);
-                }
+                JSONObject responseJson = response.getJSONObject("path");
+                PathMap.getInstance().addPath(new Path(responseJson));
             } catch (JSONException e) {
                 Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
                 Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
@@ -257,54 +174,6 @@ public class Path {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void submit(Context context, PathSubmitCallback callback) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url =  context.getString(R.string.local_url) + "/paths/new";
-        JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
-        try {
-            attributes.put("name", name);
-            attributes.put("device_id", MainActivity.getDeviceId(context));
-            attributes.put("latitudes", new JSONArray(latitudes));
-            attributes.put("longitudes", new JSONArray(longitudes));
-            attributes.put("altitudes", new JSONArray(altitudes));
-            if (parentPath != null) attributes.put("parent_path", parentPath.id);
-            request.put("attributes", attributes);
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
-                try {
-                    JSONObject responseJson = response.getJSONObject("path");
-                    id = responseJson.getInt("id");
-                    walkCount = 1;
-                    rating = 0;
-                    isNew = false;
-                    double south_bound = responseJson.getJSONArray("boundaries").getDouble(0);
-                    double west_bound = responseJson.getJSONArray("boundaries").getDouble(1);
-                    double north_bound = responseJson.getJSONArray("boundaries").getDouble(2);
-                    double east_bound = responseJson.getJSONArray("boundaries").getDouble(3);
-                    bounds = new LatLngBounds(new LatLng(south_bound, west_bound), new LatLng(north_bound, east_bound));
-                    if (parentPath != null) {
-                        parentPath.addChild(this);
-                        parentPath.update(context);
-                    }
-                    PathMap.getInstance().addPath(this);
-                    callback.onSuccess();
-                } catch (JSONException e) {
-                    Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
-                    Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
-                }
-            }, error -> {
-                Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
-                Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
-                callback.onFailure();
-            });
-            requestQueue.add(jsonObjectRequest);
-        } catch (JSONException e) {
-            Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
-            Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
-            callback.onFailure();
-        }
-    }
-
     public void edit(Context context, String title, PathChangeCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         String url =  context.getString(R.string.local_url) + String.format("/paths/%d/edit", id);
@@ -312,7 +181,6 @@ public class Path {
         JSONObject attributes = new JSONObject();
         try {
             attributes.put("name", title);
-            attributes.put("device_id", MainActivity.getDeviceId(context));
             request.put("attributes", attributes);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
                 this.name = title;
@@ -325,33 +193,6 @@ public class Path {
         } catch (JSONException e) {
             Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
             callback.onEditFailure();
-        }
-    }
-
-    public void delete(final Context context, PathChangeCallback callback) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
-        try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
-            request.put("attributes", attributes);
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, context.getString(R.string.local_url) + String.format("/paths/%d/delete", id), request, response -> {
-                if (parentPath != null) {
-                    parentPath.removeChild(this);
-                    parentPath.update(context);
-                }
-                PathMap pathMap = PathMap.getInstance();
-                for (Path child : childPaths) pathMap.deletePath(child);
-                pathMap.deletePath(this);
-                callback.onDeleteSuccess();
-            }, error -> {
-                Log.e("DELETE_PATH", Arrays.toString(error.getStackTrace()));
-                callback.onDeleteFailure();
-            });
-            requestQueue.add(jsonObjectRequest);
-        } catch (JSONException e) {
-            Log.e("DELETE_PATH", Arrays.toString(e.getStackTrace()));
-            callback.onDeleteFailure();
         }
     }
 }
