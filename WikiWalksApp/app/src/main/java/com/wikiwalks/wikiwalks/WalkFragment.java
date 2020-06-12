@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -41,6 +42,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     ImageView offTrackDirectionIndicator;
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
+    private Toolbar toolbar;
 
     public static WalkFragment newInstance(int pathId, int routeNumber) {
         Bundle args = new Bundle();
@@ -57,6 +59,10 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         routeNumber = getArguments().getInt("routeNumber");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.walk_fragment, container, false);
+        toolbar = rootView.findViewById(R.id.walk_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(path.getName());
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
         mapFragment.getMapAsync(this);
         outOfRangeBanner = rootView.findViewById(R.id.out_of_range_banner);

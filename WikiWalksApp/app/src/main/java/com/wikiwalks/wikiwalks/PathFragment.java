@@ -94,6 +94,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         for (Route route : path.getRoutes()) polylines.add(route.makePolyline(googleMap));
         googleMap.getUiSettings().setAllGesturesEnabled(false);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10 ));

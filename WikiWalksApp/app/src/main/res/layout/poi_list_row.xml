@@ -9,7 +9,8 @@
         style="@style/TextButtonTheme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+        android:drawableEnd="@drawable/chevron"
+        android:drawableRight="@drawable/chevron"
         android:gravity="center_vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

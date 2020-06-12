@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -37,7 +38,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     int position;
     AlertDialog confirmationDialog;
     RouteListRecyclerViewAdapter recyclerViewAdapter;
-    TextView title;
+    Toolbar toolbar;
 
     public static RouteListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -52,23 +53,25 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         routes = path.getRoutes();
         final View rootView = inflater.inflate(R.layout.route_list_fragment, container, false);
+        toolbar = rootView.findViewById(R.id.route_list_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle("Routes - " + path.getName());
         recyclerView = rootView.findViewById(R.id.route_list_recyclerview);
         recyclerViewAdapter = new RouteListRecyclerViewAdapter(this, routes);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        title = rootView.findViewById(R.id.route_list_frag_title);
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
         deleteButton = rootView.findViewById(R.id.edit_route_button);
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_route_list_frag);
         mapFragment.getMapAsync(this);
-        TextView title = rootView.findViewById(R.id.route_list_frag_title);
-        title.setText(path.getName());
         return rootView;
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         routeListMap = googleMap;
+        routeListMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         for (Route route : routes) {
             polylines.add(route.makePolyline(routeListMap));
         }

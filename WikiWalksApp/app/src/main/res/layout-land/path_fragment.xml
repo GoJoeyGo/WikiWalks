@@ -1,70 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/path_frag_toolbar_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="300dp">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/path_frag_collapsing_toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:expandedTitleMarginEnd="56dp"
-            app:expandedTitleMarginStart="40dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:titleEnabled="false">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/path_frag_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:contentInsetEnd="16dp"
+        app:contentInsetStart="16dp"
+        android:background="?attr/colorBackgroundFloating"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="?attr/colorOnBackground"
+        >
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/map_path_preview_frag"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:context=".ui.main.PathFragment"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.5" />
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/path_frag_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:contentInsetEnd="16dp"
-                app:contentInsetStart="16dp"
-                android:background="#00FFFFFF"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="?attr/colorOnBackground"
-                app:layout_collapseMode="pin">
-
-                <ImageButton
-                    android:id="@+id/edit_title_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|end"
-                    android:background="#00FFFFFF"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_baseline_edit_24"
-                    android:contentDescription="Edit Title" />
-            </androidx.appcompat.widget.Toolbar>
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
+        <ImageButton
+            android:id="@+id/edit_title_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:background="#00FFFFFF"
+            android:scaleType="center"
+            android:src="@drawable/ic_baseline_edit_24"
+            android:contentDescription="Edit Title" />
+    </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map_path_preview_frag"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/walk_path_option_selector"
+        app:layout_constraintTop_toBottomOf="@id/path_frag_toolbar_wrapper"
+        app:layout_constraintWidth_percent="0.5"
+        tools:context=".ui.main.PathFragment" />
+
+
     <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:clipToPadding="false"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="?attr/colorBackgroundFloating">
+        app:layout_constraintHorizontal_weight="0.5"
+        android:background="?attr/colorBackgroundFloating"
+        app:layout_constraintTop_toBottomOf="@id/path_frag_toolbar_wrapper"
+        app:layout_constraintStart_toEndOf="@id/map_path_preview_frag"
+        app:layout_constraintBottom_toTopOf="@id/walk_path_option_selector"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:padding="16dp">
 
 
@@ -124,8 +121,6 @@
                 android:text="Pictures"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/path_frag_reviews_button" />
-
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -142,35 +137,39 @@
 
         <Button
             android:id="@+id/select_route_button"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="SELECT ROUTE"
             style="@style/ButtonTheme"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/new_route_button"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp" />
 
         <Button
             android:id="@+id/new_route_button"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="RECORD NEW ROUTE"
             style="@style/ButtonTheme"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/select_route_button" />
+            app:layout_constraintStart_toEndOf="@id/select_route_button"
+            app:layout_constraintEnd_toStartOf="@id/explore_button"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/explore_button"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="EXPLORE"
             style="@style/ButtonTheme"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/new_route_button" />
+            app:layout_constraintStart_toEndOf="@id/new_route_button"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

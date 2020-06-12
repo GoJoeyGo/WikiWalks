@@ -9,6 +9,7 @@
         style="@style/TextButtonTheme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/route_indicator"
         android:drawableRight="@drawable/route_indicator"
         android:gravity="center_vertical"
         app:layout_constraintStart_toStartOf="parent"

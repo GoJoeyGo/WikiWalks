@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -47,6 +48,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private Location lastLocation;
     Route newRoute;
+    Toolbar toolbar;
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -86,6 +88,10 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.recording_fragment, container, false);
+        toolbar = rootView.findViewById(R.id.recording_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle((pathId > -1) ? "New Route - " + path.getName() : "New Path");
         stopRecordingButton = rootView.findViewById(R.id.stop_recording_button);
         stopRecordingButton.setOnClickListener(v -> {
             if (recording) {

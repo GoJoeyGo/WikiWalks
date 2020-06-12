@@ -17,7 +17,7 @@
             app:expandedTitleMarginStart="40dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
-            <fragment
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/map_poi_preview_frag"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
@@ -86,7 +86,8 @@
                 style="@style/TextButtonTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+                android:drawableEnd="@drawable/chevron"
+                android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
                 android:text="Reviews"
                 app:layout_constraintStart_toStartOf="parent"
@@ -97,7 +98,8 @@
                 style="@style/TextButtonTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+                android:drawableEnd="@drawable/chevron"
+                android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
                 android:text="Pictures"
                 app:layout_constraintStart_toStartOf="parent"

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,6 +34,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private HashMap<Integer, Marker> markers = new HashMap<>();
     private Button createPath;
     private boolean hasFailed = false;
+    Toolbar toolbar;
 
     public static MapsFragment newInstance() {
         Bundle args = new Bundle();
@@ -46,6 +48,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         PathMap.getInstance().addListener(this);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
+        toolbar = rootView.findViewById(R.id.main_toolbar);
+        toolbar.setTitle(R.string.app_name);
         createPath = rootView.findViewById(R.id.create_path_button);
         createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack("Map").commit());
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);
