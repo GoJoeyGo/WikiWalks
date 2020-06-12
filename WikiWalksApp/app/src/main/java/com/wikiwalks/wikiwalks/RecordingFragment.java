@@ -69,14 +69,15 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         int pathId = getArguments().getInt("pathId");
         if (pathId > -1)
             path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
-        if (getArguments().containsKey("latitudes")) {
-            double[] latitudeArray = getArguments().getDoubleArray("latitudes");
-            double[] longitudeArray = getArguments().getDoubleArray("longitudes");
-            double[] altitudeArray = getArguments().getDoubleArray("altitudes");
+        if (savedInstanceState != null && savedInstanceState.containsKey("latitudes")) {
+            double[] latitudeArray = savedInstanceState.getDoubleArray("latitudes");
+            double[] longitudeArray = savedInstanceState.getDoubleArray("longitudes");
+            double[] altitudeArray = savedInstanceState.getDoubleArray("altitudes");
             for (int i = 0; i < latitudeArray.length; i++) {
                 latitudes.add(latitudeArray[i]);
                 longitudes.add(longitudeArray[i]);
                 altitudes.add(altitudeArray[i]);
+                latLngs.add(new LatLng(latitudeArray[i], longitudeArray[i]));
             }
             lastLocation = new Location(LocationManager.GPS_PROVIDER);
             lastLocation.setLatitude(latitudeArray[latitudeArray.length - 1]);
@@ -243,11 +244,4 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         outState.putDoubleArray("altitudes", altitudeArray);
         super.onSaveInstanceState(outState);
     }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-    }
-
-
 }
