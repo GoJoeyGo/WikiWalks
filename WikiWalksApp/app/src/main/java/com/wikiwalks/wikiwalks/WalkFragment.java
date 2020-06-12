@@ -32,7 +32,7 @@ import java.util.ArrayList;
 
 public class WalkFragment extends Fragment implements OnMapReadyCallback {
 
-    private Integer routeNumber;
+    private int routeNumber;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
@@ -42,17 +42,19 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
 
-    public static WalkFragment newInstance(Path path, Integer routeNumber) {
+    public static WalkFragment newInstance(int pathId, int routeNumber) {
         Bundle args = new Bundle();
+        args.putInt("pathId", pathId);
+        args.putInt("routeNumber", routeNumber);
         WalkFragment fragment = new WalkFragment();
         fragment.setArguments(args);
-        fragment.setPath(path);
-        fragment.setRoute(routeNumber);
         return fragment;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        routeNumber = getArguments().getInt("routeNumber");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.walk_fragment, container, false);
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
@@ -77,7 +79,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setScrollGesturesEnabledDuringRotateOrZoom(false);
         mMap.getUiSettings().setCompassEnabled(false);
-        if (routeNumber != null) {
+        if (routeNumber > -1) {
             path.getRoutes().get(routeNumber).makePolyline(mMap);
             pathLatitudes = path.getRoutes().get(routeNumber).getLatitudes();
             pathLongitudes = path.getRoutes().get(routeNumber).getLongitudes();
@@ -148,4 +150,5 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     public void setRoute(Integer routeNumber) {
         this.routeNumber = routeNumber;
     }
+
 }

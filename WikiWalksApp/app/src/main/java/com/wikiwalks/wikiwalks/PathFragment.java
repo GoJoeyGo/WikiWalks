@@ -43,15 +43,16 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
 
     public static PathFragment newInstance(int pathId) {
         Bundle args = new Bundle();
+        args.putInt("pathId", pathId);
         PathFragment fragment = new PathFragment();
         fragment.setArguments(args);
-        fragment.setPath(PathMap.getInstance().getPathList().get(pathId));
-        PathMap.getInstance().addListener(fragment);
         return fragment;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        PathMap.getInstance().addListener(this);
         final View rootView = inflater.inflate(R.layout.path_fragment, container, false);
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
         mapFragment.getMapAsync(this);
@@ -62,14 +63,14 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
         toolbar.setTitle(path.getName());
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
         selectRouteButton.setOnClickListener(view -> {
-            RouteListFragment routeListFragment = RouteListFragment.newInstance(path);
+            RouteListFragment routeListFragment = RouteListFragment.newInstance(path.id);
             routeListFragment.setTargetFragment(this, 0);
             getParentFragmentManager().beginTransaction().add(R.id.main_frame, routeListFragment).addToBackStack(null).commit();
         });
         recordRouteButton = rootView.findViewById(R.id.new_route_button);
-        recordRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path)).addToBackStack(null).commit());
+        recordRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path.id)).addToBackStack(null).commit());
         exploreButton = rootView.findViewById(R.id.explore_button);
-        exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path, null)).addToBackStack(null).commit());
+        exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path.id, -1)).addToBackStack(null).commit());
         editButton = rootView.findViewById(R.id.edit_title_button);
         editDialog = new EditDialog();
         editDialog.setTargetFragment(this, 0);

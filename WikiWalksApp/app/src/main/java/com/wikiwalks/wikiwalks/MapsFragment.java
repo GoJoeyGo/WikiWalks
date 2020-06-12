@@ -47,7 +47,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
         createPath = rootView.findViewById(R.id.create_path_button);
-        createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(null)).addToBackStack("Map").commit());
+        createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack("Map").commit());
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);
         mapFragment.getMapAsync(this);
         return rootView;

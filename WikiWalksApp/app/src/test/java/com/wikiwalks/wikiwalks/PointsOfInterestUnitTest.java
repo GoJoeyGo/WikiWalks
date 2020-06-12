@@ -38,7 +38,6 @@ public class PointsOfInterestUnitTest {
         cords = new LatLng(poilatitude, poilongitude);
 
         assertEquals(testpoint.getName(),"Testpath");
-       ;
 
 
     }

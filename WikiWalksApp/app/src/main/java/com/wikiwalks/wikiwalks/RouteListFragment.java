@@ -39,16 +39,17 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     RouteListRecyclerViewAdapter recyclerViewAdapter;
     TextView title;
 
-    public static RouteListFragment newInstance(Path path) {
+    public static RouteListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
+        args.putInt("pathId", pathId);
         RouteListFragment fragment = new RouteListFragment();
         fragment.setArguments(args);
-        fragment.setPath(path);
         return fragment;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         routes = path.getRoutes();
         final View rootView = inflater.inflate(R.layout.route_list_fragment, container, false);
         recyclerView = rootView.findViewById(R.id.route_list_recyclerview);
@@ -86,7 +87,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
         }
         polylines.get(position).setVisible(true);
         selectRouteButton.setEnabled(true);
-        selectRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().replace(R.id.main_frame, WalkFragment.newInstance(path, position)).addToBackStack(null).commit());
+        selectRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().replace(R.id.main_frame, WalkFragment.newInstance(path.id, position)).addToBackStack(null).commit());
         if (routes.get(position).isEditable()) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(v -> {

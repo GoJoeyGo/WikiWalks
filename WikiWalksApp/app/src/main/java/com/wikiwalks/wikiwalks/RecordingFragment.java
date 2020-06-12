@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -54,16 +56,33 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         }
     };
 
-    public static RecordingFragment newInstance(Path path) {
+    public static RecordingFragment newInstance(int pathId) {
         Bundle args = new Bundle();
+        args.putInt("pathId", pathId);
         RecordingFragment fragment = new RecordingFragment();
         fragment.setArguments(args);
-        fragment.setPath(path);
         return fragment;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        int pathId = getArguments().getInt("pathId");
+        if (pathId > -1)
+            path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        if (getArguments().containsKey("latitudes")) {
+            double[] latitudeArray = getArguments().getDoubleArray("latitudes");
+            double[] longitudeArray = getArguments().getDoubleArray("longitudes");
+            double[] altitudeArray = getArguments().getDoubleArray("altitudes");
+            for (int i = 0; i < latitudeArray.length; i++) {
+                latitudes.add(latitudeArray[i]);
+                longitudes.add(longitudeArray[i]);
+                altitudes.add(altitudeArray[i]);
+            }
+            lastLocation = new Location(LocationManager.GPS_PROVIDER);
+            lastLocation.setLatitude(latitudeArray[latitudeArray.length - 1]);
+            lastLocation.setLongitude(longitudeArray[longitudeArray.length - 1]);
+            lastLocation.setAltitude(altitudeArray[altitudeArray.length - 1]);
+        }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.recording_fragment, container, false);
         stopRecordingButton = rootView.findViewById(R.id.stop_recording_button);
@@ -135,7 +154,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
                 route.makePolyline(mMap);
             }
         }
-        polyline = mMap.addPolyline(new PolylineOptions());
+        polyline = mMap.addPolyline(new PolylineOptions().addAll(latLngs));
         polyline.setWidth(20);
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20)));
         startLocationUpdates();
@@ -208,4 +227,27 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     public void onFailure() {
         Toast.makeText(getContext(), "Failed to submit...", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        double[] latitudeArray = new double[latitudes.size()];
+        double[] longitudeArray = new double[longitudes.size()];
+        double[] altitudeArray = new double[altitudes.size()];
+        for (int i = 0; i < latitudes.size(); i++) {
+            latitudeArray[i] = latitudes.get(i);
+            longitudeArray[i] = longitudes.get(i);
+            altitudeArray[i] = altitudes.get(i);
+        }
+        outState.putDoubleArray("latitudes", latitudeArray);
+        outState.putDoubleArray("longitudes", longitudeArray);
+        outState.putDoubleArray("altitudes", altitudeArray);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+    }
+
+
 }
