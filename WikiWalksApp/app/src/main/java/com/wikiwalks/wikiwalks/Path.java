@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Path {
-    private boolean editable;
 
     int id;
     private String name;
@@ -55,7 +54,6 @@ public class Path {
         name = pathJson.getString("name");
         walkCount = pathJson.getInt("walk_count");
         rating = pathJson.getDouble("average_rating");
-        editable = pathJson.getBoolean("editable");
         markerPoint = new LatLng(pathJson.getJSONArray("marker_point").getDouble(0), pathJson.getJSONArray("marker_point").getDouble(1));
         JSONArray boundaries = pathJson.getJSONArray("boundaries");
         bounds = new LatLngBounds(new LatLng(boundaries.getDouble(0), boundaries.getDouble(1)), new LatLng(boundaries.getDouble(2), boundaries.getDouble(3)));
@@ -87,10 +85,6 @@ public class Path {
 
     public void removeRoute(Route route) {
         routeList.remove(route);
-    }
-
-    public boolean isEditable() {
-        return editable;
     }
 
     public int getId() {
@@ -190,5 +184,20 @@ public class Path {
             Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
             callback.onEditFailure();
         }
+    }
+
+    public void walk(Context context) {
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        String url =  context.getString(R.string.local_url) + String.format("/paths/%d/walk", id);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, null, response -> {
+            try {
+                this.walkCount = response.getInt("new_count");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }, error -> {
+            Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 }

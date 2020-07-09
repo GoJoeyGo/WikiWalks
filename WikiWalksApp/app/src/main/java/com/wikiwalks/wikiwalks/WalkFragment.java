@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +57,17 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        new CountDownTimer(30000, 30000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                path.walk(getContext());
+            }
+        }.start();
         routeNumber = getArguments().getInt("routeNumber");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         final View rootView = inflater.inflate(R.layout.walk_fragment, container, false);

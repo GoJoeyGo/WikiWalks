@@ -133,7 +133,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
                         stopRecordingButton.setText("STOP RECORDING");
                         startLocationUpdates();
                     } else {
-                        Toast.makeText(context, "Too far away from last point to resume!", Toast.LENGTH_SHORT);
+                        Toast.makeText(context, "Too far away from last point to resume!", Toast.LENGTH_SHORT).show();
                     }
                 });
 

@@ -135,6 +135,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
                 polylines.add(route.makePolyline(mMap));
             }
         }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
     }
 
     @Override

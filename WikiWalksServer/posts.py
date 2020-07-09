@@ -132,6 +132,18 @@ def edit_path(path_id):
         return jsonify({"status": "failed"}), 500
 
 
+@posts.route("/paths/<path_id>/walk", methods=["POST"])
+def walk_path(path_id):
+    try:
+        path = Path.query.filter_by(id=path_id).first()
+        path.walk_count = path.walk_count + 1
+        db.session.commit()
+        return jsonify({"status": "success", "new_count": path.walk_count}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
+
+
 @posts.route("/pois/new", methods=["POST"])
 def add_poi():
     try:

@@ -18,10 +18,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Route {
+public class Route implements Serializable {
     int id;
     Path path;
     boolean editable;
