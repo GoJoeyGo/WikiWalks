@@ -1,6 +1,7 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,7 @@ public class PathReviewListFragment extends Fragment implements Path.GetReviewsC
     TextView ownReviewMessage;
     RatingBar ownReviewRatingBar;
     View separator;
+    TextView noReviewsIndicator;
 
     public static PathReviewListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -63,6 +65,7 @@ public class PathReviewListFragment extends Fragment implements Path.GetReviewsC
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Reviews - " + path.getName());
+        noReviewsIndicator = rootView.findViewById(R.id.no_reviews_indicator);
         recyclerView = rootView.findViewById(R.id.path_review_list_recyclerview);
         recyclerViewAdapter = new PathReviewListRecyclerViewAdapter(this, pathReviews);
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -96,24 +99,40 @@ public class PathReviewListFragment extends Fragment implements Path.GetReviewsC
     }
 
     public void updateRecyclerView() {
-        if (path.getOwnReview() != null) {
-            ownReviewRatingBar.setRating(path.getOwnReview().getRating());
-            ownReviewMessage.setText(path.getOwnReview().getMessage());
-            ownReview.setVisibility(View.VISIBLE);
-            separator.setVisibility(View.VISIBLE);
-            writeReviewButton.setText("EDIT REVIEW");
-        } else {
+        if (path.getPathReviews().size() == 0 && path.getOwnReview() == null) {
+            recyclerView.setVisibility(View.GONE);
+            noReviewsIndicator.setVisibility(View.VISIBLE);
             ownReview.setVisibility(View.GONE);
             separator.setVisibility(View.GONE);
             writeReviewButton.setText("WRITE REVIEW");
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            noReviewsIndicator.setVisibility(View.GONE);
+            if (path.getOwnReview() != null) {
+                ownReviewRatingBar.setRating(path.getOwnReview().getRating());
+                if (!path.getOwnReview().getMessage().isEmpty()) {
+                    ownReviewMessage.setTypeface(ownReviewMessage.getTypeface(), Typeface.NORMAL);
+                    ownReviewMessage.setText(path.getOwnReview().getMessage());
+                } else {
+                    ownReviewMessage.setTypeface(ownReviewMessage.getTypeface(), Typeface.ITALIC);
+                    ownReviewMessage.setText("no review written");
+                }
+                ownReview.setVisibility(View.VISIBLE);
+                separator.setVisibility(View.VISIBLE);
+                writeReviewButton.setText("EDIT REVIEW");
+            } else {
+                ownReview.setVisibility(View.GONE);
+                separator.setVisibility(View.GONE);
+                writeReviewButton.setText("WRITE REVIEW");
+            }
+            pathReviews = path.getPathReviews();
+            recyclerViewAdapter.notifyDataSetChanged();
         }
-        pathReviews = path.getPathReviews();
-        writeReviewButton.setEnabled(true);
-        recyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onGetReviewsSuccess() {
+        writeReviewButton.setEnabled(true);
         updateRecyclerView();
     }
 

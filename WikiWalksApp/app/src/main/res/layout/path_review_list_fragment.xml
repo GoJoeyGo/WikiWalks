@@ -68,6 +68,18 @@
             app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/no_reviews_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/path_review_list_toolbar_wrapper"
+        app:layout_constraintBottom_toTopOf="@id/path_write_review_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="No reviews!"
+        style="@style/TextTheme"
+        android:visibility="gone"/>
+
     <View
         android:id="@+id/path_review_separator"
         app:layout_constraintTop_toBottomOf="@id/path_review_list_own_review"
