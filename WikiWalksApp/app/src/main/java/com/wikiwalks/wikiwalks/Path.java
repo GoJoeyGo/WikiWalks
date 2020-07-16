@@ -32,6 +32,7 @@ public class Path {
     private ArrayList<Route> routeList = new ArrayList<>();
     private ArrayList<PointOfInterest> pointsOfInterest = new ArrayList<>();
     private ArrayList<PathReview> pathReviews = new ArrayList<>();
+    private PathReview ownReview;
 
     private ArrayList<Marker> markers = new ArrayList<>();
     private LatLng markerPoint;
@@ -45,6 +46,11 @@ public class Path {
     public interface GetReviewsCallback {
         void onGetReviewsSuccess();
         void onGetReviewsFailure();
+    }
+
+    public interface SubmitReviewCallback {
+        void onSubmitReviewSuccess();
+        void onSubmitReviewFailure();
     }
 
     public Path(int id, String name, int walkCount, double rating, double[] bounds) {
@@ -113,6 +119,14 @@ public class Path {
 
     public ArrayList<PathReview> getPathReviews() {
         return pathReviews;
+    }
+
+    public PathReview getOwnReview() {
+        return ownReview;
+    }
+
+    public void setOwnReview(PathReview ownReview) {
+        this.ownReview = ownReview;
     }
 
     public ArrayList<Double> getAllLatitudes() {
@@ -233,8 +247,14 @@ public class Path {
                                 break;
                             }
                         }
+                        if (ownReview != null && ownReview.getId() == review.getInt("id")) exists = true;
                         if (!exists) {
-                            pathReviews.add(new PathReview(review.getInt("id"), review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable")));
+                            PathReview newReview = new PathReview(review.getInt("id"), this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                            if (newReview.isEditable()) {
+                                ownReview = newReview;
+                            } else {
+                                pathReviews.add(newReview);
+                            }
                         }
                     }
                     callback.onGetReviewsSuccess();
@@ -243,7 +263,7 @@ public class Path {
                     callback.onGetReviewsFailure();
                 }
             }, error -> {
-                Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
+                Log.e("GET_REVIEWS", Arrays.toString(error.getStackTrace()));
                 callback.onGetReviewsFailure();
             });
             requestQueue.add(jsonObjectRequest);

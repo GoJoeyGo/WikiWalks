@@ -1,6 +1,7 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.app.AlertDialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,19 +22,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PathReview;
+import com.wikiwalks.wikiwalks.ui.dialogs.EditReviewDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PathReviewListRecyclerViewAdapter;
 import com.wikiwalks.wikiwalks.R;
 
 import java.util.ArrayList;
 
-public class PathReviewListFragment extends Fragment implements Path.GetReviewsCallback {
+public class PathReviewListFragment extends Fragment implements Path.GetReviewsCallback, EditReviewDialog.EditReviewCallback {
 
     Button writeReviewButton;
-    Button deleteButton;
-    SupportMapFragment mapFragment;
     Path path;
     RecyclerView recyclerView;
-    AlertDialog confirmationDialog;
     PathReviewListRecyclerViewAdapter recyclerViewAdapter;
     Toolbar toolbar;
     ArrayList<PathReview> pathReviews;
@@ -53,7 +53,7 @@ public class PathReviewListFragment extends Fragment implements Path.GetReviewsC
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
-        pathReviews = new ArrayList<>();
+        pathReviews = path.getPathReviews();
         final View rootView = inflater.inflate(R.layout.path_review_list_fragment, container, false);
         ownReview = rootView.findViewById(R.id.path_review_list_own_review);
         ownReviewName = rootView.findViewById(R.id.path_review_own_review_row_name);
@@ -67,9 +67,18 @@ public class PathReviewListFragment extends Fragment implements Path.GetReviewsC
         recyclerView = rootView.findViewById(R.id.path_review_list_recyclerview);
         recyclerViewAdapter = new PathReviewListRecyclerViewAdapter(this, pathReviews);
         recyclerView.setAdapter(recyclerViewAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        updateRecyclerView();
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        }
         writeReviewButton = rootView.findViewById(R.id.path_write_review_button);
+        writeReviewButton.setOnClickListener(v -> {
+            EditReviewDialog dialog = new EditReviewDialog(path);
+            dialog.setTargetFragment(this, 0);
+            dialog.show(getActivity().getSupportFragmentManager(), "EditPopup");
+        });
+        updateRecyclerView();
         path.getReviews(getContext(), this);
         return rootView;
     }
@@ -79,16 +88,19 @@ public class PathReviewListFragment extends Fragment implements Path.GetReviewsC
     }
 
     public void updateRecyclerView() {
-        for (PathReview pathReview : path.getPathReviews()) {
-            if (pathReview.isEditable()) {
-                ownReviewRatingBar.setRating(pathReview.getRating());
-                ownReviewMessage.setText(pathReview.getMessage());
-                ownReview.setVisibility(View.VISIBLE);
-                separator.setVisibility(View.VISIBLE);
-            } else if (!pathReviews.contains(pathReview)) {
-                pathReviews.add(pathReview);
-            }
+        if (path.getOwnReview() != null) {
+            ownReviewRatingBar.setRating(path.getOwnReview().getRating());
+            ownReviewMessage.setText(path.getOwnReview().getMessage());
+            ownReview.setVisibility(View.VISIBLE);
+            separator.setVisibility(View.VISIBLE);
+            writeReviewButton.setText("EDIT REVIEW");
+        } else {
+            ownReview.setVisibility(View.GONE);
+            separator.setVisibility(View.GONE);
+            writeReviewButton.setText("WRITE REVIEW");
         }
+        pathReviews = path.getPathReviews();
+        writeReviewButton.setEnabled(true);
         recyclerViewAdapter.notifyDataSetChanged();
     }
 
@@ -100,5 +112,10 @@ public class PathReviewListFragment extends Fragment implements Path.GetReviewsC
     @Override
     public void onGetReviewsFailure() {
         Toast.makeText(getContext(), "Failed to get reviews", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccess() {
+        updateRecyclerView();
     }
 }
