@@ -10,7 +10,7 @@ group_walk_attendance = db.Table("group_walk_attendance", db.metadata,
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     device_id = db.Column(db.String, nullable=False, unique=True)
-    nickname = db.Column(db.String, unique=True)
+    nickname = db.Column(db.String, default="Anonymous")
     paths = db.relationship("Path", cascade="delete")
     routes = db.relationship("Route", cascade="delete")
     points_of_interest = db.relationship("PointOfInterest", cascade="delete")

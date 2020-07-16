@@ -36,6 +36,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
     Path path;
     ConstraintLayout walkPathOptions;
     Button pointOfInterestButton;
+    Button reviewButton;
     RatingBar ratingBar;
     EditDialog editDialog;
     ArrayList<Polyline> polylines = new ArrayList<>();
@@ -76,7 +77,8 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
         editDialog.setTargetFragment(this, 0);
         editButton.setOnClickListener(v -> editDialog.show(getActivity().getSupportFragmentManager(), "EditPopup"));
         pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);
-
+        reviewButton = rootView.findViewById(R.id.path_frag_reviews_button);
+        reviewButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PathReviewListFragment.newInstance(path.id)).addToBackStack(null).commit());
         ratingBar = rootView.findViewById(R.id.path_frag_rating_bar);
         ratingBar.setRating((float)path.getRating());
         TextView walkCount = rootView.findViewById(R.id.path_frag_walk_count);

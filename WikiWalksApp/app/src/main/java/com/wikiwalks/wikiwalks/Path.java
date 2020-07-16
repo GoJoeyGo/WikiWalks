@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class Path {
 
@@ -29,6 +31,7 @@ public class Path {
 
     private ArrayList<Route> routeList = new ArrayList<>();
     private ArrayList<PointOfInterest> pointsOfInterest = new ArrayList<>();
+    private ArrayList<PathReview> pathReviews = new ArrayList<>();
 
     private ArrayList<Marker> markers = new ArrayList<>();
     private LatLng markerPoint;
@@ -37,6 +40,11 @@ public class Path {
     public interface PathChangeCallback {
         void onEditSuccess();
         void onEditFailure();
+    }
+
+    public interface GetReviewsCallback {
+        void onGetReviewsSuccess();
+        void onGetReviewsFailure();
     }
 
     public Path(int id, String name, int walkCount, double rating, double[] bounds) {
@@ -101,6 +109,10 @@ public class Path {
 
     public double getRating() {
         return rating;
+    }
+
+    public ArrayList<PathReview> getPathReviews() {
+        return pathReviews;
     }
 
     public ArrayList<Double> getAllLatitudes() {
@@ -199,5 +211,45 @@ public class Path {
             Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
         });
         requestQueue.add(jsonObjectRequest);
+    }
+
+    public void getReviews(Context context, GetReviewsCallback callback) {
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        String url = context.getString(R.string.local_url) + String.format("/paths/%d/reviews", id);
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+            attributes.put("device_id", MainActivity.getDeviceId(context));
+            request.put("attributes", attributes);
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
+                try {
+                    JSONArray reviews = response.getJSONArray("reviews");
+                    for (int i = 0; i < reviews.length(); i++) {
+                        JSONObject review = reviews.getJSONObject(i);
+                        boolean exists = false;
+                        for (PathReview pathReview : pathReviews) {
+                            if (pathReview.getId() == review.getInt("id")) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            pathReviews.add(new PathReview(review.getInt("id"), review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable")));
+                        }
+                    }
+                    callback.onGetReviewsSuccess();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callback.onGetReviewsFailure();
+                }
+            }, error -> {
+                Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
+                callback.onGetReviewsFailure();
+            });
+            requestQueue.add(jsonObjectRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            callback.onGetReviewsFailure();
+        }
     }
 }

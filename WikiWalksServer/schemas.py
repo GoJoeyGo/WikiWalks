@@ -64,7 +64,7 @@ class PathReviewSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PathReview
         unknown = EXCLUDE
-    submitter = ma.Nested(UserSchema, exclude=["device_id"])
+    submitter = fields.fields.String(default="")
     editable = fields.fields.Boolean(default=False)
 
 

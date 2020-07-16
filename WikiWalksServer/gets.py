@@ -83,6 +83,9 @@ def path_review_list(path_id):
         for review in reviews:
             if review in user.path_reviews:
                 review.editable = True
+    for review in reviews:
+        review_user = User.query.filter_by(id=review.submitter).first()
+        review.submitter = review_user.nickname
     path_review_list_schema = PathReviewSchema(many=True)
     output = path_review_list_schema.dump(reviews)
     return jsonify({"reviews": output})
@@ -168,6 +171,9 @@ def poi_review_list(poi_id):
         for review in reviews:
             if review in user.poi_reviews:
                 review.editable = True
+    for review in reviews:
+        review_user = User.query.filter_by(id=review.submitter).first()
+        review.submitter = review_user.nickname
     poi_review_list_schema = PointOfInterestReviewSchema(many=True)
     output = poi_review_list_schema.dump(reviews)
     return jsonify({"reviews": output})
