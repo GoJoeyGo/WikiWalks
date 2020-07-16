@@ -1,5 +1,6 @@
 package com.wikiwalks.wikiwalks.ui.recyclerviewadapters;
 
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,12 @@ public class PathReviewListRecyclerViewAdapter extends RecyclerView.Adapter<Path
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.name.setText(reviewList.get(position).getName());
         holder.ratingBar.setRating(reviewList.get(position).getRating());
-        holder.message.setText(reviewList.get(position).getMessage());
+        if (!reviewList.get(position).getMessage().isEmpty()) {
+            holder.message.setText(reviewList.get(position).getMessage());
+        } else {
+            holder.message.setText("no review written");
+            holder.message.setTypeface(holder.message.getTypeface(), Typeface.ITALIC);
+        }
     }
 
     @Override

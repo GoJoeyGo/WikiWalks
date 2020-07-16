@@ -7,14 +7,15 @@ import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
 
-public class PathReview {
+public class PointOfInterestReview {
     private int id;
-    private Path path;
+    private PointOfInterest pointOfInterest;
     private String name;
     private int rating;
     private String message;
@@ -25,9 +26,9 @@ public class PathReview {
         void onSubmitReviewFailure();
     }
 
-    public PathReview(int id, Path path, String name, int rating, String message, boolean editable) {
+    public PointOfInterestReview(int id, PointOfInterest pointOfInterest, String name, int rating, String message, boolean editable) {
         this.id = id;
-        this.path = path;
+        this.pointOfInterest = pointOfInterest;
         this.name = name;
         this.rating = rating;
         this.message = message;
@@ -56,7 +57,7 @@ public class PathReview {
 
     public void submit(Context context, SubmitReviewCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url =  context.getString(R.string.local_url) + String.format("/paths/%d/reviews/new", path.getId());
+        String url =  context.getString(R.string.local_url) + String.format("/pois/%d/reviews/new", pointOfInterest.getId());
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -69,7 +70,7 @@ public class PathReview {
                     JSONObject responseJson = response.getJSONObject("path_review");
                     name = responseJson.getString("submitter");
                     id = responseJson.getInt("id");
-                    path.setOwnReview(this);
+                    pointOfInterest.setOwnReview(this);
                     callback.onSubmitReviewSuccess();
                 } catch (JSONException e) {
                     Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
@@ -90,7 +91,7 @@ public class PathReview {
 
     public void edit(Context context, String message, int rating, SubmitReviewCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url =  context.getString(R.string.local_url) + String.format("/paths/%d/reviews/%d/edit", path.id, id);
+        String url =  context.getString(R.string.local_url) + String.format("/pois/%d/reviews/%d/edit", pointOfInterest.getId(), id);
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -117,14 +118,14 @@ public class PathReview {
 
     public void delete(final Context context, SubmitReviewCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url = context.getString(R.string.local_url) + String.format("/paths/%d/reviews/%d/delete", path.id, id);
+        String url = context.getString(R.string.local_url) + String.format("/pois/%d/reviews/%d/delete", pointOfInterest.getId(), id);
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
             attributes.put("device_id", MainActivity.getDeviceId(context));
             request.put("attributes", attributes);
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
-                path.setOwnReview(null);
+                pointOfInterest.setOwnReview(null);
                 callback.onSubmitReviewSuccess();
             }, error -> {
                 Toast.makeText(context, "Failed to delete review...", Toast.LENGTH_SHORT).show();

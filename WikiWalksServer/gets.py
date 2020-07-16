@@ -76,19 +76,28 @@ def get_paths():
 
 @gets.route("/paths/<path_id>/reviews", methods=["GET", "POST"])
 def path_review_list(path_id):
-    reviews = PathReview.query.filter_by(path_id=path_id)
+    page = request.args.get('page', default=1, type=int)
+    reviews = PathReview.query.filter_by(path_id=path_id).order_by(PathReview.created_time.desc())
+    own_review = None
     if request.method == "POST":
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         for review in reviews:
             if review in user.path_reviews:
                 review.editable = True
+                if (page == 1):
+                    own_review = review
+                reviews = reviews.filter(PathReview.submitter != user.id)
     for review in reviews:
         review_user = User.query.filter_by(id=review.submitter).first()
         review.submitter = review_user.nickname
+    reviews = reviews.paginate(page, 10).items
     path_review_list_schema = PathReviewSchema(many=True)
     output = path_review_list_schema.dump(reviews)
-    return jsonify({"reviews": output})
+    if own_review is None:
+        return jsonify({"reviews": output})
+    else:
+        return jsonify({"reviews": output, "own_review": path_review_list_schema.dump([own_review])})
 
 
 @gets.route("/paths/<path_id>/pictures", methods=["GET", "POST"])

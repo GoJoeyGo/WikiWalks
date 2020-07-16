@@ -8,6 +8,7 @@ public class PointOfInterest {
     private int id;
     private String name;
 
+    private PointOfInterestReview ownReview;
     LatLng coordinates;
 
     private Path path;
@@ -37,5 +38,9 @@ public class PointOfInterest {
 
     public void makeMarker(GoogleMap map) {
         map.addMarker(new MarkerOptions().position(coordinates));
+    }
+
+    public void setOwnReview(PointOfInterestReview pointOfInterestReview) {
+        ownReview = pointOfInterestReview;
     }
 }

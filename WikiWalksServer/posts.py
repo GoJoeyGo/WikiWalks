@@ -359,6 +359,7 @@ def add_path_review(path_id):
         new_path_review = PathReview(**data, path_id=path_id, submitter=user.id, created_time=get_time())
         db.session.add(new_path_review)
         db.session.commit()
+        new_path_review.submitter = user.nickname
         return jsonify({"status": "success", "path_review": path_review_schema.dump(new_path_review)}), 201
     except Exception as e:
         print(e)
