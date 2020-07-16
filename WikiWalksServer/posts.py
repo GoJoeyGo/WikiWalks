@@ -424,7 +424,7 @@ def add_path_picture(path_id):
             user = get_submitter(request.form["device_id"])
             new_path_picture = PathPicture(path_id=path_id, submitter=user.id, created_time=get_time(),
                                            description=request.form["description"], url=processed_image[1])
-            image[0].save("./images/" + image[1], 'JPEG', quality=80)
+            processed_image[0].save("./images/" + processed_image[1], 'JPEG', quality=80)
             db.session.add(new_path_picture)
             db.session.commit()
 

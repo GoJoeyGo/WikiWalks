@@ -96,6 +96,8 @@ class PathPicture(db.Model):
     submitter = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_time = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String)
+    width = db.Column(db.Integer)
+    height = db.Column(db.Integer)
     url = db.Column(db.String, nullable=False)
 
     __mapper_args__ = {
@@ -109,6 +111,8 @@ class PointOfInterestPicture(db.Model):
     submitter = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_time = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String)
+    width = db.Column(db.Integer)
+    height = db.Column(db.Integer)
     url = db.Column(db.String, nullable=False)
 
     __mapper_args__ = {
