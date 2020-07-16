@@ -1,4 +1,4 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui.recyclerviewadapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +9,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.wikiwalks.wikiwalks.PathReview;
+import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.ui.PathReviewListFragment;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class PathReviewListRecyclerViewAdapter extends RecyclerView.Adapter<PathReviewListRecyclerViewAdapter.ViewHolder> {
     ArrayList<PathReview> reviewList;

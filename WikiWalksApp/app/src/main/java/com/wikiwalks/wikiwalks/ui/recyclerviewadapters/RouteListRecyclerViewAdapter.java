@@ -1,4 +1,4 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui.recyclerviewadapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,10 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.Route;
+import com.wikiwalks.wikiwalks.ui.RouteListFragment;
 
 import java.util.ArrayList;
 
@@ -18,6 +22,10 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
     public RouteListRecyclerViewAdapter(RouteListFragment context, ArrayList<Route> routeList) {
         this.context = context;
         this.routeList = routeList;
+    }
+
+    public ArrayList<Button> getButtons() {
+        return buttons;
     }
 
     @NonNull

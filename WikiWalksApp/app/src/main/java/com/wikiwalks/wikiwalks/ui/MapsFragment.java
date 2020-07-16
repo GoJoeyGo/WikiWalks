@@ -1,6 +1,5 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +18,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.wikiwalks.wikiwalks.MainActivity;
+import com.wikiwalks.wikiwalks.Path;
+import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.Route;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +58,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);
         mapFragment.getMapAsync(this);
         return rootView;
+    }
+
+    public void setmMap(GoogleMap mMap) {
+        this.mMap = mMap;
     }
 
     @Override

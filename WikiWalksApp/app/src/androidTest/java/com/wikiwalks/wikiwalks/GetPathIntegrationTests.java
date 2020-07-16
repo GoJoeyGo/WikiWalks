@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.wikiwalks.wikiwalks.ui.MapsFragment;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class GetPathIntegrationTests {
     public void setup() {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         fragment = MapsFragment.newInstance();
-        fragment.mMap = map;
+        fragment.setmMap(map);
         pathMap = spy(PathMap.getInstance());
 
     }

@@ -1,14 +1,12 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -22,6 +20,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
+import com.wikiwalks.wikiwalks.Path;
+import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.Route;
+import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.RouteListRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
@@ -90,7 +93,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
         }
         polylines.get(position).setVisible(true);
         selectRouteButton.setEnabled(true);
-        selectRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().replace(R.id.main_frame, WalkFragment.newInstance(path.id, position)).addToBackStack(null).commit());
+        selectRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().replace(R.id.main_frame, WalkFragment.newInstance(path.getId(), position)).addToBackStack(null).commit());
         if (routes.get(position).isEditable()) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(v -> {
@@ -113,7 +116,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
         for (Polyline polyline : polylines) {
             polyline.setVisible(true);
         }
-        recyclerViewAdapter.buttons.remove(position);
+        recyclerViewAdapter.getButtons().remove(position);
         recyclerViewAdapter.notifyItemRemoved(position);
         recyclerViewAdapter.notifyItemRangeChanged(position, routes.size());
         deleteButton.setVisibility(View.GONE);

@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLngBounds;
+import com.wikiwalks.wikiwalks.ui.RecordingFragment;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -17,20 +17,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.mockito.Mock;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.concurrent.NotThreadSafe;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -49,8 +44,8 @@ public class RecordPathIntegrationTests {
     @Before
     public void setup() {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        fragment = RecordingFragment.newInstance(null);
-        fragment.mMap = map;
+        fragment = RecordingFragment.newInstance(-1);
+        fragment.setmMap(map);
         exampleLocations = new Location[]{new Location(LocationManager.GPS_PROVIDER), new Location(LocationManager.GPS_PROVIDER), new Location(LocationManager.GPS_PROVIDER)};
         exampleLocations[0].setLatitude(1);
         exampleLocations[0].setLongitude(1);

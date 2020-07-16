@@ -1,4 +1,4 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.wikiwalks.wikiwalks.R;
 
 public class EditDialog extends DialogFragment {
 

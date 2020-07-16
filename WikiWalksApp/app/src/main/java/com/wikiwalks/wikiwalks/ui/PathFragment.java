@@ -1,6 +1,5 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -22,6 +20,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
+import com.wikiwalks.wikiwalks.ui.dialogs.EditDialog;
+import com.wikiwalks.wikiwalks.Path;
+import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.Route;
 
 import java.util.ArrayList;
 
@@ -64,21 +67,21 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
         toolbar.setTitle(path.getName());
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
         selectRouteButton.setOnClickListener(view -> {
-            RouteListFragment routeListFragment = RouteListFragment.newInstance(path.id);
+            RouteListFragment routeListFragment = RouteListFragment.newInstance(path.getId());
             routeListFragment.setTargetFragment(this, 0);
             getParentFragmentManager().beginTransaction().add(R.id.main_frame, routeListFragment).addToBackStack(null).commit();
         });
         recordRouteButton = rootView.findViewById(R.id.new_route_button);
-        recordRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path.id)).addToBackStack(null).commit());
+        recordRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path.getId())).addToBackStack(null).commit());
         exploreButton = rootView.findViewById(R.id.explore_button);
-        exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path.id, -1)).addToBackStack(null).commit());
+        exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path.getId(), -1)).addToBackStack(null).commit());
         editButton = rootView.findViewById(R.id.edit_title_button);
         editDialog = new EditDialog();
         editDialog.setTargetFragment(this, 0);
         editButton.setOnClickListener(v -> editDialog.show(getActivity().getSupportFragmentManager(), "EditPopup"));
         pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);
         reviewButton = rootView.findViewById(R.id.path_frag_reviews_button);
-        reviewButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PathReviewListFragment.newInstance(path.id)).addToBackStack(null).commit());
+        reviewButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PathReviewListFragment.newInstance(path.getId())).addToBackStack(null).commit());
         ratingBar = rootView.findViewById(R.id.path_frag_rating_bar);
         ratingBar.setRating((float)path.getRating());
         TextView walkCount = rootView.findViewById(R.id.path_frag_walk_count);
@@ -127,7 +130,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
 
     @Override
     public void OnPathMapChange() {
-        path = PathMap.getInstance().getPathList().get(path.id);
+        path = PathMap.getInstance().getPathList().get(path.getId());
         if (path != null) {
             for (Polyline polyline : polylines) {
                 polyline.remove();

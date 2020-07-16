@@ -1,4 +1,4 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -29,6 +29,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.wikiwalks.wikiwalks.Path;
+import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.Route;
 
 import java.util.ArrayList;
 

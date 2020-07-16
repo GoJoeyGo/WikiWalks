@@ -9,9 +9,10 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
+
+import com.wikiwalks.wikiwalks.ui.MapsFragment;
+import com.wikiwalks.wikiwalks.ui.PermissionsFragment;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
 import android.content.Intent;
@@ -13,6 +13,8 @@ import android.widget.Button;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
+import com.wikiwalks.wikiwalks.R;
 
 public class PermissionsFragment extends Fragment {
     Button permissionsButton;

@@ -1,4 +1,4 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui;
 
 import android.content.Context;
 import android.location.Location;
@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
@@ -30,6 +29,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.wikiwalks.wikiwalks.MainActivity;
+import com.wikiwalks.wikiwalks.Path;
+import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.Route;
+import com.wikiwalks.wikiwalks.ui.dialogs.SubmissionDialog;
 
 import java.util.ArrayList;
 
@@ -143,6 +148,10 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         mapFragment.getMapAsync(this);
         context = getContext();
         return rootView;
+    }
+
+    public void setmMap(GoogleMap mMap) {
+        this.mMap = mMap;
     }
 
     @Override

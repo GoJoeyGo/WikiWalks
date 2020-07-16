@@ -1,4 +1,4 @@
-package com.wikiwalks.wikiwalks;
+package com.wikiwalks.wikiwalks.ui;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -17,6 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.SupportMapFragment;
+import com.wikiwalks.wikiwalks.Path;
+import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.PathReview;
+import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PathReviewListRecyclerViewAdapter;
+import com.wikiwalks.wikiwalks.R;
 
 import java.util.ArrayList;
 
