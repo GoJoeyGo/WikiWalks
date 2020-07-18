@@ -2,7 +2,7 @@ import datetime
 import os
 import uuid
 
-from PIL import Image
+from PIL import Image, ExifTags, ImageOps
 from flask import jsonify, request, Blueprint
 from sqlalchemy import func
 
@@ -19,6 +19,7 @@ def allowed_file(filename):
 def process_picture(file):
     filename = str(uuid.uuid1()) + ".jpg"
     image = Image.open(file.stream)
+    image = ImageOps.exif_transpose(image)
     if image.mode in ("RGBA", "P"):
         image = image.convert("RGB")
     image.thumbnail((1920, 1920), Image.LANCZOS)
@@ -416,7 +417,7 @@ def delete_path_review(path_id, path_review_id):
 def add_path_picture(path_id):
     try:
         if 'image' not in request.files:
-            return jsonify({"status": "no file found"}), 500
+            return jsonify({"status": "no file found"}), 501
         path_picture_schema = PathPictureSchema()
         image = request.files["image"]
         if allowed_file(image.filename):
@@ -429,11 +430,12 @@ def add_path_picture(path_id):
             processed_image[0].save("./images/" + processed_image[1], 'JPEG', quality=80)
             db.session.add(new_path_picture)
             db.session.commit()
+            new_path_picture.submitter = user.nickname
             return jsonify({"status": "success", "path_picture": path_picture_schema.dump(new_path_picture)}), 201
         else:
             return jsonify({"status": "invalid file type"}), 403
     except Exception as e:
-        print(e)
+        print(e.with_traceback())
         return jsonify({"status": "failed"}), 500
 
 

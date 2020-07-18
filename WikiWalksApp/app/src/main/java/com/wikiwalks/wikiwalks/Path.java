@@ -5,7 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.request.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -29,10 +29,13 @@ public class Path {
 
     private ArrayList<Route> routeList = new ArrayList<>();
     private ArrayList<PointOfInterest> pointsOfInterest = new ArrayList<>();
+    private ArrayList<PathPicture> pathPictures = new ArrayList<>();
     private ArrayList<PathReview> pathReviews = new ArrayList<>();
     private PathReview ownReview;
     private int nextReviewPage = 1;
-    private boolean isLoading = false;
+    private int nextPicturePage = 1;
+    private boolean isLoadingReviews = false;
+    private boolean isLoadingPictures = false;
 
     private ArrayList<Marker> markers = new ArrayList<>();
     private LatLng markerPoint;
@@ -43,9 +46,9 @@ public class Path {
         void onEditFailure();
     }
 
-    public interface GetReviewsCallback {
-        void onGetReviewsSuccess();
-        void onGetReviewsFailure();
+    public interface GetAdditionalCallback {
+        void onGetAdditionalSuccess();
+        void onGetAdditionalFailure();
     }
 
     public Path(int id, String name, int walkCount, double rating, double[] bounds) {
@@ -110,6 +113,10 @@ public class Path {
 
     public double getRating() {
         return rating;
+    }
+
+    public ArrayList<PathPicture> getPathPictures() {
+        return pathPictures;
     }
 
     public ArrayList<PathReview> getPathReviews() {
@@ -222,9 +229,9 @@ public class Path {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void getReviews(Context context, GetReviewsCallback callback) {
-        if (!isLoading) {
-            isLoading = true;
+    public void getReviews(Context context, GetAdditionalCallback callback) {
+        if (!isLoadingReviews) {
+            isLoadingReviews = true;
             RequestQueue requestQueue = Volley.newRequestQueue(context);
             String url = context.getString(R.string.local_url) + String.format("/paths/%d/reviews?page=%d", id, nextReviewPage);
             JSONObject request = new JSONObject();
@@ -254,27 +261,80 @@ public class Path {
                             ownReview = new PathReview(review.getInt("id"), this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
                         }
                         nextReviewPage++;
-                        isLoading = false;
-                        callback.onGetReviewsSuccess();
+                        isLoadingReviews = false;
+                        callback.onGetAdditionalSuccess();
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        isLoading = false;
-                        callback.onGetReviewsFailure();
+                        isLoadingReviews = false;
+                        callback.onGetAdditionalFailure();
                     }
                 }, error -> {
                     Log.e("GET_REVIEWS", Arrays.toString(error.getStackTrace()));
                     if (nextReviewPage > 1) {
                         Toast.makeText(context, "No more reviews!", Toast.LENGTH_SHORT).show();
                     } else {
-                        isLoading = false;
-                        callback.onGetReviewsFailure();
+                        isLoadingReviews = false;
+                        callback.onGetAdditionalFailure();
                     }
                 });
                 requestQueue.add(jsonObjectRequest);
             } catch (JSONException e) {
                 e.printStackTrace();
-                isLoading = false;
-                callback.onGetReviewsFailure();
+                isLoadingReviews = false;
+                callback.onGetAdditionalFailure();
+            }
+        }
+    }
+
+    public void getPictures(Context context, GetAdditionalCallback callback) {
+        if (!isLoadingPictures) {
+            isLoadingPictures = true;
+            RequestQueue requestQueue = Volley.newRequestQueue(context);
+            String url = context.getString(R.string.local_url) + String.format("/paths/%d/pictures?page=%d", id, nextPicturePage);
+            JSONObject request = new JSONObject();
+            JSONObject attributes = new JSONObject();
+            try {
+                attributes.put("device_id", MainActivity.getDeviceId(context));
+                request.put("attributes", attributes);
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
+                    try {
+                        JSONArray pictures = response.getJSONArray("pictures");
+                        for (int i = 0; i < pictures.length(); i++) {
+                            JSONObject picture = pictures.getJSONObject(i);
+                            boolean exists = false;
+                            for (PathPicture pathPicture : pathPictures) {
+                                if (pathPicture.getId() == picture.getInt("id")) {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (!exists) {
+                                PathPicture newPicture = new PathPicture(picture.getInt("id"), this, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), picture.getBoolean("editable"));
+                                pathPictures.add(newPicture);
+                            }
+                        }
+                        nextPicturePage++;
+                        isLoadingPictures = false;
+                        callback.onGetAdditionalSuccess();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        isLoadingPictures = false;
+                        callback.onGetAdditionalFailure();
+                    }
+                }, error -> {
+                    Log.e("GET_PICTURES", Arrays.toString(error.getStackTrace()));
+                    if (nextPicturePage > 1) {
+                        Toast.makeText(context, "No more pictures!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        isLoadingPictures = false;
+                        callback.onGetAdditionalFailure();
+                    }
+                });
+                requestQueue.add(jsonObjectRequest);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                isLoadingPictures = false;
+                callback.onGetAdditionalFailure();
             }
         }
     }

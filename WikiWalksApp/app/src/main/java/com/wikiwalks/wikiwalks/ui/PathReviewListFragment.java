@@ -28,7 +28,7 @@ import com.wikiwalks.wikiwalks.R;
 
 import java.util.ArrayList;
 
-public class PathReviewListFragment extends Fragment implements Path.GetReviewsCallback, EditReviewDialog.EditReviewCallback {
+public class PathReviewListFragment extends Fragment implements Path.GetAdditionalCallback, EditReviewDialog.EditReviewCallback {
 
     Button writeReviewButton;
     Path path;
@@ -131,13 +131,13 @@ public class PathReviewListFragment extends Fragment implements Path.GetReviewsC
     }
 
     @Override
-    public void onGetReviewsSuccess() {
+    public void onGetAdditionalSuccess() {
         writeReviewButton.setEnabled(true);
         updateRecyclerView();
     }
 
     @Override
-    public void onGetReviewsFailure() {
+    public void onGetAdditionalFailure() {
         Toast.makeText(getContext(), "Failed to get reviews", Toast.LENGTH_SHORT).show();
     }
 

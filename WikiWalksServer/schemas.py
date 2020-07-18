@@ -48,7 +48,7 @@ class PathPictureSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PathPicture
         unknown = EXCLUDE
-    submitter = ma.Nested(UserSchema, exclude=["device_id"])
+    submitter = fields.fields.String(default="")
     editable = fields.fields.Boolean(default=False)
 
 
@@ -56,7 +56,7 @@ class PointOfInterestPictureSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PointOfInterestPicture
         unknown = EXCLUDE
-    submitter = ma.Nested(UserSchema, exclude=["device_id"])
+    submitter = fields.fields.String(default="")
     editable = fields.fields.Boolean(default=False)
 
 
@@ -72,5 +72,5 @@ class PointOfInterestReviewSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = PointOfInterestReview
         unknown = EXCLUDE
-    submitter = ma.Nested(UserSchema, exclude=["device_id"])
+    submitter = fields.fields.String(default="")
     editable = fields.fields.Boolean(default=False)

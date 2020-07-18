@@ -110,6 +110,9 @@ def path_pictures_list(path_id):
         for picture in pictures:
             if picture in user.path_pictures:
                 picture.editable = True
+    for picture in pictures:
+        picture_user = User.query.filter_by(id=picture.submitter).first()
+        picture.submitter = picture_user.nickname
     pictures = pictures.paginate(page, 10).items
     path_picture_list_schema = PathPictureSchema(many=True)
     output = path_picture_list_schema.dump(pictures)
@@ -210,7 +213,10 @@ def poi_pictures_list(poi_id):
         for picture in pictures:
             if picture in user.poi_pictures:
                 picture.editable = True
-    pictures = pictures.paginate(page, 10).items
+    for picture in pictures:
+        picture_user = User.query.filter_by(id=picture.submitter).first()
+        picture.submitter = picture_user.nickname
+    pictures = pictures.paginate(page, 3).items
     poi_picture_list_schema = PointOfInterestPicture(many=True)
     output = poi_picture_list_schema.dump(pictures)
     return jsonify({"pictures": output})
