@@ -102,13 +102,15 @@ def path_review_list(path_id):
 
 @gets.route("/paths/<path_id>/pictures", methods=["GET", "POST"])
 def path_pictures_list(path_id):
-    pictures = PathPicture.query.filter_by(path_id=path_id)
+    page = request.args.get('page', default=1, type=int)
+    pictures = PathPicture.query.filter_by(path_id=path_id).order_by(PathPicture.created_time.desc())
     if request.method == "POST":
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         for picture in pictures:
             if picture in user.path_pictures:
                 picture.editable = True
+    pictures = pictures.paginate(page, 10).items
     path_picture_list_schema = PathPictureSchema(many=True)
     output = path_picture_list_schema.dump(pictures)
     return jsonify({"pictures": output})
@@ -173,31 +175,43 @@ def get_pois():
 
 @gets.route("/pois/<poi_id>/reviews", methods=["GET", "POST"])
 def poi_review_list(poi_id):
-    reviews = PointOfInterestReview.query.filter_by(point_of_interest_id=poi_id)
+    page = request.args.get('page', default=1, type=int)
+    reviews = PointOfInterestReview.query.filter_by(point_of_interest_id=poi_id) \
+        .order_by(PointOfInterestReview.created_time.desc())
+    own_review = None
     if request.method == "POST":
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         for review in reviews:
             if review in user.poi_reviews:
                 review.editable = True
+                if (page == 1):
+                    own_review = review
+                reviews = reviews.filter(PointOfInterestReview.submitter != user.id)
     for review in reviews:
         review_user = User.query.filter_by(id=review.submitter).first()
         review.submitter = review_user.nickname
+    reviews = reviews.paginate(page, 10).items
     poi_review_list_schema = PointOfInterestReviewSchema(many=True)
     output = poi_review_list_schema.dump(reviews)
-    return jsonify({"reviews": output})
+    if own_review is None:
+        return jsonify({"reviews": output})
+    else:
+        return jsonify({"reviews": output, "own_review": poi_review_list_schema.dump([own_review])})
 
 
 @gets.route("/pois/<poi_id>/pictures", methods=["GET", "POST"])
 def poi_pictures_list(poi_id):
-    pictures = PointOfInterestPicture.query.filter_by(point_of_interest_id=poi_id)
+    page = request.args.get('page', default=1, type=int)
+    pictures = PointOfInterestPicture.query.filter_by(point_of_interest_id=poi_id).order_by(PointOfInterestPicture.created_time.desc())
     if request.method == "POST":
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         for picture in pictures:
             if picture in user.poi_pictures:
                 picture.editable = True
-    poi_picture_list_schema = PointOfInterestPictureSchema(many=True)
+    pictures = pictures.paginate(page, 10).items
+    poi_picture_list_schema = PointOfInterestPicture(many=True)
     output = poi_picture_list_schema.dump(pictures)
     return jsonify({"pictures": output})
 

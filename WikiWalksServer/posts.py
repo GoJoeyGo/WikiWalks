@@ -422,12 +422,13 @@ def add_path_picture(path_id):
         if allowed_file(image.filename):
             processed_image = process_picture(image)
             user = get_submitter(request.form["device_id"])
+            width, height = processed_image[0].size
             new_path_picture = PathPicture(path_id=path_id, submitter=user.id, created_time=get_time(),
-                                           description=request.form["description"], url=processed_image[1])
+                                           description=request.form["description"], url=processed_image[1],
+                                           width=width, height=height)
             processed_image[0].save("./images/" + processed_image[1], 'JPEG', quality=80)
             db.session.add(new_path_picture)
             db.session.commit()
-
             return jsonify({"status": "success", "path_picture": path_picture_schema.dump(new_path_picture)}), 201
         else:
             return jsonify({"status": "invalid file type"}), 403
@@ -483,12 +484,13 @@ def add_poi_picture(poi_id):
         if allowed_file(image.filename):
             processed_image = process_picture(image)
             user = get_submitter(request.form["device_id"])
-            new_poi_picture = PointOfInterestPicture(poi_id=poi_id, submitter=user.id, created_time=get_time(),
-                                                     description=request.form["description"], url=processed_image[1])
-            image[0].save("./images/" + image[1], 'JPEG', quality=80)
+            width, height = processed_image[0].size
+            new_poi_picture = PointOfInterestPicture(point_of_interest_id=poi_id, submitter=user.id,
+                                                     created_time=get_time(), description=request.form["description"],
+                                                     url=processed_image[1], width=width, height=height)
+            processed_image[0].save("./images/" + processed_image[1], 'JPEG', quality=80)
             db.session.add(new_poi_picture)
             db.session.commit()
-
             return jsonify({"status": "success", "poi_picture": poi_picture_schema.dump(new_poi_picture)}), 201
         else:
             return jsonify({"status": "invalid file type"}), 403
@@ -497,7 +499,7 @@ def add_poi_picture(poi_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<poi_id>/reviews/<poi_picture_id>/edit", methods=["POST"])
+@posts.route("/pois/<poi_id>/reviews/<poi_picture_id>/edit", methods=["POST"])
 def edit_poi_picture(poi_id, poi_picture_id):
     try:
         poi_picture_schema = PointOfInterestPictureSchema()
