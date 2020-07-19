@@ -39,7 +39,7 @@
         app:layout_constraintBottom_toTopOf="@id/maps_fragment_create_path_background"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/main_toolbar_wrapper"
-        tools:context=".ui.main.MapsFragment"/>
+        tools:context=".ui.main.MapsFragment" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/maps_fragment_create_path_background"

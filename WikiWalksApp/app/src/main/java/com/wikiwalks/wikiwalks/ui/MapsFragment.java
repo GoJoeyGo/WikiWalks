@@ -87,7 +87,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void setMapLocation() {
         MainActivity.checkLocationPermission(this.getActivity());
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-            if (location != null) mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+            if (location != null)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
             else setMapLocation();
         });
     }

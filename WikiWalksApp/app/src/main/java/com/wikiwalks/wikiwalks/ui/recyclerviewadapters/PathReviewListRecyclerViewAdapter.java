@@ -50,7 +50,7 @@ public class PathReviewListRecyclerViewAdapter extends RecyclerView.Adapter<Path
         return reviewList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView name;
         RatingBar ratingBar;

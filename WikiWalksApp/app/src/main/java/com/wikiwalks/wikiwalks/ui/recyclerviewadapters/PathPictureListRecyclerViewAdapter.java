@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,7 +14,6 @@ import com.squareup.picasso.Picasso;
 import com.wikiwalks.wikiwalks.PathPicture;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.PathPictureListFragment;
-import com.wikiwalks.wikiwalks.ui.PathReviewListFragment;
 
 import java.util.ArrayList;
 
@@ -59,7 +57,7 @@ public class PathPictureListRecyclerViewAdapter extends RecyclerView.Adapter<Pat
         return pictureList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView name;
         TextView description;

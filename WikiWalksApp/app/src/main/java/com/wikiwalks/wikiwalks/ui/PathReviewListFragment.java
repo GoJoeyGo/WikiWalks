@@ -22,9 +22,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PathReview;
+import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditReviewDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PathReviewListRecyclerViewAdapter;
-import com.wikiwalks.wikiwalks.R;
 
 import java.util.ArrayList;
 

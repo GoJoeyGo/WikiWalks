@@ -20,11 +20,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditDialog;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
+import com.wikiwalks.wikiwalks.ui.dialogs.EditDialog;
 
 import java.util.ArrayList;
 
@@ -86,13 +86,12 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
         picturesButton = rootView.findViewById(R.id.path_frag_pictures_button);
         picturesButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PathPictureListFragment.newInstance(path.getId())).addToBackStack(null).commit());
         ratingBar = rootView.findViewById(R.id.path_frag_rating_bar);
-        ratingBar.setRating((float)path.getRating());
+        ratingBar.setRating((float) path.getRating());
         TextView walkCount = rootView.findViewById(R.id.path_frag_walk_count);
         String walkCountString;
         if (path.getWalkCount() == 1) {
             walkCountString = "Path has been walked once.";
-        }
-        else {
+        } else {
             walkCountString = String.format("Path has been walked %s times.", path.getWalkCount());
         }
         walkCount.setText(walkCountString);
@@ -105,7 +104,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditDi
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         for (Route route : path.getRoutes()) polylines.add(route.makePolyline(googleMap));
         googleMap.getUiSettings().setAllGesturesEnabled(false);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10 ));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
     }
 
     public void setPath(Path path) {

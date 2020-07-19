@@ -8,8 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RatingBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -77,13 +75,13 @@ public class EditReviewDialog extends DialogFragment implements PathReview.Submi
         });
         deleteButton = view.findViewById(R.id.edit_review_popup_delete_button);
         deleteButton.setOnClickListener(v -> {
-                    confirmationDialog = new AlertDialog.Builder(getContext())
-                            .setTitle("Confirm Deletion")
-                            .setMessage("Are you sure you want to delete this review?")
-                            .setPositiveButton("Yes", (dialog, which) -> review.delete(getContext(), this))
-                            .setNegativeButton("No", (dialog, which) -> confirmationDialog.dismiss()).create();
-                    confirmationDialog.show();
-                });
+            confirmationDialog = new AlertDialog.Builder(getContext())
+                    .setTitle("Confirm Deletion")
+                    .setMessage("Are you sure you want to delete this review?")
+                    .setPositiveButton("Yes", (dialog, which) -> review.delete(getContext(), this))
+                    .setNegativeButton("No", (dialog, which) -> confirmationDialog.dismiss()).create();
+            confirmationDialog.show();
+        });
         cancelButton = view.findViewById(R.id.edit_review_popup_cancel_button);
         cancelButton.setOnClickListener(v -> {
             getDialog().cancel();

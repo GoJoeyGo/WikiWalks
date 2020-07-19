@@ -13,46 +13,46 @@
         app:layout_constraintTop_toTopOf="parent"
         android:background="?attr/colorBackgroundFloating">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/walk_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:contentInsetEnd="16dp"
-                app:contentInsetStart="16dp"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/walk_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:contentInsetEnd="16dp"
+            app:contentInsetStart="16dp" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/out_of_range_banner"
-                android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/out_of_range_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/off_track_variable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/off_track_direction_indicator" />
+
+            <ImageView
+                android:id="@+id/off_track_direction_indicator"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:padding="10dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/off_track_variable"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/colorOnBackground"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@id/off_track_direction_indicator"/>
-
-                <ImageView
-                    android:id="@+id/off_track_direction_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/off_track_variable"
-                    app:srcCompat="@drawable/ic_arrow_upward_black_24dp"
-                    tools:ignore="VectorDrawableCompat"
-                    android:pivotX="50%"
-                    android:pivotY="50%"
-                    android:contentDescription="Direction Arrow" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintStart_toEndOf="@id/off_track_variable"
+                app:srcCompat="@drawable/ic_arrow_upward_black_24dp"
+                tools:ignore="VectorDrawableCompat"
+                android:pivotX="50%"
+                android:pivotY="50%"
+                android:contentDescription="Direction Arrow" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
@@ -64,7 +64,7 @@
         app:layout_constraintBottom_toTopOf="@id/walk_frag_button_wrapper"
         app:layout_constraintStart_toStartOf="parent"
         tools:context=".ui.main.WalkFragment"
-        android:layout_marginTop="?attr/actionBarSize"/>
+        android:layout_marginTop="?attr/actionBarSize" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/walk_frag_button_wrapper"

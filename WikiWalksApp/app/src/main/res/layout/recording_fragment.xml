@@ -20,8 +20,7 @@
             app:titleTextColor="?attr/colorOnBackground"
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
-            app:layout_constraintHorizontal_bias="1.0">
-        </androidx.appcompat.widget.Toolbar>
+            app:layout_constraintHorizontal_bias="1.0"></androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView

@@ -145,8 +145,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
             if (pathLatitudes.get(i) - 0.00005 < location.getLatitude() && location.getLatitude() < pathLatitudes.get(i) + 0.00005 && pathLongitudes.get(i) - 0.00005 < location.getLongitude() && location.getLongitude() < pathLongitudes.get(i) + 0.00005) {
                 inRange = true;
                 break;
-            }
-            else {
+            } else {
                 Location destination = new Location(LocationManager.GPS_PROVIDER);
                 destination.setLatitude(pathLatitudes.get(i));
                 destination.setLongitude(pathLongitudes.get(i));
@@ -163,8 +162,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
             outOfRangeBanner.setVisibility(View.VISIBLE);
             offTrackVariable.setText(String.format("You are %d metres away.", (int) shortestDistance[0]));
             offTrackDirectionIndicator.setRotation(shortestDistance[1]);
-        }
-        else {
+        } else {
             outOfRangeBanner.setVisibility(View.INVISIBLE);
         }
     }

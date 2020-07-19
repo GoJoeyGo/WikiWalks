@@ -1,28 +1,21 @@
 package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.OpenableColumns;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.request.SimpleMultiPartRequest;
-
-import com.android.volley.request.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonElement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 
-import static com.wikiwalks.wikiwalks.MainActivity.getFileName;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PathPicture {
     private int id;
@@ -36,6 +29,7 @@ public class PathPicture {
 
     public interface PictureUploadCallback {
         void onSubmitPictureSuccess();
+
         void onSubmitPictureFailure();
     }
 
@@ -83,26 +77,33 @@ public class PathPicture {
         return editable;
     }
 
-    public static void upload(Context context, Uri uri, String description, Path path, PictureUploadCallback callback) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url =  context.getString(R.string.local_url) + String.format("/paths/%d/pictures/new", path.getId());
-        SimpleMultiPartRequest request = new SimpleMultiPartRequest(SimpleMultiPartRequest.Method.POST, url, response -> {
-            try {
-                JSONObject picture = new JSONObject(response).getJSONObject("path_picture");
-                PathPicture pathPicture = new PathPicture(picture.getInt("id"), path, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), true);
-                path.getPathPictures().add(0, pathPicture);
-                callback.onSubmitPictureSuccess();
-            } catch (JSONException e) {
-                e.printStackTrace();
+    public static void upload(Context context, String filename, Uri uri, String description, Path path, PictureUploadCallback callback) {
+        File file = new File(filename);
+        RequestBody imageBody = RequestBody.create(MediaType.parse(context.getContentResolver().getType(uri)), file);
+        MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", file.getName(), imageBody);
+        RequestBody deviceIdBody = RequestBody.create(MultipartBody.FORM, MainActivity.getDeviceId(context));
+        RequestBody descriptionBody = RequestBody.create(MultipartBody.FORM, description);
+        Call<JsonElement> newPathPicture = MainActivity.getRetrofitRequests(context).newPathPicture(path.getId(), imagePart, deviceIdBody, descriptionBody);
+        newPathPicture.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_picture");
+                        path.getPathPictures().add(0, new PathPicture(responseJson.getInt("id"), path, responseJson.getString("url"), responseJson.getInt("width"), responseJson.getInt("height"), responseJson.getString("description"), responseJson.getString("submitter"), true));
+                        callback.onSubmitPictureSuccess();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        callback.onSubmitPictureFailure();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                t.printStackTrace();
                 callback.onSubmitPictureFailure();
             }
-        }, error -> {
-            Log.e("UPLOAD_PATH_PICTURE", Arrays.toString(error.getStackTrace()));
-            callback.onSubmitPictureFailure();
         });
-        request.addFile("image",  context.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/" + getFileName(context, uri));
-        request.addStringParam("device_id", MainActivity.getDeviceId(context));
-        request.addStringParam("description", description);
-        requestQueue.add(request);
     }
 }

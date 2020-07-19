@@ -53,7 +53,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="SAVE"
-                android:fontFamily="monospace"/>
+                android:fontFamily="monospace" />
 
             <Button
                 android:id="@+id/edit_popup_cancel_button"
@@ -63,7 +63,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="CANCEL"
-                android:fontFamily="monospace"/>
+                android:fontFamily="monospace" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

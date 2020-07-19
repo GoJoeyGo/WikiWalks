@@ -8,6 +8,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="300dp">
+
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/poi_frag_collapsing_toolbar_layout"
             android:layout_width="match_parent"
@@ -26,7 +27,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:context=".ui.main.PoIFragment"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.5"/>
+                app:layout_collapseParallaxMultiplier="0.5" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/poi_frag_toolbar"

@@ -79,7 +79,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
             polylines.add(route.makePolyline(routeListMap));
         }
         routeListMap.getUiSettings().setAllGesturesEnabled(false);
-        routeListMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10 ));
+        routeListMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
     }
 
     public void setPath(Path path) {
@@ -100,7 +100,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
                 confirmationDialog = new AlertDialog.Builder(getContext())
                         .setTitle("Confirm Deletion")
                         .setMessage("Are you sure you want to delete this route?")
-                        .setPositiveButton("Yes", (dialog, which) ->  path.getRoutes().get(position).delete(getContext(), this))
+                        .setPositiveButton("Yes", (dialog, which) -> path.getRoutes().get(position).delete(getContext(), this))
                         .setNegativeButton("No", (dialog, which) -> confirmationDialog.dismiss()).create();
                 confirmationDialog.show();
             });

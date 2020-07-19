@@ -4,11 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.OpenableColumns;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -18,17 +14,16 @@ import androidx.fragment.app.FragmentActivity;
 import com.wikiwalks.wikiwalks.ui.MapsFragment;
 import com.wikiwalks.wikiwalks.ui.PermissionsFragment;
 
-import java.io.File;
-import java.io.IOError;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.UUID;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 0;
     Bundle savedInstanceState = null;
+    static RetrofitRequests retrofitRequests;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frame, PermissionsFragment.newInstance())
+                        .replace(R.id.main_frame, PermissionsFragment.newInstance(PermissionsFragment.PermissionType.LOCATION))
                         .commitNow();
             }
         } else {
@@ -62,12 +57,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initialiseMap() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_frame, MapsFragment.newInstance()).commitNow();
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, MapsFragment.newInstance()).commitNow();
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStackImmediate();
 
@@ -86,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static void checkLocationPermission(FragmentActivity fragmentActivity) {
         if (ActivityCompat.checkSelfPermission(fragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(fragmentActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            fragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, PermissionsFragment.newInstance()).commitNow();
+            fragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, PermissionsFragment.newInstance(PermissionsFragment.PermissionType.LOCATION)).commitNow();
         }
     }
 
@@ -96,26 +90,10 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public static String getFileName(Context context, Uri uri) {
-        String result = null;
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
-            } finally {
-                cursor.close();
-            }
+    public static RetrofitRequests getRetrofitRequests(Context context) {
+        if (retrofitRequests == null) {
+            retrofitRequests = new Retrofit.Builder().baseUrl(context.getString(R.string.local_url)).addConverterFactory(GsonConverterFactory.create()).build().create(RetrofitRequests.class);
         }
-        if (result == null) {
-            result = uri.getPath();
-            int cut = result.lastIndexOf('/');
-            if (cut != -1) {
-                result = result.substring(cut + 1);
-            }
-        }
-        return result;
+        return retrofitRequests;
     }
-
 }

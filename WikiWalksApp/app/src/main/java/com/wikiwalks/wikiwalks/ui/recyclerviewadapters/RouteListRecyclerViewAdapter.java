@@ -54,7 +54,7 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
         return routeList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         Button button;
 

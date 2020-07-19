@@ -13,8 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathReview;
 import com.wikiwalks.wikiwalks.R;
 
 public class EditDialog extends DialogFragment {

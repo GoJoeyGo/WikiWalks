@@ -39,7 +39,8 @@ public class RecordPathIntegrationTests {
     RecordingFragment fragment;
     Context appContext;
 
-    @Mock GoogleMap map;
+    @Mock
+    GoogleMap map;
 
     @Before
     public void setup() {
@@ -75,7 +76,7 @@ public class RecordPathIntegrationTests {
     @Test
     public void B_editPath() throws InterruptedException {
         Path testPath = null;
-        for (Map.Entry<Integer,Path> entry : PathMap.getInstance().getPathList().entrySet()) {
+        for (Map.Entry<Integer, Path> entry : PathMap.getInstance().getPathList().entrySet()) {
             testPath = entry.getValue();
         }
         testPath.edit(appContext, "Test Edited Title", mock(Path.PathChangeCallback.class));
@@ -86,7 +87,7 @@ public class RecordPathIntegrationTests {
     @Test
     public void C_deleteRoute() throws InterruptedException {
         Path testPath = null;
-        for (Map.Entry<Integer,Path> entry : PathMap.getInstance().getPathList().entrySet()) {
+        for (Map.Entry<Integer, Path> entry : PathMap.getInstance().getPathList().entrySet()) {
             testPath = entry.getValue();
         }
         assertTrue(PathMap.getInstance().getPathList().containsValue(testPath));

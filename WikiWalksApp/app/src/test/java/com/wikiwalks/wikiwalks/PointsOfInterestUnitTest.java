@@ -33,11 +33,11 @@ public class PointsOfInterestUnitTest {
         double poilatitude = 151.1;
         double poilongitude = 153.6;
 
-        PointOfInterest testpoint = new PointOfInterest( id, name, poilatitude, poilongitude, testpath);
+        PointOfInterest testpoint = new PointOfInterest(id, name, poilatitude, poilongitude, testpath);
 
         cords = new LatLng(poilatitude, poilongitude);
 
-        assertEquals(testpoint.getName(),"Testpath");
+        assertEquals(testpoint.getName(), "Testpath");
 
 
     }

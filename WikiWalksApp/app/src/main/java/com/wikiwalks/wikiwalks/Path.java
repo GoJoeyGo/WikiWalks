@@ -4,14 +4,12 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.request.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.JsonElement;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +17,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Path {
 
@@ -43,11 +46,13 @@ public class Path {
 
     public interface PathChangeCallback {
         void onEditSuccess();
+
         void onEditFailure();
     }
 
     public interface GetAdditionalCallback {
         void onGetAdditionalSuccess();
+
         void onGetAdditionalFailure();
     }
 
@@ -59,7 +64,8 @@ public class Path {
         this.bounds = new LatLngBounds(new LatLng(bounds[0], bounds[1]), new LatLng(bounds[2], bounds[3]));
     }
 
-    public Path() {}
+    public Path() {
+    }
 
     public Path(JSONObject pathJson) throws JSONException {
         id = pathJson.getInt("id");
@@ -175,111 +181,135 @@ public class Path {
         return marker;
     }
 
-    public void update(final Context context) {
-        final RequestQueue requestQueue = Volley.newRequestQueue(context);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.GET, context.getString(R.string.local_url) + String.format("/paths/%d", id), null, response -> {
-            try {
-                JSONObject responseJson = response.getJSONObject("path");
-                PathMap.getInstance().addPath(new Path(responseJson));
-            } catch (JSONException e) {
-                Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
-                Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
+    public void update(Context context) {
+        Call<JsonElement> updatePath = MainActivity.getRetrofitRequests(context).updatePath(id);
+        updatePath.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                try {
+                    JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path");
+                    PathMap.getInstance().addPath(new Path(responseJson));
+                } catch (JSONException e) {
+                    Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
+                    Log.e("UPDATE_PATH1", Arrays.toString(e.getStackTrace()));
+                }
             }
-        }, error -> {
-            Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
-            Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
+                Log.e("UPDATE_PATH2", Arrays.toString(t.getStackTrace()));
+            }
         });
-        requestQueue.add(jsonObjectRequest);
     }
 
     public void edit(Context context, String title, PathChangeCallback callback) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url =  context.getString(R.string.local_url) + String.format("/paths/%d/edit", id);
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
             attributes.put("name", title);
             request.put("attributes", attributes);
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
-                this.name = title;
-                callback.onEditSuccess();
-            }, error -> {
-                Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
-                callback.onEditFailure();
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> editPath = MainActivity.getRetrofitRequests(context).editPath(id, body);
+            editPath.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    Path.this.name = title;
+                    callback.onEditSuccess();
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.e("SUBMIT_PATH1", Arrays.toString(t.getStackTrace()));
+                    callback.onEditFailure();
+                }
             });
-            requestQueue.add(jsonObjectRequest);
         } catch (JSONException e) {
-            Log.e("SUBMIT_PATH", Arrays.toString(e.getStackTrace()));
+            Log.e("SUBMIT_PATH2", Arrays.toString(e.getStackTrace()));
             callback.onEditFailure();
         }
     }
 
     public void walk(Context context) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url =  context.getString(R.string.local_url) + String.format("/paths/%d/walk", id);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, null, response -> {
-            try {
-                this.walkCount = response.getInt("new_count");
-            } catch (JSONException e) {
-                e.printStackTrace();
+        Call<JsonElement> walkPath = MainActivity.getRetrofitRequests(context).walkPath(id);
+        walkPath.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                try {
+                    Path.this.walkCount = new JSONObject(response.body().toString()).getInt("new_count");
+                } catch (JSONException e) {
+                    Log.e("WALK_PATH1", Arrays.toString(e.getStackTrace()));
+                }
             }
-        }, error -> {
-            Log.e("SUBMIT_PATH", Arrays.toString(error.getStackTrace()));
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("WALK_PATH2", Arrays.toString(t.getStackTrace()));
+            }
         });
-        requestQueue.add(jsonObjectRequest);
     }
 
     public void getReviews(Context context, GetAdditionalCallback callback) {
         if (!isLoadingReviews) {
             isLoadingReviews = true;
-            RequestQueue requestQueue = Volley.newRequestQueue(context);
-            String url = context.getString(R.string.local_url) + String.format("/paths/%d/reviews?page=%d", id, nextReviewPage);
             JSONObject request = new JSONObject();
             JSONObject attributes = new JSONObject();
             try {
                 attributes.put("device_id", MainActivity.getDeviceId(context));
                 request.put("attributes", attributes);
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
-                    try {
-                        JSONArray reviews = response.getJSONArray("reviews");
-                        for (int i = 0; i < reviews.length(); i++) {
-                            JSONObject review = reviews.getJSONObject(i);
-                            boolean exists = false;
-                            for (PathReview pathReview : pathReviews) {
-                                if (pathReview.getId() == review.getInt("id")) {
-                                    exists = true;
-                                    break;
+                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+                Call<JsonElement> getReviews = MainActivity.getRetrofitRequests(context).getPathReviews(id, nextReviewPage, body);
+                getReviews.enqueue(new Callback<JsonElement>() {
+                    @Override
+                    public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                        if (response.isSuccessful()) {
+                            try {
+                                JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString());
+                                JSONArray reviews = responseJson.getJSONArray("reviews");
+                                for (int i = 0; i < reviews.length(); i++) {
+                                    JSONObject review = reviews.getJSONObject(i);
+                                    boolean exists = false;
+                                    for (PathReview pathReview : pathReviews) {
+                                        if (pathReview.getId() == review.getInt("id")) {
+                                            exists = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!exists) {
+                                        PathReview newReview = new PathReview(review.getInt("id"), Path.this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                                        pathReviews.add(newReview);
+                                    }
                                 }
+                                if (responseJson.has("own_review")) {
+                                    JSONObject review = responseJson.getJSONArray("own_review").getJSONObject(0);
+                                    ownReview = new PathReview(review.getInt("id"), Path.this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                                }
+                                nextReviewPage++;
+                                isLoadingReviews = false;
+                                callback.onGetAdditionalSuccess();
+                            } catch (JSONException e) {
+                                Log.e("GET_REVIEWS1", Arrays.toString(e.getStackTrace()));
+                                isLoadingReviews = false;
+                                callback.onGetAdditionalFailure();
                             }
-                            if (!exists) {
-                                PathReview newReview = new PathReview(review.getInt("id"), this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
-                                    pathReviews.add(newReview);
+                        } else {
+                            if (nextReviewPage > 1) {
+                                Toast.makeText(context, "No more reviews!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                isLoadingReviews = false;
+                                callback.onGetAdditionalFailure();
                             }
                         }
-                        if (response.has("own_review")) {
-                            JSONObject review = response.getJSONArray("own_review").getJSONObject(0);
-                            ownReview = new PathReview(review.getInt("id"), this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
-                        }
-                        nextReviewPage++;
-                        isLoadingReviews = false;
-                        callback.onGetAdditionalSuccess();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        isLoadingReviews = false;
-                        callback.onGetAdditionalFailure();
                     }
-                }, error -> {
-                    Log.e("GET_REVIEWS", Arrays.toString(error.getStackTrace()));
-                    if (nextReviewPage > 1) {
-                        Toast.makeText(context, "No more reviews!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        isLoadingReviews = false;
+
+                    @Override
+                    public void onFailure(Call<JsonElement> call, Throwable t) {
+                        Log.e("GET_REVIEWS2", Arrays.toString(t.getStackTrace()));
                         callback.onGetAdditionalFailure();
                     }
                 });
-                requestQueue.add(jsonObjectRequest);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("GET_REVIEWS3", Arrays.toString(e.getStackTrace()));
                 isLoadingReviews = false;
                 callback.onGetAdditionalFailure();
             }
@@ -289,50 +319,59 @@ public class Path {
     public void getPictures(Context context, GetAdditionalCallback callback) {
         if (!isLoadingPictures) {
             isLoadingPictures = true;
-            RequestQueue requestQueue = Volley.newRequestQueue(context);
-            String url = context.getString(R.string.local_url) + String.format("/paths/%d/pictures?page=%d", id, nextPicturePage);
             JSONObject request = new JSONObject();
             JSONObject attributes = new JSONObject();
             try {
                 attributes.put("device_id", MainActivity.getDeviceId(context));
                 request.put("attributes", attributes);
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
-                    try {
-                        JSONArray pictures = response.getJSONArray("pictures");
-                        for (int i = 0; i < pictures.length(); i++) {
-                            JSONObject picture = pictures.getJSONObject(i);
-                            boolean exists = false;
-                            for (PathPicture pathPicture : pathPictures) {
-                                if (pathPicture.getId() == picture.getInt("id")) {
-                                    exists = true;
-                                    break;
+                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+                Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPathPictures(id, nextPicturePage, body);
+                getPictures.enqueue(new Callback<JsonElement>() {
+                    @Override
+                    public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                        if (response.isSuccessful()) {
+                            try {
+                                JSONArray pictures = new JSONObject(response.body().getAsJsonObject().toString()).getJSONArray("pictures");
+                                for (int i = 0; i < pictures.length(); i++) {
+                                    JSONObject picture = pictures.getJSONObject(i);
+                                    boolean exists = false;
+                                    for (PathPicture pathPicture : pathPictures) {
+                                        if (pathPicture.getId() == picture.getInt("id")) {
+                                            exists = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!exists) {
+                                        PathPicture newPicture = new PathPicture(picture.getInt("id"), Path.this, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), picture.getBoolean("editable"));
+                                        pathPictures.add(newPicture);
+                                    }
                                 }
+                                nextPicturePage++;
+                                isLoadingPictures = false;
+                                callback.onGetAdditionalSuccess();
+                            } catch (JSONException e) {
+                                Log.e("GET_PICTURES1", Arrays.toString(e.getStackTrace()));
+                                isLoadingPictures = false;
+                                callback.onGetAdditionalFailure();
                             }
-                            if (!exists) {
-                                PathPicture newPicture = new PathPicture(picture.getInt("id"), this, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), picture.getBoolean("editable"));
-                                pathPictures.add(newPicture);
+                        } else {
+                            if (nextPicturePage > 1) {
+                                Toast.makeText(context, "No more pictures!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                isLoadingPictures = false;
+                                callback.onGetAdditionalFailure();
                             }
                         }
-                        nextPicturePage++;
-                        isLoadingPictures = false;
-                        callback.onGetAdditionalSuccess();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        isLoadingPictures = false;
-                        callback.onGetAdditionalFailure();
                     }
-                }, error -> {
-                    Log.e("GET_PICTURES", Arrays.toString(error.getStackTrace()));
-                    if (nextPicturePage > 1) {
-                        Toast.makeText(context, "No more pictures!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        isLoadingPictures = false;
+
+                    @Override
+                    public void onFailure(Call<JsonElement> call, Throwable t) {
+                        Log.e("GET_PICTURES2", Arrays.toString(t.getStackTrace()));
                         callback.onGetAdditionalFailure();
                     }
                 });
-                requestQueue.add(jsonObjectRequest);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("GET_PICTURES3", Arrays.toString(e.getStackTrace()));
                 isLoadingPictures = false;
                 callback.onGetAdditionalFailure();
             }

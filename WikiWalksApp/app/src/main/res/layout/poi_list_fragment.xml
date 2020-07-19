@@ -8,6 +8,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="300dp">
+
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/poi_list_frag_collapsing_toolbar_layout"
             android:layout_width="match_parent"
@@ -58,7 +59,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="Points of Interest"/>
+                android:text="Points of Interest" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/poi_list_recyclerview"

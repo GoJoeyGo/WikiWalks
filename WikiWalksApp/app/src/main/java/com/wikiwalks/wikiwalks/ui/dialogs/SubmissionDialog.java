@@ -19,6 +19,7 @@ public class SubmissionDialog extends DialogFragment {
 
     public interface SubmissionDialogListener {
         void onPositiveClick(String title);
+
         void onNegativeClick();
     }
 

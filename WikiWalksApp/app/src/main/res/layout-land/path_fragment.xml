@@ -12,28 +12,27 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/path_frag_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:contentInsetEnd="16dp"
-        app:contentInsetStart="16dp"
-        android:background="?attr/colorBackgroundFloating"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:titleTextColor="?attr/colorOnBackground"
-        >
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/path_frag_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:contentInsetEnd="16dp"
+            app:contentInsetStart="16dp"
+            android:background="?attr/colorBackgroundFloating"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:titleTextColor="?attr/colorOnBackground">
 
-        <ImageButton
-            android:id="@+id/edit_title_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
-            android:background="#00FFFFFF"
-            android:scaleType="center"
-            android:src="@drawable/ic_baseline_edit_24"
-            android:contentDescription="Edit Title" />
-    </androidx.appcompat.widget.Toolbar>
+            <ImageButton
+                android:id="@+id/edit_title_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:background="#00FFFFFF"
+                android:scaleType="center"
+                android:src="@drawable/ic_baseline_edit_24"
+                android:contentDescription="Edit Title" />
+        </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
@@ -71,7 +70,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/path_frag_rating_bar"/>
+                app:layout_constraintEnd_toStartOf="@id/path_frag_rating_bar" />
 
             <RatingBar
                 android:id="@+id/path_frag_rating_bar"

@@ -4,15 +4,17 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-
-import com.android.volley.request.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonElement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PointOfInterestReview {
     private int id;
@@ -24,6 +26,7 @@ public class PointOfInterestReview {
 
     public interface SubmitReviewCallback {
         void onSubmitReviewSuccess();
+
         void onSubmitReviewFailure();
     }
 
@@ -56,9 +59,7 @@ public class PointOfInterestReview {
         return editable;
     }
 
-    public void submit(Context context, SubmitReviewCallback callback) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url =  context.getString(R.string.local_url) + String.format("/pois/%d/reviews/new", pointOfInterest.getId());
+    public void submit(Context context, PathReview.SubmitReviewCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -66,33 +67,39 @@ public class PointOfInterestReview {
             attributes.put("text", message);
             attributes.put("rating", rating);
             request.put("attributes", attributes);
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
-                try {
-                    JSONObject responseJson = response.getJSONObject("path_review");
-                    name = responseJson.getString("submitter");
-                    id = responseJson.getInt("id");
-                    pointOfInterest.setOwnReview(this);
-                    callback.onSubmitReviewSuccess();
-                } catch (JSONException e) {
-                    Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
-                    Log.e("SUBMIT_PATH_REVIEW", Arrays.toString(e.getStackTrace()));
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> newPoIReview = MainActivity.getRetrofitRequests(context).newPoIReview(pointOfInterest.getId(), body);
+            newPoIReview.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_review");
+                        name = responseJson.getString("submitter");
+                        id = responseJson.getInt("id");
+                        pointOfInterest.setOwnReview(PointOfInterestReview.this);
+                        callback.onSubmitReviewSuccess();
+                    } catch (JSONException e) {
+                        Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
+                        Log.e("SUBMIT_POI_REVIEW1", Arrays.toString(e.getStackTrace()));
+                        callback.onSubmitReviewFailure();
+                    }
                 }
-            }, error -> {
-                Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
-                Log.e("SUBMIT_PATH_REVIEW", Arrays.toString(error.getStackTrace()));
-                callback.onSubmitReviewFailure();
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
+                    Log.e("SUBMIT_POI_REVIEW2", Arrays.toString(t.getStackTrace()));
+                    callback.onSubmitReviewFailure();
+                }
             });
-            requestQueue.add(jsonObjectRequest);
         } catch (JSONException e) {
             Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
-            Log.e("SUBMIT_PATH_REVIEW", Arrays.toString(e.getStackTrace()));
+            Log.e("SUBMIT_POI_REVIEW3", Arrays.toString(e.getStackTrace()));
             callback.onSubmitReviewFailure();
         }
     }
 
-    public void edit(Context context, String message, int rating, SubmitReviewCallback callback) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url =  context.getString(R.string.local_url) + String.format("/pois/%d/reviews/%d/edit", pointOfInterest.getId(), id);
+    public void edit(Context context, String message, int rating, PathReview.SubmitReviewCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -100,43 +107,55 @@ public class PointOfInterestReview {
             attributes.put("rating", rating);
             attributes.put("device_id", MainActivity.getDeviceId(context));
             request.put("attributes", attributes);
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
-                this.message = message;
-                this.rating = rating;
-                callback.onSubmitReviewSuccess();
-            }, error -> {
-                Toast.makeText(context, "Failed to edit review...", Toast.LENGTH_SHORT).show();
-                Log.e("EDIT_PATH_REVIEW", Arrays.toString(error.getStackTrace()));
-                callback.onSubmitReviewFailure();
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> editPoIReview = MainActivity.getRetrofitRequests(context).editPoIReview(pointOfInterest.getId(), id, body);
+            editPoIReview.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    PointOfInterestReview.this.message = message;
+                    PointOfInterestReview.this.rating = rating;
+                    callback.onSubmitReviewSuccess();
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Toast.makeText(context, "Failed to edit review...", Toast.LENGTH_SHORT).show();
+                    Log.e("EDIT_POI_REVIEW1", Arrays.toString(t.getStackTrace()));
+                    callback.onSubmitReviewFailure();
+                }
             });
-            requestQueue.add(jsonObjectRequest);
         } catch (JSONException e) {
             Toast.makeText(context, "Failed to edit review...", Toast.LENGTH_SHORT).show();
-            Log.e("EDIT_PATH_REVIEW", Arrays.toString(e.getStackTrace()));
+            Log.e("EDIT_POI_REVIEW2", Arrays.toString(e.getStackTrace()));
             callback.onSubmitReviewFailure();
         }
     }
 
-    public void delete(final Context context, SubmitReviewCallback callback) {
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        String url = context.getString(R.string.local_url) + String.format("/pois/%d/reviews/%d/delete", pointOfInterest.getId(), id);
+    public void delete(final Context context, PathReview.SubmitReviewCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
             attributes.put("device_id", MainActivity.getDeviceId(context));
             request.put("attributes", attributes);
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, request, response -> {
-                pointOfInterest.setOwnReview(null);
-                callback.onSubmitReviewSuccess();
-            }, error -> {
-                Toast.makeText(context, "Failed to delete review...", Toast.LENGTH_SHORT).show();
-                Log.e("DELETE_PATH_REVIEW", Arrays.toString(error.getStackTrace()));
-                callback.onSubmitReviewFailure();
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> deletePoIReview = MainActivity.getRetrofitRequests(context).deletePoIReview(pointOfInterest.getId(), id, body);
+            deletePoIReview.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    pointOfInterest.setOwnReview(null);
+                    callback.onSubmitReviewSuccess();
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Toast.makeText(context, "Failed to delete review...", Toast.LENGTH_SHORT).show();
+                    Log.e("DELETE_POI_REVIEW1", Arrays.toString(t.getStackTrace()));
+                    callback.onSubmitReviewFailure();
+                }
             });
-            requestQueue.add(jsonObjectRequest);
         } catch (JSONException e) {
             Toast.makeText(context, "Failed to delete review...", Toast.LENGTH_SHORT).show();
-            Log.e("DELETE_PATH_REVIEW", Arrays.toString(e.getStackTrace()));
+            Log.e("DELETE_POI_REVIEW2", Arrays.toString(e.getStackTrace()));
             callback.onSubmitReviewFailure();
         }
     }
