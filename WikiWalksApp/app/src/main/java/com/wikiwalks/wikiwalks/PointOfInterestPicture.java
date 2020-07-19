@@ -89,7 +89,7 @@ public class PointOfInterestPicture {
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
                     try {
-                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_picture");
+                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("poi_picture");
                         pointOfInterest.getPointOfInterestPictures().add(0, new PointOfInterestPicture(responseJson.getInt("id"), pointOfInterest, responseJson.getString("url"), responseJson.getInt("width"), responseJson.getInt("height"), responseJson.getString("description"), responseJson.getString("submitter"), true));
                         callback.onSubmitPictureSuccess();
                     } catch (JSONException e) {

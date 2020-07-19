@@ -74,7 +74,7 @@ public class PointOfInterestReview {
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
                         try {
-                            JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_review");
+                            JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("poi_review");
                             name = responseJson.getString("submitter");
                             id = responseJson.getInt("id");
                             pointOfInterest.setOwnReview(PointOfInterestReview.this);
