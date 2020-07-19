@@ -106,13 +106,18 @@ public class Route implements Serializable {
             newRoute.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    try {
-                        JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("path");
-                        PathMap.getInstance().addPath(new Path(responseJson));
-                        callback.onSuccess();
-                    } catch (JSONException e) {
-                        Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
-                        Log.e("SUBMIT_PATH1", Arrays.toString(e.getStackTrace()));
+                    if (response.isSuccessful()) {
+                        try {
+                            JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("path");
+                            PathMap.getInstance().addPath(new Path(responseJson));
+                            callback.onSuccess();
+                        } catch (JSONException e) {
+                            Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
+                            Log.e("SUBMIT_PATH1", Arrays.toString(e.getStackTrace()));
+                            callback.onFailure();
+                        }
+                    } else {
+                        callback.onFailure();
                     }
                 }
 
@@ -141,17 +146,21 @@ public class Route implements Serializable {
             deleteRoute.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    path.removeRoute(Route.this);
-                    if (path.getRoutes().size() == 0) {
-                        for (Marker marker : path.getMarkers()) {
-                            marker.remove();
+                    if (response.isSuccessful()) {
+                        path.removeRoute(Route.this);
+                        if (path.getRoutes().size() == 0) {
+                            for (Marker marker : path.getMarkers()) {
+                                marker.remove();
+                            }
+                            PathMap.getInstance().deletePath(path);
                         }
-                        PathMap.getInstance().deletePath(path);
+                        for (Polyline polyline : polylines) {
+                            polyline.remove();
+                        }
+                        callback.onSuccess();
+                    } else {
+                        callback.onFailure();
                     }
-                    for (Polyline polyline : polylines) {
-                        polyline.remove();
-                    }
-                    callback.onSuccess();
                 }
 
                 @Override

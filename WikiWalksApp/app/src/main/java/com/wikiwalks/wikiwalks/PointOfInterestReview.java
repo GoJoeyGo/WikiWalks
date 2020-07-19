@@ -59,7 +59,7 @@ public class PointOfInterestReview {
         return editable;
     }
 
-    public void submit(Context context, PathReview.SubmitReviewCallback callback) {
+    public void submit(Context context, PointOfInterestReview.SubmitReviewCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -72,15 +72,19 @@ public class PointOfInterestReview {
             newPoIReview.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    try {
-                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_review");
-                        name = responseJson.getString("submitter");
-                        id = responseJson.getInt("id");
-                        pointOfInterest.setOwnReview(PointOfInterestReview.this);
-                        callback.onSubmitReviewSuccess();
-                    } catch (JSONException e) {
-                        Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
-                        Log.e("SUBMIT_POI_REVIEW1", Arrays.toString(e.getStackTrace()));
+                    if (response.isSuccessful()) {
+                        try {
+                            JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_review");
+                            name = responseJson.getString("submitter");
+                            id = responseJson.getInt("id");
+                            pointOfInterest.setOwnReview(PointOfInterestReview.this);
+                            callback.onSubmitReviewSuccess();
+                        } catch (JSONException e) {
+                            Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
+                            Log.e("SUBMIT_POI_REVIEW1", Arrays.toString(e.getStackTrace()));
+                            callback.onSubmitReviewFailure();
+                        }
+                    } else {
                         callback.onSubmitReviewFailure();
                     }
                 }
@@ -99,7 +103,7 @@ public class PointOfInterestReview {
         }
     }
 
-    public void edit(Context context, String message, int rating, PathReview.SubmitReviewCallback callback) {
+    public void edit(Context context, String message, int rating, PointOfInterestReview.SubmitReviewCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -112,9 +116,11 @@ public class PointOfInterestReview {
             editPoIReview.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    PointOfInterestReview.this.message = message;
-                    PointOfInterestReview.this.rating = rating;
-                    callback.onSubmitReviewSuccess();
+                    if (response.isSuccessful()) {
+                        PointOfInterestReview.this.message = message;
+                        PointOfInterestReview.this.rating = rating;
+                        callback.onSubmitReviewSuccess();
+                    }
                 }
 
                 @Override
@@ -131,7 +137,7 @@ public class PointOfInterestReview {
         }
     }
 
-    public void delete(final Context context, PathReview.SubmitReviewCallback callback) {
+    public void delete(final Context context, PointOfInterestReview.SubmitReviewCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -142,8 +148,12 @@ public class PointOfInterestReview {
             deletePoIReview.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    pointOfInterest.setOwnReview(null);
-                    callback.onSubmitReviewSuccess();
+                    if (response.isSuccessful()) {
+                        pointOfInterest.setOwnReview(null);
+                        callback.onSubmitReviewSuccess();
+                    } else {
+                        callback.onSubmitReviewFailure();
+                    }
                 }
 
                 @Override

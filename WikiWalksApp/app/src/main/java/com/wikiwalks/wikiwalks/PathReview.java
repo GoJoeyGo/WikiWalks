@@ -72,15 +72,19 @@ public class PathReview {
             newPathReview.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    try {
-                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_review");
-                        name = responseJson.getString("submitter");
-                        id = responseJson.getInt("id");
-                        path.setOwnReview(PathReview.this);
-                        callback.onSubmitReviewSuccess();
-                    } catch (JSONException e) {
-                        Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
-                        Log.e("SUBMIT_PATH_REVIEW1", Arrays.toString(e.getStackTrace()));
+                    if (response.isSuccessful()) {
+                        try {
+                            JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_review");
+                            name = responseJson.getString("submitter");
+                            id = responseJson.getInt("id");
+                            path.setOwnReview(PathReview.this);
+                            callback.onSubmitReviewSuccess();
+                        } catch (JSONException e) {
+                            Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
+                            Log.e("SUBMIT_PATH_REVIEW1", Arrays.toString(e.getStackTrace()));
+                            callback.onSubmitReviewFailure();
+                        }
+                    } else {
                         callback.onSubmitReviewFailure();
                     }
                 }
@@ -112,9 +116,13 @@ public class PathReview {
             editPathReview.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    PathReview.this.message = message;
-                    PathReview.this.rating = rating;
-                    callback.onSubmitReviewSuccess();
+                    if (response.isSuccessful()) {
+                        PathReview.this.message = message;
+                        PathReview.this.rating = rating;
+                        callback.onSubmitReviewSuccess();
+                    } else {
+                        callback.onSubmitReviewFailure();
+                    }
                 }
 
                 @Override
@@ -142,8 +150,12 @@ public class PathReview {
             deletePathReview.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    path.setOwnReview(null);
-                    callback.onSubmitReviewSuccess();
+                    if (response.isSuccessful()) {
+                        path.setOwnReview(null);
+                        callback.onSubmitReviewSuccess();
+                    } else {
+                        callback.onSubmitReviewFailure();
+                    }
                 }
 
                 @Override

@@ -56,6 +56,12 @@ public interface RetrofitRequests {
                                        @Path("review_id") int reviewId,
                                        @Body RequestBody body);
 
+    @POST("/pois/{id}/reviews")
+    Call<JsonElement> getPoIReviews(@Path("id") int id,
+                                    @Query("page") int page,
+                                    @Body RequestBody body);
+
+
     @POST("/pois/{id}/reviews/new")
     Call<JsonElement> newPoIReview(@Path("id") int id,
                                    @Body RequestBody body);
@@ -81,4 +87,16 @@ public interface RetrofitRequests {
                                      @Part MultipartBody.Part image,
                                      @Part("device_id") RequestBody deviceId,
                                      @Part("description") RequestBody description);
+
+    @POST("/pois/{id}/pictures")
+    Call<JsonElement> getPoIPictures(@Path("id") int id,
+                                     @Query("page") int page,
+                                     @Body RequestBody body);
+
+    @Multipart
+    @POST("/pois/{id}/pictures/new")
+    Call<JsonElement> newPoIPicture(@Path("id") int id,
+                                    @Part MultipartBody.Part image,
+                                    @Part("device_id") RequestBody deviceId,
+                                    @Part("description") RequestBody description);
 }

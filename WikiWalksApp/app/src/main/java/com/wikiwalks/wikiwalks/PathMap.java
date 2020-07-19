@@ -54,19 +54,22 @@ public class PathMap {
             getPaths.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    try {
-                        JSONArray responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONArray("paths");
-                        for (int i = 0; i < responseJson.length(); i++) {
-                            JSONObject pathJson = responseJson.getJSONObject(i);
-                            if (!pathList.containsKey(pathJson.getInt("id"))) {
-                                pathList.put(pathJson.getInt("id"), new Path(pathJson));
+                    if (response.isSuccessful()) {
+                        try {
+                            JSONArray responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONArray("paths");
+                            for (int i = 0; i < responseJson.length(); i++) {
+                                JSONObject pathJson = responseJson.getJSONObject(i);
+                                if (!pathList.containsKey(pathJson.getInt("id"))) {
+                                    pathList.put(pathJson.getInt("id"), new Path(pathJson));
+                                }
                             }
+                            triggerChangeListeners();
+                        } catch (JSONException e) {
+                            triggerFailedListeners();
+                            Log.e("GET_PATHS1", Arrays.toString(e.getStackTrace()));
                         }
-                        triggerChangeListeners();
-                    } catch (JSONException e) {
+                    } else {
                         triggerFailedListeners();
-                        Log.e("GET_PATHS1", Arrays.toString(e.getStackTrace()));
-
                     }
                 }
 

@@ -186,12 +186,14 @@ public class Path {
         updatePath.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                try {
-                    JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path");
-                    PathMap.getInstance().addPath(new Path(responseJson));
-                } catch (JSONException e) {
-                    Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
-                    Log.e("UPDATE_PATH1", Arrays.toString(e.getStackTrace()));
+                if (response.isSuccessful()) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path");
+                        PathMap.getInstance().addPath(new Path(responseJson));
+                    } catch (JSONException e) {
+                        Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
+                        Log.e("UPDATE_PATH1", Arrays.toString(e.getStackTrace()));
+                    }
                 }
             }
 
@@ -214,8 +216,10 @@ public class Path {
             editPath.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    Path.this.name = title;
-                    callback.onEditSuccess();
+                    if (response.isSuccessful()) {
+                        Path.this.name = title;
+                        callback.onEditSuccess();
+                    }
                 }
 
                 @Override
@@ -235,10 +239,12 @@ public class Path {
         walkPath.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                try {
-                    Path.this.walkCount = new JSONObject(response.body().toString()).getInt("new_count");
-                } catch (JSONException e) {
-                    Log.e("WALK_PATH1", Arrays.toString(e.getStackTrace()));
+                if (response.isSuccessful()) {
+                    try {
+                        Path.this.walkCount = new JSONObject(response.body().toString()).getInt("new_count");
+                    } catch (JSONException e) {
+                        Log.e("WALK_PATH1", Arrays.toString(e.getStackTrace()));
+                    }
                 }
             }
 
