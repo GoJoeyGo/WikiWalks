@@ -3,12 +3,8 @@ package com.wikiwalks.wikiwalks.ui.dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -17,26 +13,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
-import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.squareup.picasso.Picasso;
-import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathPicture;
 import com.wikiwalks.wikiwalks.R;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import static android.app.Activity.RESULT_OK;
 
 public class EditPictureDialog extends DialogFragment implements PathPicture.PictureEditCallback {
 
@@ -75,9 +57,11 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
     Button cancelButton;
     PathPicture pathPicture;
     AlertDialog confirmationDialog;
+    Bitmap bitmap;
 
-    public EditPictureDialog(PathPicture pathPicture) {
+    public EditPictureDialog(PathPicture pathPicture, Bitmap bitmap) {
         this.pathPicture = pathPicture;
+        this.bitmap = bitmap;
     }
 
     @NonNull
@@ -87,7 +71,8 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.edit_picture_popup, null);
         imageView = view.findViewById(R.id.edit_picture_popup_selected_image);
-        Picasso.get().load(pathPicture.getUrl()).into(imageView);
+        imageView.setImageBitmap(bitmap);
+        //Picasso.get().load(pathPicture.getUrl()).into(imageView);
         title = view.findViewById(R.id.edit_picture_popup_description);
         title.getEditText().setText(pathPicture.getDescription());
         submitButton = view.findViewById(R.id.edit_picture_popup_submit_button);

@@ -1,10 +1,10 @@
 package com.wikiwalks.wikiwalks.ui.recyclerviewadapters;
 
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,12 +38,12 @@ public class PathPictureListRecyclerViewAdapter extends RecyclerView.Adapter<Pat
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        Picasso.get().load(context.getString(R.string.local_url) + "/pictures/" + pictureList.get(position).getUrl()).into(holder.imageView);
+        Picasso.get().load(context.getString(R.string.local_url) + "/pictures/" + pictureList.get(position).getUrl()).placeholder(R.drawable.banner_background).into(holder.imageView);
         if (pictureList.get(position).isEditable()) {
             holder.name.setTypeface(holder.name.getTypeface(), Typeface.BOLD_ITALIC);
             holder.name.setText("You");
             holder.editButton.setVisibility(View.VISIBLE);
-            holder.editButton.setOnClickListener(v -> context.launchEditDialog(position));
+            holder.editButton.setOnClickListener(v -> context.launchEditDialog(position, ((BitmapDrawable) holder.imageView.getDrawable()).getBitmap()));
         } else {
             holder.name.setText(pictureList.get(position).getSubmitter());
         }

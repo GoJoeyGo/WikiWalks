@@ -3,6 +3,7 @@ package com.wikiwalks.wikiwalks.ui;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,9 +114,9 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
         dialog.show(getActivity().getSupportFragmentManager(), "PicturePopup");
     }
 
-    public void launchEditDialog(int position) {
+    public void launchEditDialog(int position, Bitmap bitmap) {
         this.position = position;
-        EditPictureDialog dialog = new EditPictureDialog(pathPictures.get(position));
+        EditPictureDialog dialog = new EditPictureDialog(pathPictures.get(position), bitmap);
         dialog.setTargetFragment(this, 0);
         dialog.show(getActivity().getSupportFragmentManager(), "PicturePopup");
     }

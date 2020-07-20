@@ -34,8 +34,7 @@
                 app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:maxHeight="300dp"
-                android:visibility="gone" />
+                android:maxHeight="300dp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/edit_picture_popup_description"
