@@ -47,14 +47,15 @@ public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<Picture
             holder.editButton.setOnClickListener(v -> context.launchEditDialog(position, ((BitmapDrawable) holder.imageView.getDrawable()).getBitmap()));
         } else {
             holder.editButton.setVisibility(View.INVISIBLE);
+            holder.name.setTypeface(holder.name.getTypeface(), Typeface.NORMAL);
             holder.name.setText(picture.getSubmitter());
         }
         if (!picture.getDescription().isEmpty()) {
-            holder.description.setText(picture.getDescription());
             holder.description.setTypeface(holder.description.getTypeface(), Typeface.NORMAL);
+            holder.description.setText(picture.getDescription());
         } else {
-            holder.description.setText("no description written");
             holder.description.setTypeface(holder.description.getTypeface(), Typeface.ITALIC);
+            holder.description.setText("no description written");
         }
     }
 
