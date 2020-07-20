@@ -89,7 +89,7 @@ public class Route implements Serializable {
         return editable;
     }
 
-    public void submit(Context context, String title, RouteSubmitCallback callback) {
+    public static void submit(Context context, Path path, String title, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, RouteSubmitCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {

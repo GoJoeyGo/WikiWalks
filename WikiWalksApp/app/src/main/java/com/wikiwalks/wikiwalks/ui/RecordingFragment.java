@@ -52,7 +52,6 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     private ArrayList<Double> altitudes = new ArrayList<>();
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private Location lastLocation;
-    Route newRoute;
     Toolbar toolbar;
 
     LocationCallback locationCallback = new LocationCallback() {
@@ -215,18 +214,12 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         dialog.show(getActivity().getSupportFragmentManager(), "SubmissionPopup");
     }
 
-    public Route generateRoute() {
-        newRoute = new Route(-1, path, true, latitudes, longitudes, altitudes);
-        return newRoute;
-    }
-
     @Override
     public void onPositiveClick(String title) {
         if (title.equals("")) {
             title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
         }
-        newRoute = generateRoute();
-        newRoute.submit(this.getContext(), title, this);
+        Route.submit(this.getContext(), path, title, latitudes, longitudes, altitudes, this);
     }
 
     @Override
