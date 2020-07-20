@@ -43,7 +43,7 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
     @Override
     public void onEditPictureSuccess() {
         listener.onEdit();
-        getDialog().dismiss();
+        dismiss();
     }
 
     @Override
@@ -54,7 +54,7 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
     @Override
     public void onDeletePictureSuccess() {
         listener.onDelete();
-        getDialog().dismiss();
+        dismiss();
     }
 
     @Override
@@ -89,9 +89,14 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
         imageView = view.findViewById(R.id.edit_picture_popup_selected_image);
         Picasso.get().load(pathPicture.getUrl()).into(imageView);
         title = view.findViewById(R.id.edit_picture_popup_description);
+        title.getEditText().setText(pathPicture.getDescription());
         submitButton = view.findViewById(R.id.edit_picture_popup_submit_button);
         submitButton.setOnClickListener(v -> {
-            pathPicture.edit(getContext(), title.getEditText().getText().toString(), this);
+            if (!pathPicture.getDescription().equals(title.getEditText().getText().toString())) {
+                pathPicture.edit(getContext(), title.getEditText().getText().toString(), this);
+            } else {
+                dismiss();
+            }
         });
         deleteButton = view.findViewById(R.id.edit_picture_popup_delete_button);
         deleteButton.setOnClickListener(v -> {
@@ -104,7 +109,7 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
         });
         cancelButton = view.findViewById(R.id.edit_picture_popup_cancel_button);
         cancelButton.setOnClickListener(v -> {
-            this.getDialog().cancel();
+            dismiss();
         });
         builder.setView(view);
         return builder.create();

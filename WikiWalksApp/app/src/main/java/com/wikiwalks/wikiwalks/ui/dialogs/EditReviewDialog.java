@@ -27,7 +27,7 @@ public class EditReviewDialog extends DialogFragment implements PathReview.Submi
     @Override
     public void onSubmitReviewSuccess() {
         listener.onSuccess();
-        getDialog().dismiss();
+        dismiss();
     }
 
     @Override
@@ -70,7 +70,11 @@ public class EditReviewDialog extends DialogFragment implements PathReview.Submi
                 PathReview newReview = new PathReview(-1, path, "", (int) rating.getRating(), message.getEditText().getText().toString(), true);
                 newReview.submit(getContext(), this);
             } else {
-                review.edit(getContext(), message.getEditText().getText().toString(), (int) rating.getRating(), this);
+                if (!review.getMessage().equals(message.getEditText().getText().toString())) {
+                    review.edit(getContext(), message.getEditText().getText().toString(), (int) rating.getRating(), this);
+                } else {
+                    dismiss();
+                }
             }
         });
         deleteButton = view.findViewById(R.id.edit_review_popup_delete_button);
@@ -84,7 +88,7 @@ public class EditReviewDialog extends DialogFragment implements PathReview.Submi
         });
         cancelButton = view.findViewById(R.id.edit_review_popup_cancel_button);
         cancelButton.setOnClickListener(v -> {
-            getDialog().cancel();
+            dismiss();
         });
         if (review != null) {
             deleteButton.setVisibility(View.VISIBLE);

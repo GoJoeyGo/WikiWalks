@@ -442,7 +442,7 @@ def add_path_picture(path_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/paths/<path_id>/reviews/<path_picture_id>/edit", methods=["POST"])
+@posts.route("/paths/<path_id>/pictures/<path_picture_id>/edit", methods=["POST"])
 def edit_path_picture(path_id, path_picture_id):
     try:
         path_picture_schema = PathPictureSchema()
@@ -450,7 +450,8 @@ def edit_path_picture(path_id, path_picture_id):
         user = get_submitter(request_json["device_id"])
         path_picture = PathPicture.query.filter_by(id=path_picture_id)
         if path_picture.first() in user.path_pictures:
-            path_picture.update(dict(path_picture_schema.load(request_json, partial=True), url=path_picture.url))
+            path_picture.update(dict(path_picture_schema.load(request_json, partial=True),
+                                     url=path_picture.first().url))
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
