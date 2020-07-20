@@ -26,9 +26,9 @@ public class PointOfInterest {
     private int id;
     private String name;
 
-    private ArrayList<PointOfInterestPicture> pointOfInterestPictures = new ArrayList<>();
-    private ArrayList<PointOfInterestReview> pointOfInterestReviews = new ArrayList<>();
-    private PointOfInterestReview ownReview;
+    private ArrayList<Picture> picturesList = new ArrayList<>();
+    private ArrayList<Review> reviewsList = new ArrayList<>();
+    private Review ownReview;
     private int nextReviewPage = 1;
     private int nextPicturePage = 1;
     private boolean isLoadingReviews = false;
@@ -36,12 +36,6 @@ public class PointOfInterest {
     LatLng coordinates;
 
     private Path path;
-
-    public interface GetAdditionalCallback {
-        void onGetAdditionalSuccess();
-
-        void onGetAdditionalFailure();
-    }
 
     public PointOfInterest(int id, String name, double latitude, double longitude, Path path) {
         this.id = id;
@@ -66,23 +60,27 @@ public class PointOfInterest {
         return path;
     }
 
-    public ArrayList<PointOfInterestPicture> getPointOfInterestPictures() {
-        return pointOfInterestPictures;
-    }
-
-    public ArrayList<PointOfInterestReview> getPointOfInterestReviews() {
-        return pointOfInterestReviews;
-    }
-
     public void makeMarker(GoogleMap map) {
         map.addMarker(new MarkerOptions().position(coordinates));
     }
 
-    public void setOwnReview(PointOfInterestReview pointOfInterestReview) {
+    public void setOwnReview(Review pointOfInterestReview) {
         ownReview = pointOfInterestReview;
     }
 
-    public void getReviews(Context context, GetAdditionalCallback callback) {
+    public Review getOwnReview() {
+        return ownReview;
+    }
+
+    public ArrayList<Review> getReviewsList() {
+        return reviewsList;
+    }
+
+    public ArrayList<Picture> getPicturesList() {
+        return picturesList;
+    }
+
+    public void getReviews(Context context, Review.GetReviewCallback callback) {
         if (!isLoadingReviews) {
             isLoadingReviews = true;
             JSONObject request = new JSONObject();
@@ -102,35 +100,35 @@ public class PointOfInterest {
                                 for (int i = 0; i < reviews.length(); i++) {
                                     JSONObject review = reviews.getJSONObject(i);
                                     boolean exists = false;
-                                    for (PointOfInterestReview pointOfInterestReview : pointOfInterestReviews) {
+                                    for (Review pointOfInterestReview : reviewsList) {
                                         if (pointOfInterestReview.getId() == review.getInt("id")) {
                                             exists = true;
                                             break;
                                         }
                                     }
                                     if (!exists) {
-                                        PointOfInterestReview newReview = new PointOfInterestReview(review.getInt("id"), PointOfInterest.this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
-                                        pointOfInterestReviews.add(newReview);
+                                        Review newReview = new Review(Review.ReviewType.POINT_OF_INTEREST, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                                        reviewsList.add(newReview);
                                     }
                                 }
                                 if (responseJson.has("own_review")) {
                                     JSONObject review = responseJson.getJSONArray("own_review").getJSONObject(0);
-                                    ownReview = new PointOfInterestReview(review.getInt("id"), PointOfInterest.this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                                    ownReview = new Review(Review.ReviewType.POINT_OF_INTEREST, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
                                 }
                                 nextReviewPage++;
                                 isLoadingReviews = false;
-                                callback.onGetAdditionalSuccess();
+                                callback.onGetReviewSuccess();
                             } catch (JSONException e) {
                                 Log.e("GET_REVIEWS1", Arrays.toString(e.getStackTrace()));
                                 isLoadingReviews = false;
-                                callback.onGetAdditionalFailure();
+                                callback.onGetReviewFailure();
                             }
                         } else {
                             if (nextReviewPage > 1) {
                                 Toast.makeText(context, "No more reviews!", Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingReviews = false;
-                                callback.onGetAdditionalFailure();
+                                callback.onGetReviewFailure();
                             }
                         }
                     }
@@ -138,18 +136,18 @@ public class PointOfInterest {
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
                         Log.e("GET_REVIEWS2", Arrays.toString(t.getStackTrace()));
-                        callback.onGetAdditionalFailure();
+                        callback.onGetReviewFailure();
                     }
                 });
             } catch (JSONException e) {
                 Log.e("GET_REVIEWS3", Arrays.toString(e.getStackTrace()));
                 isLoadingReviews = false;
-                callback.onGetAdditionalFailure();
+                callback.onGetReviewFailure();
             }
         }
     }
 
-    public void getPictures(Context context, GetAdditionalCallback callback) {
+    public void getPictures(Context context, Picture.GetPictureCallback callback) {
         if (!isLoadingPictures) {
             isLoadingPictures = true;
             JSONObject request = new JSONObject();
@@ -168,31 +166,31 @@ public class PointOfInterest {
                                 for (int i = 0; i < pictures.length(); i++) {
                                     JSONObject picture = pictures.getJSONObject(i);
                                     boolean exists = false;
-                                    for (PointOfInterestPicture pointOfInterestPicture : pointOfInterestPictures) {
-                                        if (pointOfInterestPicture.getId() == picture.getInt("id")) {
+                                    for (Picture poiPicture : PointOfInterest.this.picturesList) {
+                                        if (poiPicture.getId() == picture.getInt("id")) {
                                             exists = true;
                                             break;
                                         }
                                     }
                                     if (!exists) {
-                                        PointOfInterestPicture newPicture = new PointOfInterestPicture(picture.getInt("id"), PointOfInterest.this, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), picture.getBoolean("editable"));
-                                        pointOfInterestPictures.add(newPicture);
+                                        Picture newPicture = new Picture(Picture.PictureType.POINT_OF_INTEREST, picture.getInt("id"), id, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), picture.getBoolean("editable"));
+                                        PointOfInterest.this.picturesList.add(newPicture);
                                     }
                                 }
                                 nextPicturePage++;
                                 isLoadingPictures = false;
-                                callback.onGetAdditionalSuccess();
+                                callback.onGetPictureSuccess();
                             } catch (JSONException e) {
                                 Log.e("GET_PICTURES1", Arrays.toString(e.getStackTrace()));
                                 isLoadingPictures = false;
-                                callback.onGetAdditionalFailure();
+                                callback.onGetPictureFailure();
                             }
                         } else {
                             if (nextPicturePage > 1) {
                                 Toast.makeText(context, "No more pictures!", Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingPictures = false;
-                                callback.onGetAdditionalFailure();
+                                callback.onGetPictureFailure();
                             }
                         }
                     }
@@ -200,13 +198,13 @@ public class PointOfInterest {
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
                         Log.e("GET_PICTURES2", Arrays.toString(t.getStackTrace()));
-                        callback.onGetAdditionalFailure();
+                        callback.onGetPictureFailure();
                     }
                 });
             } catch (JSONException e) {
                 Log.e("GET_PICTURES3", Arrays.toString(e.getStackTrace()));
                 isLoadingPictures = false;
-                callback.onGetAdditionalFailure();
+                callback.onGetPictureFailure();
             }
         }
     }

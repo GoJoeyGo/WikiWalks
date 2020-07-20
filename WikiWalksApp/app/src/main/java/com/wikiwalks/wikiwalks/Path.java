@@ -32,9 +32,9 @@ public class Path {
 
     private ArrayList<Route> routeList = new ArrayList<>();
     private ArrayList<PointOfInterest> pointsOfInterest = new ArrayList<>();
-    private ArrayList<PathPicture> pathPictures = new ArrayList<>();
-    private ArrayList<PathReview> pathReviews = new ArrayList<>();
-    private PathReview ownReview;
+    private ArrayList<Picture> pictures = new ArrayList<>();
+    private ArrayList<Review> reviews = new ArrayList<>();
+    private Review ownReview;
     private int nextReviewPage = 1;
     private int nextPicturePage = 1;
     private boolean isLoadingReviews = false;
@@ -46,14 +46,7 @@ public class Path {
 
     public interface PathChangeCallback {
         void onEditSuccess();
-
         void onEditFailure();
-    }
-
-    public interface GetAdditionalCallback {
-        void onGetAdditionalSuccess();
-
-        void onGetAdditionalFailure();
     }
 
     public Path(int id, String name, int walkCount, double rating, double[] bounds) {
@@ -78,7 +71,9 @@ public class Path {
         JSONArray points_of_interest = pathJson.getJSONArray("points_of_interest");
         for (int i = 0; i < points_of_interest.length(); i++) {
             JSONObject pointOfInterest = points_of_interest.getJSONObject(i);
-            pointsOfInterest.add(new PointOfInterest(pointOfInterest.getInt("id"), pointOfInterest.getString("name"), pointOfInterest.getDouble("latitude"), pointOfInterest.getDouble("longitude"), this));
+            PointOfInterest newPointOfInterest = new PointOfInterest(pointOfInterest.getInt("id"), pointOfInterest.getString("name"), pointOfInterest.getDouble("latitude"), pointOfInterest.getDouble("longitude"), this);
+            pointsOfInterest.add(newPointOfInterest);
+            PathMap.getInstance().getPointOfInterestList().put(newPointOfInterest.getId(), newPointOfInterest);
         }
         JSONArray routes = pathJson.getJSONArray("routes");
         for (int i = 0; i < routes.length(); i++) {
@@ -121,19 +116,19 @@ public class Path {
         return rating;
     }
 
-    public ArrayList<PathPicture> getPathPictures() {
-        return pathPictures;
+    public ArrayList<Picture> getPicturesList() {
+        return pictures;
     }
 
-    public ArrayList<PathReview> getPathReviews() {
-        return pathReviews;
+    public ArrayList<Review> getReviewsList() {
+        return reviews;
     }
 
-    public PathReview getOwnReview() {
+    public Review getOwnReview() {
         return ownReview;
     }
 
-    public void setOwnReview(PathReview ownReview) {
+    public void setOwnReview(Review ownReview) {
         this.ownReview = ownReview;
     }
 
@@ -255,7 +250,7 @@ public class Path {
         });
     }
 
-    public void getReviews(Context context, GetAdditionalCallback callback) {
+    public void getReviews(Context context, Review.GetReviewCallback callback) {
         if (!isLoadingReviews) {
             isLoadingReviews = true;
             JSONObject request = new JSONObject();
@@ -275,35 +270,35 @@ public class Path {
                                 for (int i = 0; i < reviews.length(); i++) {
                                     JSONObject review = reviews.getJSONObject(i);
                                     boolean exists = false;
-                                    for (PathReview pathReview : pathReviews) {
+                                    for (Review pathReview : Path.this.reviews) {
                                         if (pathReview.getId() == review.getInt("id")) {
                                             exists = true;
                                             break;
                                         }
                                     }
                                     if (!exists) {
-                                        PathReview newReview = new PathReview(review.getInt("id"), Path.this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
-                                        pathReviews.add(newReview);
+                                        Review newReview = new Review(Review.ReviewType.PATH, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                                        Path.this.reviews.add(newReview);
                                     }
                                 }
                                 if (responseJson.has("own_review")) {
                                     JSONObject review = responseJson.getJSONArray("own_review").getJSONObject(0);
-                                    ownReview = new PathReview(review.getInt("id"), Path.this, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                                    ownReview = new Review(Review.ReviewType.PATH, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
                                 }
                                 nextReviewPage++;
                                 isLoadingReviews = false;
-                                callback.onGetAdditionalSuccess();
+                                callback.onGetReviewSuccess();
                             } catch (JSONException e) {
                                 Log.e("GET_REVIEWS1", Arrays.toString(e.getStackTrace()));
                                 isLoadingReviews = false;
-                                callback.onGetAdditionalFailure();
+                                callback.onGetReviewFailure();
                             }
                         } else {
                             if (nextReviewPage > 1) {
                                 Toast.makeText(context, "No more reviews!", Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingReviews = false;
-                                callback.onGetAdditionalFailure();
+                                callback.onGetReviewFailure();
                             }
                         }
                     }
@@ -311,18 +306,18 @@ public class Path {
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
                         Log.e("GET_REVIEWS2", Arrays.toString(t.getStackTrace()));
-                        callback.onGetAdditionalFailure();
+                        callback.onGetReviewFailure();
                     }
                 });
             } catch (JSONException e) {
                 Log.e("GET_REVIEWS3", Arrays.toString(e.getStackTrace()));
                 isLoadingReviews = false;
-                callback.onGetAdditionalFailure();
+                callback.onGetReviewFailure();
             }
         }
     }
 
-    public void getPictures(Context context, GetAdditionalCallback callback) {
+    public void getPictures(Context context, Picture.GetPictureCallback callback) {
         if (!isLoadingPictures) {
             isLoadingPictures = true;
             JSONObject request = new JSONObject();
@@ -341,31 +336,31 @@ public class Path {
                                 for (int i = 0; i < pictures.length(); i++) {
                                     JSONObject picture = pictures.getJSONObject(i);
                                     boolean exists = false;
-                                    for (PathPicture pathPicture : pathPictures) {
+                                    for (Picture pathPicture : Path.this.pictures) {
                                         if (pathPicture.getId() == picture.getInt("id")) {
                                             exists = true;
                                             break;
                                         }
                                     }
                                     if (!exists) {
-                                        PathPicture newPicture = new PathPicture(picture.getInt("id"), Path.this, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), picture.getBoolean("editable"));
-                                        pathPictures.add(newPicture);
+                                        Picture newPicture = new Picture(Picture.PictureType.PATH, picture.getInt("id"), id, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), picture.getBoolean("editable"));
+                                        Path.this.pictures.add(newPicture);
                                     }
                                 }
                                 nextPicturePage++;
                                 isLoadingPictures = false;
-                                callback.onGetAdditionalSuccess();
+                                callback.onGetPictureSuccess();
                             } catch (JSONException e) {
                                 Log.e("GET_PICTURES1", Arrays.toString(e.getStackTrace()));
                                 isLoadingPictures = false;
-                                callback.onGetAdditionalFailure();
+                                callback.onGetPictureFailure();
                             }
                         } else {
                             if (nextPicturePage > 1) {
                                 Toast.makeText(context, "No more pictures!", Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingPictures = false;
-                                callback.onGetAdditionalFailure();
+                                callback.onGetPictureFailure();
                             }
                         }
                     }
@@ -373,13 +368,13 @@ public class Path {
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
                         Log.e("GET_PICTURES2", Arrays.toString(t.getStackTrace()));
-                        callback.onGetAdditionalFailure();
+                        callback.onGetPictureFailure();
                     }
                 });
             } catch (JSONException e) {
                 Log.e("GET_PICTURES3", Arrays.toString(e.getStackTrace()));
                 isLoadingPictures = false;
-                callback.onGetAdditionalFailure();
+                callback.onGetPictureFailure();
             }
         }
     }

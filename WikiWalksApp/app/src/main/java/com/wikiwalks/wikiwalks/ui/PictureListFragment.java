@@ -19,51 +19,59 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-
-import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
-import com.wikiwalks.wikiwalks.PathPicture;
+import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditPictureDialog;
 import com.wikiwalks.wikiwalks.ui.dialogs.SubmitPictureDialog;
-import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PathPictureListRecyclerViewAdapter;
+import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PictureListRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
-public class PathPictureListFragment extends Fragment implements Path.GetAdditionalCallback, SubmitPictureDialog.PictureDialogListener, EditPictureDialog.EditPictureDialogListener {
+public class PictureListFragment extends Fragment implements Picture.GetPictureCallback, SubmitPictureDialog.PictureDialogListener, EditPictureDialog.EditPictureDialogListener {
 
     Button submitPictureButton;
-    Path path;
+    int parentId;
     RecyclerView recyclerView;
-    PathPictureListRecyclerViewAdapter recyclerViewAdapter;
+    PictureListRecyclerViewAdapter recyclerViewAdapter;
     Toolbar toolbar;
-    ArrayList<PathPicture> pathPictures;
+    ArrayList<Picture> pictures;
     TextView noPicturesIndicator;
     int position;
+    Picture.PictureType type;
 
 
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 0;
 
-    public static PathPictureListFragment newInstance(int pathId) {
+    public static PictureListFragment newInstance(Picture.PictureType type, int parentId) {
         Bundle args = new Bundle();
-        args.putInt("pathId", pathId);
-        PathPictureListFragment fragment = new PathPictureListFragment();
+        args.putInt("parentId", parentId);
+        args.putSerializable("type", type);
+        PictureListFragment fragment = new PictureListFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
-        pathPictures = path.getPathPictures();
-        final View rootView = inflater.inflate(R.layout.path_picture_list_fragment, container, false);
+        parentId = getArguments().getInt("parentId");
+        type = (Picture.PictureType) getArguments().getSerializable("type");
+        String title;
+        if (type == Picture.PictureType.PATH) {
+            pictures = PathMap.getInstance().getPathList().get(parentId).getPicturesList();
+            title = PathMap.getInstance().getPathList().get(parentId).getName();
+        } else {
+            pictures = PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList();
+            title = PathMap.getInstance().getPointOfInterestList().get(parentId).getName();
+        }
+        final View rootView = inflater.inflate(R.layout.picture_list_fragment, container, false);
         toolbar = rootView.findViewById(R.id.path_picture_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Pictures - " + path.getName());
+        toolbar.setTitle("Pictures - " + title);
         noPicturesIndicator = rootView.findViewById(R.id.no_pictures_indicator);
         recyclerView = rootView.findViewById(R.id.path_picture_list_recyclerview);
-        recyclerViewAdapter = new PathPictureListRecyclerViewAdapter(this, pathPictures);
+        recyclerViewAdapter = new PictureListRecyclerViewAdapter(this, pictures);
         recyclerView.setAdapter(recyclerViewAdapter);
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -75,7 +83,11 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(1)) {
-                    path.getPictures(getContext(), PathPictureListFragment.this);
+                    if (type == Picture.PictureType.PATH) {
+                        PathMap.getInstance().getPathList().get(parentId).getPictures(getContext(), PictureListFragment.this);
+                    } else {
+                        PathMap.getInstance().getPointOfInterestList().get(parentId).getPictures(getContext(), PictureListFragment.this);
+                    }
                 }
             }
         });
@@ -88,35 +100,35 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
             }
         });
         updateRecyclerView();
-        path.getPictures(getContext(), this);
+        if (type == Picture.PictureType.PATH) {
+            PathMap.getInstance().getPathList().get(parentId).getPictures(getContext(), PictureListFragment.this);
+        } else {
+            PathMap.getInstance().getPointOfInterestList().get(parentId).getPictures(getContext(), PictureListFragment.this);
+        }
         return rootView;
     }
 
-    public void setPath(Path path) {
-        this.path = path;
-    }
-
     public void updateRecyclerView() {
-        if (path.getPathPictures().size() == 0) {
+        pictures = (type == Picture.PictureType.PATH) ? PathMap.getInstance().getPathList().get(parentId).getPicturesList() : PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList();
+        if (pictures.size() == 0) {
             recyclerView.setVisibility(View.GONE);
             noPicturesIndicator.setVisibility(View.VISIBLE);
         } else {
             recyclerView.setVisibility(View.VISIBLE);
             noPicturesIndicator.setVisibility(View.GONE);
-            pathPictures = path.getPathPictures();
             recyclerViewAdapter.notifyDataSetChanged();
         }
     }
 
     public void launchSubmitDialog() {
-        SubmitPictureDialog dialog = new SubmitPictureDialog(path);
+        SubmitPictureDialog dialog = SubmitPictureDialog.newInstance(type, parentId);
         dialog.setTargetFragment(this, 0);
         dialog.show(getActivity().getSupportFragmentManager(), "PicturePopup");
     }
 
     public void launchEditDialog(int position, Bitmap bitmap) {
         this.position = position;
-        EditPictureDialog dialog = new EditPictureDialog(pathPictures.get(position), bitmap);
+        EditPictureDialog dialog = new EditPictureDialog(pictures.get(position), bitmap);
         dialog.setTargetFragment(this, 0);
         dialog.show(getActivity().getSupportFragmentManager(), "PicturePopup");
     }
@@ -137,12 +149,12 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
     }
 
     @Override
-    public void onGetAdditionalSuccess() {
+    public void onGetPictureSuccess() {
         updateRecyclerView();
     }
 
     @Override
-    public void onGetAdditionalFailure() {
+    public void onGetPictureFailure() {
         Toast.makeText(getContext(), "Failed to get pictures", Toast.LENGTH_SHORT).show();
     }
 
@@ -159,6 +171,6 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
     @Override
     public void onDelete() {
         recyclerViewAdapter.notifyItemRemoved(position);
-        recyclerViewAdapter.notifyItemRangeChanged(position, pathPictures.size());
+        recyclerViewAdapter.notifyItemRangeChanged(position, pictures.size());
     }
 }

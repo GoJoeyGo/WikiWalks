@@ -23,8 +23,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.squareup.picasso.Picasso;
-import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathPicture;
+import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.R;
 
 import java.io.File;
@@ -38,7 +37,7 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class SubmitPictureDialog extends DialogFragment implements PathPicture.PictureUploadCallback {
+public class SubmitPictureDialog extends DialogFragment implements Picture.SubmitPictureCallback {
 
     @Override
     public void onSubmitPictureSuccess() {
@@ -62,20 +61,28 @@ public class SubmitPictureDialog extends DialogFragment implements PathPicture.P
     Button galleryButton;
     Button submitButton;
     Button cancelButton;
-    Path path;
+    int parentId;
+    Picture.PictureType type;
     Uri photoURI;
     String filename;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_SELECT = 1;
 
-    public SubmitPictureDialog(Path path) {
-        this.path = path;
+    public static SubmitPictureDialog newInstance(Picture.PictureType type, int parentId) {
+        Bundle args = new Bundle();
+        args.putInt("parentId", parentId);
+        args.putSerializable("type", type);
+        SubmitPictureDialog dialog = new SubmitPictureDialog();
+        dialog.setArguments(args);
+        return dialog;
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        parentId = getArguments().getInt("parentId");
+        type = (Picture.PictureType) getArguments().getSerializable("type");
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.submit_picture_popup, null);
@@ -103,7 +110,7 @@ public class SubmitPictureDialog extends DialogFragment implements PathPicture.P
         submitButton = view.findViewById(R.id.picture_popup_submit_button);
         submitButton.setOnClickListener(v -> {
             if (photoURI != null) {
-                PathPicture.upload(getContext(), filename, photoURI, title.getEditText().getText().toString(), path, this);
+                Picture.submit(getContext(), type, parentId, filename, photoURI, title.getEditText().getText().toString(), this);
             }
         });
         cancelButton = view.findViewById(R.id.picture_popup_cancel_button);

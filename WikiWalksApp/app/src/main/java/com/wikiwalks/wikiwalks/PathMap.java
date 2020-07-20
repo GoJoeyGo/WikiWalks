@@ -24,6 +24,7 @@ public class PathMap {
 
     private static PathMap instance = null;
     private LinkedHashMap<Integer, Path> pathList = new LinkedHashMap<>();
+    private LinkedHashMap<Integer, PointOfInterest> pointOfInterestList = new LinkedHashMap<>();
 
     public interface PathMapListener {
         void OnPathMapChange();
@@ -117,5 +118,9 @@ public class PathMap {
 
     public HashMap<Integer, Path> getPathList() {
         return pathList;
+    }
+
+    public LinkedHashMap<Integer, PointOfInterest> getPointOfInterestList() {
+        return pointOfInterestList;
     }
 }

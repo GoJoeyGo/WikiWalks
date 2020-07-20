@@ -16,11 +16,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.squareup.picasso.Picasso;
-import com.wikiwalks.wikiwalks.PathPicture;
+import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.R;
 
-public class EditPictureDialog extends DialogFragment implements PathPicture.PictureEditCallback {
+public class EditPictureDialog extends DialogFragment implements Picture.EditPictureCallback {
 
     @Override
     public void onEditPictureSuccess() {
@@ -55,12 +54,12 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
     Button submitButton;
     Button deleteButton;
     Button cancelButton;
-    PathPicture pathPicture;
+    Picture picture;
     AlertDialog confirmationDialog;
     Bitmap bitmap;
 
-    public EditPictureDialog(PathPicture pathPicture, Bitmap bitmap) {
-        this.pathPicture = pathPicture;
+    public EditPictureDialog(Picture picture, Bitmap bitmap) {
+        this.picture = picture;
         this.bitmap = bitmap;
     }
 
@@ -72,13 +71,12 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
         View view = inflater.inflate(R.layout.edit_picture_popup, null);
         imageView = view.findViewById(R.id.edit_picture_popup_selected_image);
         imageView.setImageBitmap(bitmap);
-        //Picasso.get().load(pathPicture.getUrl()).into(imageView);
         title = view.findViewById(R.id.edit_picture_popup_description);
-        title.getEditText().setText(pathPicture.getDescription());
+        title.getEditText().setText(picture.getDescription());
         submitButton = view.findViewById(R.id.edit_picture_popup_submit_button);
         submitButton.setOnClickListener(v -> {
-            if (!pathPicture.getDescription().equals(title.getEditText().getText().toString())) {
-                pathPicture.edit(getContext(), title.getEditText().getText().toString(), this);
+            if (!picture.getDescription().equals(title.getEditText().getText().toString())) {
+                picture.edit(getContext(), title.getEditText().getText().toString(), this);
             } else {
                 dismiss();
             }
@@ -88,7 +86,7 @@ public class EditPictureDialog extends DialogFragment implements PathPicture.Pic
             confirmationDialog = new AlertDialog.Builder(getContext())
                     .setTitle("Confirm Deletion")
                     .setMessage("Are you sure you want to delete this picture?")
-                    .setPositiveButton("Yes", (dialog, which) -> pathPicture.delete(getContext(), this))
+                    .setPositiveButton("Yes", (dialog, which) -> picture.delete(getContext(), this))
                     .setNegativeButton("No", (dialog, which) -> confirmationDialog.dismiss()).create();
             confirmationDialog.show();
         });

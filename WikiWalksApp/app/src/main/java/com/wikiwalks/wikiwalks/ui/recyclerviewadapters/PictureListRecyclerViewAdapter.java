@@ -13,17 +13,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
-import com.wikiwalks.wikiwalks.PathPicture;
+import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.R;
-import com.wikiwalks.wikiwalks.ui.PathPictureListFragment;
+import com.wikiwalks.wikiwalks.ui.PictureListFragment;
 
 import java.util.ArrayList;
 
-public class PathPictureListRecyclerViewAdapter extends RecyclerView.Adapter<PathPictureListRecyclerViewAdapter.ViewHolder> {
-    ArrayList<PathPicture> pictureList;
-    PathPictureListFragment context;
+public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<PictureListRecyclerViewAdapter.ViewHolder> {
+    ArrayList<Picture> pictureList;
+    PictureListFragment context;
 
-    public PathPictureListRecyclerViewAdapter(PathPictureListFragment context, ArrayList<PathPicture> pictureList) {
+    public PictureListRecyclerViewAdapter(PictureListFragment context, ArrayList<Picture> pictureList) {
         this.context = context;
         this.pictureList = pictureList;
     }
@@ -32,7 +32,7 @@ public class PathPictureListRecyclerViewAdapter extends RecyclerView.Adapter<Pat
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context.getContext());
-        View view = inflater.inflate(R.layout.path_picture_list_row, parent, false);
+        View view = inflater.inflate(R.layout.picture_list_row, parent, false);
         return new ViewHolder(view);
     }
 

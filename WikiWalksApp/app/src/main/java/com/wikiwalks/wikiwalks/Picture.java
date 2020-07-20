@@ -19,22 +19,30 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PathPicture {
+public class Picture {
     private int id;
-    private Path path;
+    private int parentId;
     private String url;
     private int width;
     private int height;
     private String description;
     private String submitter;
     private boolean editable;
+    private PictureType type;
 
-    public interface PictureUploadCallback {
+    public enum PictureType {PATH, POINT_OF_INTEREST}
+
+    public interface GetPictureCallback {
+        void onGetPictureSuccess();
+        void onGetPictureFailure();
+    }
+
+    public interface SubmitPictureCallback {
         void onSubmitPictureSuccess();
         void onSubmitPictureFailure();
     }
 
-    public interface PictureEditCallback {
+    public interface EditPictureCallback {
         void onEditPictureSuccess();
         void onEditPictureFailure();
         void onDeletePictureSuccess();
@@ -42,9 +50,10 @@ public class PathPicture {
     }
 
 
-    public PathPicture(int id, Path path, String url, int width, int height, String description, String submitter, boolean editable) {
+    public Picture(PictureType type, int id, int parentId, String url, int width, int height, String description, String submitter, boolean editable) {
+        this.type = type;
         this.id = id;
-        this.path = path;
+        this.parentId = parentId;
         this.url = url;
         this.width = width;
         this.height = height;
@@ -55,10 +64,6 @@ public class PathPicture {
 
     public int getId() {
         return id;
-    }
-
-    public Path getPath() {
-        return path;
     }
 
     public String getUrl() {
@@ -85,20 +90,22 @@ public class PathPicture {
         return editable;
     }
 
-    public static void upload(Context context, String filename, Uri uri, String description, Path path, PictureUploadCallback callback) {
+    public static void submit(Context context, PictureType type, int parentId, String filename, Uri uri, String description, SubmitPictureCallback callback) {
         File file = new File(filename);
         RequestBody imageBody = RequestBody.create(MediaType.parse(context.getContentResolver().getType(uri)), file);
         MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", file.getName(), imageBody);
         RequestBody deviceIdBody = RequestBody.create(MultipartBody.FORM, MainActivity.getDeviceId(context));
         RequestBody descriptionBody = RequestBody.create(MultipartBody.FORM, description);
-        Call<JsonElement> newPathPicture = MainActivity.getRetrofitRequests(context).newPathPicture(path.getId(), imagePart, deviceIdBody, descriptionBody);
-        newPathPicture.enqueue(new Callback<JsonElement>() {
+        Call<JsonElement> newPicture = (type == PictureType.PATH) ? MainActivity.getRetrofitRequests(context).newPathPicture(parentId, imagePart, deviceIdBody, descriptionBody) : MainActivity.getRetrofitRequests(context).newPoIPicture(parentId, imagePart, deviceIdBody, descriptionBody);
+        newPicture.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
                     try {
                         JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_picture");
-                        path.getPathPictures().add(0, new PathPicture(responseJson.getInt("id"), path, responseJson.getString("url"), responseJson.getInt("width"), responseJson.getInt("height"), responseJson.getString("description"), responseJson.getString("submitter"), true));
+                        Picture newPicture = new Picture(type, responseJson.getInt("id"), parentId, responseJson.getString("url"), responseJson.getInt("width"), responseJson.getInt("height"), responseJson.getString("description"), responseJson.getString("submitter"), true);
+                        if (type == PictureType.PATH) PathMap.getInstance().getPathList().get(parentId).getPicturesList().add(0, newPicture);
+                        else PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().add(0, newPicture);
                         callback.onSubmitPictureSuccess();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -115,7 +122,7 @@ public class PathPicture {
         });
     }
 
-    public void edit(Context context, String description, PictureEditCallback callback) {
+    public void edit(Context context, String description, EditPictureCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -123,12 +130,12 @@ public class PathPicture {
             attributes.put("device_id", MainActivity.getDeviceId(context));
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> editPathPicture = MainActivity.getRetrofitRequests(context).editPathPicture(path.getId(), id, body);
-            editPathPicture.enqueue(new Callback<JsonElement>() {
+            Call<JsonElement> editPicture = (type == PictureType.PATH) ? MainActivity.getRetrofitRequests(context).editPathPicture(parentId, id, body) : MainActivity.getRetrofitRequests(context).editPoIPicture(parentId, id, body);
+            editPicture.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                        PathPicture.this.description = description;
+                        Picture.this.description = description;
                         callback.onEditPictureSuccess();
                     }
                 }
@@ -145,19 +152,20 @@ public class PathPicture {
         }
     }
 
-    public void delete(Context context, PictureEditCallback callback) {
+    public void delete(Context context, EditPictureCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
             attributes.put("device_id", MainActivity.getDeviceId(context));
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> deletePathPicture = MainActivity.getRetrofitRequests(context).deletePathPicture(path.getId(), id, body);
-            deletePathPicture.enqueue(new Callback<JsonElement>() {
+            Call<JsonElement> deletePicture = (type == PictureType.PATH) ? MainActivity.getRetrofitRequests(context).deletePathPicture(parentId, id, body) : MainActivity.getRetrofitRequests(context).deletePoIPicture(parentId, id, body);
+            deletePicture.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                        path.getPathPictures().remove(PathPicture.this);
+                        if (type == PictureType.PATH) PathMap.getInstance().getPathList().get(parentId).getPicturesList().remove(Picture.this);
+                        else PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().remove(Picture.this);
                         callback.onDeletePictureSuccess();
                     } else {
                         callback.onDeletePictureFailure();

@@ -10,17 +10,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.wikiwalks.wikiwalks.PathReview;
+import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.R;
-import com.wikiwalks.wikiwalks.ui.PathReviewListFragment;
+import com.wikiwalks.wikiwalks.ui.ReviewListFragment;
 
 import java.util.ArrayList;
 
-public class PathReviewListRecyclerViewAdapter extends RecyclerView.Adapter<PathReviewListRecyclerViewAdapter.ViewHolder> {
-    ArrayList<PathReview> reviewList;
-    PathReviewListFragment context;
+public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewListRecyclerViewAdapter.ViewHolder> {
+    ArrayList<Review> reviewList;
+    ReviewListFragment context;
 
-    public PathReviewListRecyclerViewAdapter(PathReviewListFragment context, ArrayList<PathReview> reviewList) {
+    public ReviewListRecyclerViewAdapter(ReviewListFragment context, ArrayList<Review> reviewList) {
         this.context = context;
         this.reviewList = reviewList;
     }
@@ -29,7 +29,7 @@ public class PathReviewListRecyclerViewAdapter extends RecyclerView.Adapter<Path
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context.getContext());
-        View view = inflater.inflate(R.layout.path_review_list_row, parent, false);
+        View view = inflater.inflate(R.layout.review_list_row, parent, false);
         return new ViewHolder(view);
     }
 
