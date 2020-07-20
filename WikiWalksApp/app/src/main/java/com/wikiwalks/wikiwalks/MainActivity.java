@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity;
 import com.wikiwalks.wikiwalks.ui.MapsFragment;
 import com.wikiwalks.wikiwalks.ui.PermissionsFragment;
 
+import java.io.File;
 import java.util.UUID;
 
 import retrofit2.Retrofit;
@@ -95,5 +96,15 @@ public class MainActivity extends AppCompatActivity {
             retrofitRequests = new Retrofit.Builder().baseUrl(context.getString(R.string.local_url)).addConverterFactory(GsonConverterFactory.create()).build().create(RetrofitRequests.class);
         }
         return retrofitRequests;
+    }
+
+    @Override
+    protected void onDestroy() {
+        for (File file : getExternalCacheDir().listFiles()) {
+            if (file.getAbsolutePath().endsWith(".jpg")) {
+                file.delete();
+            }
+        }
+        super.onDestroy();
     }
 }

@@ -2,6 +2,7 @@ package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.google.gson.JsonElement;
 
@@ -9,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Arrays;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -29,8 +31,14 @@ public class PathPicture {
 
     public interface PictureUploadCallback {
         void onSubmitPictureSuccess();
-
         void onSubmitPictureFailure();
+    }
+
+    public interface PictureEditCallback {
+        void onEditPictureSuccess();
+        void onEditPictureFailure();
+        void onDeletePictureSuccess();
+        void onDeletePictureFailure();
     }
 
 
@@ -105,5 +113,66 @@ public class PathPicture {
                 callback.onSubmitPictureFailure();
             }
         });
+    }
+
+    public void edit(Context context, String description, PictureEditCallback callback) {
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+            attributes.put("description", description);
+            attributes.put("device_id", MainActivity.getDeviceId(context));
+            request.put("attributes", attributes);
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> editPathPicture = MainActivity.getRetrofitRequests(context).editPathPicture(path.getId(), id, body);
+            editPathPicture.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    if (response.isSuccessful()) {
+                        PathPicture.this.description = description;
+                        callback.onEditPictureSuccess();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.e("EDIT_PATH_PICTURE1", Arrays.toString(t.getStackTrace()));
+                    callback.onEditPictureFailure();
+                }
+            });
+        } catch (JSONException e) {
+            Log.e("EDIT_PATH_PICTURE2", Arrays.toString(e.getStackTrace()));
+            callback.onEditPictureFailure();
+        }
+    }
+
+    public void delete(Context context, PictureEditCallback callback) {
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+            attributes.put("device_id", MainActivity.getDeviceId(context));
+            request.put("attributes", attributes);
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> deletePathPicture = MainActivity.getRetrofitRequests(context).deletePathPicture(path.getId(), id, body);
+            deletePathPicture.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    if (response.isSuccessful()) {
+                        path.getPathPictures().remove(PathPicture.this);
+                        callback.onDeletePictureSuccess();
+                    } else {
+                        callback.onDeletePictureFailure();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.e("DELETE_PATH_PICTURE1", Arrays.toString(t.getStackTrace()));
+                    callback.onDeletePictureFailure();
+                }
+            });
+        } catch (JSONException e) {
+            Log.e("DELETE_PATH_PICTURE2", Arrays.toString(e.getStackTrace()));
+            callback.onDeletePictureFailure();
+        }
     }
 }

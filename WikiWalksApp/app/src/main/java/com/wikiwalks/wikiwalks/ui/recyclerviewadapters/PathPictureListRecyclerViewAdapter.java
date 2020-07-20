@@ -4,6 +4,8 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -40,6 +42,8 @@ public class PathPictureListRecyclerViewAdapter extends RecyclerView.Adapter<Pat
         if (pictureList.get(position).isEditable()) {
             holder.name.setTypeface(holder.name.getTypeface(), Typeface.BOLD_ITALIC);
             holder.name.setText("You");
+            holder.editButton.setVisibility(View.VISIBLE);
+            holder.editButton.setOnClickListener(v -> context.launchEditDialog(position));
         } else {
             holder.name.setText(pictureList.get(position).getSubmitter());
         }
@@ -62,12 +66,14 @@ public class PathPictureListRecyclerViewAdapter extends RecyclerView.Adapter<Pat
         TextView name;
         TextView description;
         ImageView imageView;
+        ImageButton editButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.path_picture_row_name);
             description = itemView.findViewById(R.id.path_picture_row_text);
             imageView = itemView.findViewById(R.id.path_picture_row_image);
+            editButton = itemView.findViewById(R.id.path_picture_edit_button);
         }
     }
 }

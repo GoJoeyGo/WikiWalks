@@ -41,7 +41,6 @@ public class Route implements Serializable {
 
     public interface RouteSubmitCallback {
         void onSuccess();
-
         void onFailure();
     }
 

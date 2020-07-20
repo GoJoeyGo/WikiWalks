@@ -88,6 +88,16 @@ public interface RetrofitRequests {
                                      @Part("device_id") RequestBody deviceId,
                                      @Part("description") RequestBody description);
 
+    @POST("/paths/{id}/pictures/{picture_id}/edit")
+    Call<JsonElement> editPathPicture(@Path("id") int id,
+                                      @Path("picture_id") int pictureId,
+                                      @Body RequestBody body);
+
+    @POST("/paths/{id}/pictures/{picture_id}/delete")
+    Call<JsonElement> deletePathPicture(@Path("id") int id,
+                                        @Path("picture_id") int pictureId,
+                                        @Body RequestBody body);
+
     @POST("/pois/{id}/pictures")
     Call<JsonElement> getPoIPictures(@Path("id") int id,
                                      @Query("page") int page,
@@ -99,4 +109,14 @@ public interface RetrofitRequests {
                                     @Part MultipartBody.Part image,
                                     @Part("device_id") RequestBody deviceId,
                                     @Part("description") RequestBody description);
+
+    @POST("/pois/{id}/pictures/{picture_id}/edit")
+    Call<JsonElement> editPoIPicture(@Path("id") int id,
+                                     @Path("picture_id") int pictureId,
+                                     @Body RequestBody body);
+
+    @POST("/pois/{id}/pictures/{picture_id}/delete")
+    Call<JsonElement> deletePoIPicture(@Path("id") int id,
+                                       @Path("picture_id") int pictureId,
+                                       @Body RequestBody body);
 }

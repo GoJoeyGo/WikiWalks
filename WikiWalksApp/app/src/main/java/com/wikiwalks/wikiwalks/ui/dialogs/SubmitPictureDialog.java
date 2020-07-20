@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,21 +38,21 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class PictureDialog extends DialogFragment implements PathPicture.PictureUploadCallback {
+public class SubmitPictureDialog extends DialogFragment implements PathPicture.PictureUploadCallback {
 
     @Override
     public void onSubmitPictureSuccess() {
-        listener.onEdit();
+        listener.onSubmit();
         getDialog().dismiss();
     }
 
     @Override
     public void onSubmitPictureFailure() {
-
+        Toast.makeText(getContext(), "Failed to submit picture!", Toast.LENGTH_SHORT).show();
     }
 
     public interface PictureDialogListener {
-        void onEdit();
+        void onSubmit();
     }
 
     PictureDialogListener listener;
@@ -59,7 +60,7 @@ public class PictureDialog extends DialogFragment implements PathPicture.Picture
     ImageView imageView;
     Button cameraButton;
     Button galleryButton;
-    Button editButton;
+    Button submitButton;
     Button cancelButton;
     Path path;
     Uri photoURI;
@@ -68,7 +69,7 @@ public class PictureDialog extends DialogFragment implements PathPicture.Picture
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_SELECT = 1;
 
-    public PictureDialog(Path path) {
+    public SubmitPictureDialog(Path path) {
         this.path = path;
     }
 
@@ -77,7 +78,7 @@ public class PictureDialog extends DialogFragment implements PathPicture.Picture
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.picture_popup, null);
+        View view = inflater.inflate(R.layout.submit_picture_popup, null);
         imageView = view.findViewById(R.id.picture_popup_selected_image);
         cameraButton = view.findViewById(R.id.picture_popup_camera_button);
         cameraButton.setOnClickListener(v -> {
@@ -85,9 +86,7 @@ public class PictureDialog extends DialogFragment implements PathPicture.Picture
             if (takePicture.resolveActivity(getContext().getPackageManager()) != null) {
                 try {
                     File photoFile = File.createTempFile(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + "_", ".jpg", getContext().getExternalFilesDir(Environment.DIRECTORY_DCIM));
-                    photoURI = FileProvider.getUriForFile(getContext(),
-                            "com.wikiwalks.wikiwalks.fileprovider",
-                            photoFile);
+                    photoURI = FileProvider.getUriForFile(getContext(), "com.wikiwalks.wikiwalks.fileprovider", photoFile);
                     takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                     startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
                 } catch (IOException ex) {
@@ -101,8 +100,8 @@ public class PictureDialog extends DialogFragment implements PathPicture.Picture
             startActivityForResult(selectPicture, REQUEST_IMAGE_SELECT);
         });
         title = view.findViewById(R.id.picture_popup_description);
-        editButton = view.findViewById(R.id.picture_popup_submit_button);
-        editButton.setOnClickListener(v -> {
+        submitButton = view.findViewById(R.id.picture_popup_submit_button);
+        submitButton.setOnClickListener(v -> {
             if (photoURI != null) {
                 PathPicture.upload(getContext(), filename, photoURI, title.getEditText().getText().toString(), path, this);
             }
@@ -123,7 +122,7 @@ public class PictureDialog extends DialogFragment implements PathPicture.Picture
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        editButton.setEnabled(false);
+        submitButton.setEnabled(false);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_SELECT && data != null) {
                 photoURI = data.getData();
@@ -133,9 +132,9 @@ public class PictureDialog extends DialogFragment implements PathPicture.Picture
                     inputStream.read(buffer);
                     File targetFile = File.createTempFile(photoURI.getLastPathSegment(), ".jpg", getContext().getExternalCacheDir());
                     filename = targetFile.getAbsolutePath();
-                    OutputStream outStream = new FileOutputStream(targetFile);
-                    outStream.write(buffer);
-                    outStream.close();
+                    OutputStream outputStream = new FileOutputStream(targetFile);
+                    outputStream.write(buffer);
+                    outputStream.close();
                     inputStream.close();
                     targetFile.deleteOnExit();
                 } catch (IOException e) {
@@ -168,6 +167,6 @@ public class PictureDialog extends DialogFragment implements PathPicture.Picture
                 e.printStackTrace();
             }
         }
-        editButton.setEnabled(true);
+        submitButton.setEnabled(true);
     }
 }

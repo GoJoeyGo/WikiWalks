@@ -45,7 +45,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="FROM CAMERA"
-                android:fontFamily="monospace" />
+                android:fontFamily="monospace"
+                style="@style/ButtonTheme" />
 
             <Button
                 android:id="@+id/picture_popup_gallery_button"
@@ -55,7 +56,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="FROM GALLERY"
-                android:fontFamily="monospace" />
+                android:fontFamily="monospace"
+                style="@style/ButtonTheme" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/picture_popup_description"
@@ -85,7 +87,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="SAVE"
-                android:fontFamily="monospace" />
+                android:fontFamily="monospace"
+                style="@style/ButtonTheme"
+                android:enabled="false"/>
 
             <Button
                 android:id="@+id/picture_popup_cancel_button"
@@ -95,7 +99,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="CANCEL"
-                android:fontFamily="monospace" />
+                android:fontFamily="monospace"
+                style="@style/ButtonTheme" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -23,12 +23,13 @@ import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PathPicture;
 import com.wikiwalks.wikiwalks.R;
-import com.wikiwalks.wikiwalks.ui.dialogs.PictureDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.EditPictureDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.SubmitPictureDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PathPictureListRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
-public class PathPictureListFragment extends Fragment implements Path.GetAdditionalCallback, PictureDialog.PictureDialogListener {
+public class PathPictureListFragment extends Fragment implements Path.GetAdditionalCallback, SubmitPictureDialog.PictureDialogListener, EditPictureDialog.EditPictureDialogListener {
 
     Button submitPictureButton;
     Path path;
@@ -37,6 +38,7 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
     Toolbar toolbar;
     ArrayList<PathPicture> pathPictures;
     TextView noPicturesIndicator;
+    int position;
 
 
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 0;
@@ -81,7 +83,7 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions((new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}), REQUEST_CODE_ASK_PERMISSIONS);
             } else {
-                launchDialog();
+                launchSubmitDialog();
             }
         });
         updateRecyclerView();
@@ -105,8 +107,15 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
         }
     }
 
-    public void launchDialog() {
-        PictureDialog dialog = new PictureDialog(path);
+    public void launchSubmitDialog() {
+        SubmitPictureDialog dialog = new SubmitPictureDialog(path);
+        dialog.setTargetFragment(this, 0);
+        dialog.show(getActivity().getSupportFragmentManager(), "PicturePopup");
+    }
+
+    public void launchEditDialog(int position) {
+        this.position = position;
+        EditPictureDialog dialog = new EditPictureDialog(pathPictures.get(position));
         dialog.setTargetFragment(this, 0);
         dialog.show(getActivity().getSupportFragmentManager(), "PicturePopup");
     }
@@ -115,7 +124,7 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_CODE_ASK_PERMISSIONS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                launchDialog();
+                launchSubmitDialog();
             } else {
                 getParentFragmentManager().beginTransaction()
                         .add(R.id.main_frame, PermissionsFragment.newInstance(PermissionsFragment.PermissionType.STORAGE)).addToBackStack(null)
@@ -137,7 +146,18 @@ public class PathPictureListFragment extends Fragment implements Path.GetAdditio
     }
 
     @Override
+    public void onSubmit() {
+        updateRecyclerView();
+    }
+
+    @Override
     public void onEdit() {
         updateRecyclerView();
+    }
+
+    @Override
+    public void onDelete() {
+        recyclerViewAdapter.notifyItemRemoved(position);
+        recyclerViewAdapter.notifyItemRangeChanged(position, pathPictures.size());
     }
 }
