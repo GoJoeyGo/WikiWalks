@@ -38,17 +38,19 @@ public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<Picture
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        Picasso.get().load(context.getString(R.string.local_url) + "/pictures/" + pictureList.get(position).getUrl()).placeholder(R.drawable.banner_background).into(holder.imageView);
-        if (pictureList.get(position).isEditable()) {
+        Picture picture = pictureList.get(position);
+        Picasso.get().load(context.getString(R.string.local_url) + "/pictures/" + picture.getUrl()).placeholder(R.drawable.banner_background).into(holder.imageView);
+        if (picture.isEditable()) {
             holder.name.setTypeface(holder.name.getTypeface(), Typeface.BOLD_ITALIC);
             holder.name.setText("You");
             holder.editButton.setVisibility(View.VISIBLE);
             holder.editButton.setOnClickListener(v -> context.launchEditDialog(position, ((BitmapDrawable) holder.imageView.getDrawable()).getBitmap()));
         } else {
-            holder.name.setText(pictureList.get(position).getSubmitter());
+            holder.editButton.setVisibility(View.INVISIBLE);
+            holder.name.setText(picture.getSubmitter());
         }
-        if (!pictureList.get(position).getDescription().isEmpty()) {
-            holder.description.setText(pictureList.get(position).getDescription());
+        if (!picture.getDescription().isEmpty()) {
+            holder.description.setText(picture.getDescription());
             holder.description.setTypeface(holder.description.getTypeface(), Typeface.NORMAL);
         } else {
             holder.description.setText("no description written");
