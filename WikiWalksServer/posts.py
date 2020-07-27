@@ -17,7 +17,7 @@ def allowed_file(filename):
 
 
 def process_picture(file):
-    filename = str(uuid.uuid4()) + ".jpg"
+    filename = str(uuid.uuid4()) + ".webp"
     image = Image.open(file.stream)
     image = ImageOps.exif_transpose(image)
     if image.mode in ("RGBA", "P"):
@@ -427,7 +427,7 @@ def add_path_picture(path_id):
             new_path_picture = PathPicture(path_id=path_id, submitter=user.id,
                                            created_time=get_time(), description=request.form["description"],
                                            url=processed_image[1], width=width, height=height)
-            processed_image[0].save("./images/" + processed_image[1], 'JPEG', quality=80)
+            processed_image[0].save("./images/" + processed_image[1], 'WEBP', quality=80)
             db.session.add(new_path_picture)
             db.session.commit()
             return jsonify({"status": "success", "picture": path_picture_schema.dump(new_path_picture)}), 201
@@ -490,7 +490,7 @@ def add_poi_picture(poi_id):
             new_poi_picture = PointOfInterestPicture(point_of_interest_id=poi_id, submitter=user.id,
                                                      created_time=get_time(), description=request.form["description"],
                                                      url=processed_image[1], width=width, height=height)
-            processed_image[0].save("./images/" + processed_image[1], 'JPEG', quality=80)
+            processed_image[0].save("./images/" + processed_image[1], 'WEBP', quality=80)
             db.session.add(new_poi_picture)
             db.session.commit()
             return jsonify({"status": "success", "picture": poi_picture_schema.dump(new_poi_picture)}), 201
