@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,8 +28,9 @@ import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PointOfInterestListRecycl
 
 import java.util.ArrayList;
 
-public class PointOfInterestListFragment extends Fragment implements OnMapReadyCallback {
+public class PointOfInterestListFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
+    Toolbar toolbar;
     Path path;
     GoogleMap mMap;
     ArrayList<Polyline> polylines = new ArrayList<>();
@@ -52,6 +54,10 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
         pointOfInterestList = path.getPointsOfInterest();
         final View rootView = inflater.inflate(R.layout.poi_list_fragment, container, false);
+        toolbar = rootView.findViewById(R.id.poi_list_frag_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle("Points of Interest - " + path.getName());
         recyclerView = rootView.findViewById(R.id.poi_list_recyclerview);
         recyclerViewAdapter = new PointOfInterestListRecyclerViewAdapter(this, pointOfInterestList);
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -66,8 +72,16 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         for (Route route : path.getRoutes()) polylines.add(route.makePolyline(mMap));
-        for (PointOfInterest pointOfInterest : pointOfInterestList) markers.add(pointOfInterest.makeMarker(googleMap));
+        for (int i = 0; i < pointOfInterestList.size(); i++) {
+            markers.add(pointOfInterestList.get(i).makeMarker(googleMap, ((i * 50) % 360)));
+        };
         googleMap.getUiSettings().setAllGesturesEnabled(false);
+        mMap.setOnMarkerClickListener(this);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return true;
     }
 }

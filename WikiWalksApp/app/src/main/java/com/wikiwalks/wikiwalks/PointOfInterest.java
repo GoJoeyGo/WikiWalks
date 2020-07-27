@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -67,8 +68,9 @@ public class PointOfInterest {
         return path;
     }
 
-    public Marker makeMarker(GoogleMap map) {
-        Marker marker = map.addMarker(new MarkerOptions().position(coordinates));
+    public Marker makeMarker(GoogleMap map, float hue) {
+        Marker marker = map.addMarker(new MarkerOptions().position(coordinates).icon(BitmapDescriptorFactory.defaultMarker(hue)));
+        marker.setTag(id);
         return marker;
     }
 

@@ -525,7 +525,7 @@ def delete_poi_picture(poi_id, poi_picture_id):
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         poi_picture = PointOfInterestPicture.query.get(poi_picture_id)
-        if poi_picture in user.path_pictures:
+        if poi_picture in user.poi_pictures:
             if os.path.isfile("./images/" + poi_picture.url):
                 os.remove("./images/" + poi_picture.url)
             db.session.delete(poi_picture)

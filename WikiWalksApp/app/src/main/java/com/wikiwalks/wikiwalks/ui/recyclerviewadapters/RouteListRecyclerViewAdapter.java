@@ -1,11 +1,15 @@
 package com.wikiwalks.wikiwalks.ui.recyclerviewadapters;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.wikiwalks.wikiwalks.R;
@@ -46,6 +50,11 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
             holder.button.setBackgroundColor(0xFF777777);
             context.selectRoute(position);
         });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            holder.button.getCompoundDrawablesRelative()[0].setTint(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}));
+        } else {
+            holder.button.getCompoundDrawables()[0].mutate().setColorFilter(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}), PorterDuff.Mode.SRC_IN);
+        }
         buttons.add(holder.button);
     }
 
@@ -56,7 +65,7 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        Button button;
+        AppCompatButton button;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
