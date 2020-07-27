@@ -17,7 +17,7 @@ def allowed_file(filename):
 
 
 def process_picture(file):
-    filename = str(uuid.uuid1()) + ".jpg"
+    filename = str(uuid.uuid4()) + ".jpg"
     image = Image.open(file.stream)
     image = ImageOps.exif_transpose(image)
     if image.mode in ("RGBA", "P"):
@@ -273,21 +273,21 @@ def add_poi_review(poi_id):
         request_json = request.get_json(force=True)["attributes"]
         if request_json["rating"] > 5 or request_json["rating"] < 0:
             return jsonify({"status": "failed"}), 403
-        poi = PointOfInterest.query.filter_by(id=poi_id).first()
-        if poi.rating_count == 0:
-            poi.average_rating = request_json["rating"]
-            poi.rating_count = 1
+        point_of_interest = PointOfInterest.query.filter_by(id=poi_id).first()
+        if point_of_interest.rating_count == 0:
+            point_of_interest.average_rating = request_json["rating"]
+            point_of_interest.rating_count = 1
         else:
-            poi.average_rating = ((poi.average_rating * poi.rating_count) + request_json["rating"]) / \
-                                 (poi.rating_count + 1)
-            poi.rating_count = poi.rating_count + 1
+            point_of_interest.average_rating = ((point_of_interest.average_rating * point_of_interest.rating_count) + request_json["rating"]) / \
+                                  (point_of_interest.rating_count + 1)
+            point_of_interest.rating_count = point_of_interest.rating_count + 1
         user = get_submitter(request_json["device_id"])
-        data = poi_review_schema.load(request_json)
-        new_poi_review = PointOfInterestReview(**data, point_of_interest_id=poi_id, submitter=user.id,
-                                               created_time=get_time())
+        data = poi_review_schema.load(request_json, partial=True)
+        new_poi_review = PointOfInterestReview(**data, point_of_interest_id=poi_id, submitter=user.id, created_time=get_time())
         db.session.add(new_poi_review)
         db.session.commit()
-        return jsonify({"status": "success", "poi_review": poi_review_schema.dump(new_poi_review)}), 201
+        new_poi_review.submitter = user.nickname
+        return jsonify({"status": "success", "review": poi_review_schema.dump(new_poi_review)}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
@@ -361,7 +361,7 @@ def add_path_review(path_id):
         db.session.add(new_path_review)
         db.session.commit()
         new_path_review.submitter = user.nickname
-        return jsonify({"status": "success", "path_review": path_review_schema.dump(new_path_review)}), 201
+        return jsonify({"status": "success", "review": path_review_schema.dump(new_path_review)}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
@@ -430,7 +430,7 @@ def add_path_picture(path_id):
             processed_image[0].save("./images/" + processed_image[1], 'JPEG', quality=80)
             db.session.add(new_path_picture)
             db.session.commit()
-            return jsonify({"status": "success", "path_picture": path_picture_schema.dump(new_path_picture)}), 201
+            return jsonify({"status": "success", "picture": path_picture_schema.dump(new_path_picture)}), 201
         else:
             return jsonify({"status": "invalid file type"}), 403
     except Exception as e:
@@ -493,7 +493,7 @@ def add_poi_picture(poi_id):
             processed_image[0].save("./images/" + processed_image[1], 'JPEG', quality=80)
             db.session.add(new_poi_picture)
             db.session.commit()
-            return jsonify({"status": "success", "poi_picture": poi_picture_schema.dump(new_poi_picture)}), 201
+            return jsonify({"status": "success", "picture": poi_picture_schema.dump(new_poi_picture)}), 201
         else:
             return jsonify({"status": "invalid file type"}), 403
     except Exception as e:
@@ -501,7 +501,7 @@ def add_poi_picture(poi_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/pois/<poi_id>/reviews/<poi_picture_id>/edit", methods=["POST"])
+@posts.route("/pois/<poi_id>/pictures/<poi_picture_id>/edit", methods=["POST"])
 def edit_poi_picture(poi_id, poi_picture_id):
     try:
         poi_picture_schema = PointOfInterestPictureSchema()

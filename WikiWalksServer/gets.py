@@ -216,8 +216,8 @@ def poi_pictures_list(poi_id):
     for picture in pictures:
         picture_user = User.query.filter_by(id=picture.submitter).first()
         picture.submitter = picture_user.nickname
-    pictures = pictures.paginate(page, 3).items
-    poi_picture_list_schema = PointOfInterestPicture(many=True)
+    pictures = pictures.paginate(page, 10).items
+    poi_picture_list_schema = PointOfInterestPictureSchema(many=True)
     output = poi_picture_list_schema.dump(pictures)
     return jsonify({"pictures": output})
 
