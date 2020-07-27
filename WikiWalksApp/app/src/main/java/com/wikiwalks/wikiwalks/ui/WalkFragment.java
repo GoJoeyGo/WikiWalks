@@ -27,16 +27,19 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
 
 import java.util.ArrayList;
 
-public class WalkFragment extends Fragment implements OnMapReadyCallback {
+public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private int routeNumber;
     private GoogleMap mMap;
@@ -61,7 +64,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
-        new CountDownTimer(30000, 30000) {
+        new CountDownTimer(60000, 60000) {
             @Override
             public void onTick(long millisUntilFinished) {
 
@@ -93,7 +96,6 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
             return;
         }
         mMap.setMyLocationEnabled(true);
@@ -110,6 +112,10 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
             pathLatitudes = path.getAllLatitudes();
             pathLongitudes = path.getAllLongitudes();
         }
+        for (PointOfInterest pointOfInterest : path.getPointsOfInterest()) {
+            pointOfInterest.makeMarker(mMap, BitmapDescriptorFactory.HUE_RED);
+        }
+        mMap.setOnMarkerClickListener(this);
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20)));
         startLocationUpdates();
     }
@@ -171,4 +177,9 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback {
         this.routeNumber = routeNumber;
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestFragment.newInstance((int) marker.getTag())).addToBackStack(null).commit();
+        return true;
+    }
 }
