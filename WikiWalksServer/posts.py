@@ -1,12 +1,8 @@
-import base64
 import datetime
-import io
 import os
 import uuid
 
-import cv2
-import numpy as np
-from PIL import Image, ExifTags, ImageOps
+from PIL import Image, ImageOps
 from flask import jsonify, request, Blueprint
 from sqlalchemy import func
 

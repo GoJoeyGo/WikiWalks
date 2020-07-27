@@ -23,7 +23,6 @@ public class Review {
     private String name;
     private int rating;
     private String message;
-    private boolean editable;
     private ReviewType type;
 
     public enum ReviewType {PATH, POINT_OF_INTEREST}
@@ -45,14 +44,13 @@ public class Review {
         void onDeleteReviewFailure();
     }
 
-    public Review(ReviewType type, int id, int parentId, String name, int rating, String message, boolean editable) {
+    public Review(ReviewType type, int id, int parentId, String name, int rating, String message) {
         this.type = type;
         this.id = id;
         this.parentId = parentId;
         this.name = name;
         this.rating = rating;
         this.message = message;
-        this.editable = editable;
     }
 
     public int getId() {
@@ -87,7 +85,7 @@ public class Review {
                     if (response.isSuccessful()) {
                         try {
                             JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_review");
-                            Review newReview = new Review(type, responseJson.getInt("id"), parentId, responseJson.getString("submitter"), rating, message, true);
+                            Review newReview = new Review(type, responseJson.getInt("id"), parentId, responseJson.getString("submitter"), rating, message);
                             if (type == ReviewType.PATH) PathMap.getInstance().getPathList().get(parentId).setOwnReview(newReview);
                             callback.onSubmitReviewSuccess();
                         } catch (JSONException e) {

@@ -107,13 +107,13 @@ public class PointOfInterest {
                                         }
                                     }
                                     if (!exists) {
-                                        Review newReview = new Review(Review.ReviewType.POINT_OF_INTEREST, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                                        Review newReview = new Review(Review.ReviewType.POINT_OF_INTEREST, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"));
                                         reviewsList.add(newReview);
                                     }
                                 }
                                 if (responseJson.has("own_review")) {
                                     JSONObject review = responseJson.getJSONArray("own_review").getJSONObject(0);
-                                    ownReview = new Review(Review.ReviewType.POINT_OF_INTEREST, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"), review.getBoolean("editable"));
+                                    ownReview = new Review(Review.ReviewType.POINT_OF_INTEREST, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"));
                                 }
                                 nextReviewPage++;
                                 isLoadingReviews = false;
