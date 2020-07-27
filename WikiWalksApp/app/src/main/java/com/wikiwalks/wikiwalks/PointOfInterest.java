@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonElement;
 
@@ -33,13 +34,15 @@ public class PointOfInterest {
     private int nextPicturePage = 1;
     private boolean isLoadingReviews = false;
     private boolean isLoadingPictures = false;
+    private double rating;
     LatLng coordinates;
 
     private Path path;
 
-    public PointOfInterest(int id, String name, double latitude, double longitude, Path path) {
+    public PointOfInterest(int id, String name, double rating, double latitude, double longitude, Path path) {
         this.id = id;
         this.name = name;
+        this.rating = rating;
         this.coordinates = new LatLng(latitude, longitude);
         this.path = path;
     }
@@ -52,6 +55,10 @@ public class PointOfInterest {
         return name;
     }
 
+    public double getRating() {
+        return rating;
+    }
+
     public LatLng getCoordinates() {
         return coordinates;
     }
@@ -60,8 +67,9 @@ public class PointOfInterest {
         return path;
     }
 
-    public void makeMarker(GoogleMap map) {
-        map.addMarker(new MarkerOptions().position(coordinates));
+    public Marker makeMarker(GoogleMap map) {
+        Marker marker = map.addMarker(new MarkerOptions().position(coordinates));
+        return marker;
     }
 
     public void setOwnReview(Review pointOfInterestReview) {

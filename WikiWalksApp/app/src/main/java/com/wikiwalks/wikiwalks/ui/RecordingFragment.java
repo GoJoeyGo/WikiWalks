@@ -211,7 +211,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     public void showSubmissionDialog() {
         SubmissionDialog dialog = new SubmissionDialog(path == null);
         dialog.setTargetFragment(this, 0);
-        dialog.show(getActivity().getSupportFragmentManager(), "SubmissionPopup");
+        dialog.show(getParentFragmentManager(), "SubmissionPopup");
     }
 
     @Override

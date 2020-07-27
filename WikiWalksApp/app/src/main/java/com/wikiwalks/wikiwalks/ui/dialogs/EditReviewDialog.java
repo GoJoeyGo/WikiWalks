@@ -55,6 +55,7 @@ public class EditReviewDialog extends DialogFragment implements Review.SubmitRev
 
     @Override
     public void onSubmitReviewFailure() {
+        Toast.makeText(getContext(), "Failed to submit review!", Toast.LENGTH_SHORT).show();
     }
 
     EditReviewDialogListener listener;
@@ -102,7 +103,6 @@ public class EditReviewDialog extends DialogFragment implements Review.SubmitRev
         saveButton = view.findViewById(R.id.edit_review_popup_save_button);
         saveButton.setOnClickListener(v -> {
             if (review == null) {
-                Toast.makeText(getContext(), Float.toString(rating.getRating()), Toast.LENGTH_SHORT).show();
                 Review.submit(getContext(), type, parentId, message.getEditText().getText().toString(), (int) rating.getRating(), this);
             } else {
                 if (!review.getMessage().equals(message.getEditText().getText().toString()) || (int) rating.getRating() != review.getRating()) {

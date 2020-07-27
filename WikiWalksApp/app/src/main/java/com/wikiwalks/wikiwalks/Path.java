@@ -71,7 +71,7 @@ public class Path {
         JSONArray points_of_interest = pathJson.getJSONArray("points_of_interest");
         for (int i = 0; i < points_of_interest.length(); i++) {
             JSONObject pointOfInterest = points_of_interest.getJSONObject(i);
-            PointOfInterest newPointOfInterest = new PointOfInterest(pointOfInterest.getInt("id"), pointOfInterest.getString("name"), pointOfInterest.getDouble("latitude"), pointOfInterest.getDouble("longitude"), this);
+            PointOfInterest newPointOfInterest = new PointOfInterest(pointOfInterest.getInt("id"), pointOfInterest.getString("name"), pointOfInterest.getDouble("average_rating"), pointOfInterest.getDouble("latitude"), pointOfInterest.getDouble("longitude"), this);
             pointsOfInterest.add(newPointOfInterest);
             PathMap.getInstance().getPointOfInterestList().put(newPointOfInterest.getId(), newPointOfInterest);
         }
