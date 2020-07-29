@@ -10,7 +10,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonElement;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +45,54 @@ public class PointOfInterest {
         this.rating = rating;
         this.coordinates = new LatLng(latitude, longitude);
         this.path = path;
+    }
+    public interface PoiSubmitCallback {
+        void onSuccess();
+        void onFailure();
+    }
+
+    public static void submitPoi(Context context, int id, String name, double latitude, double longitude, double altitude, int path, String title, PointOfInterest.PoiSubmitCallback callback)  {
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+        attributes.put("device_id", id);
+        attributes.put("path_id", path);
+        attributes.put("latitude", latitude);
+        attributes.put("longitude", longitude);
+        attributes.put("altitude",altitude);
+        attributes.put("name", title);
+        request.put("attributes", attributes);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> newRoute = MainActivity.getRetrofitRequests(context).newRoute(body);
+        newRoute.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("poi");
+                        PathMap.getInstance().addPath(new Path(responseJson));
+                        callback.onSuccess();
+                    } catch (JSONException e) {
+                        Toast.makeText(context, "Failed to upload POI...", Toast.LENGTH_SHORT).show();
+                        Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
+                        callback.onFailure();
+                    }
+                } else {
+                    callback.onFailure();
+                }
+            }
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Toast.makeText(context, "Failed to upload POI...", Toast.LENGTH_SHORT).show();
+                Log.e("SUBMIT_POI", Arrays.toString(t.getStackTrace()));
+                callback.onFailure();
+            }
+        });
+    } catch (JSONException e) {
+            Toast.makeText(context, "Failed to upload POI...", Toast.LENGTH_SHORT).show();
+            Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
+            callback.onFailure();
+        }
     }
 
     public int getId() {
@@ -218,4 +265,5 @@ public class PointOfInterest {
             }
         }
     }
+
 }
