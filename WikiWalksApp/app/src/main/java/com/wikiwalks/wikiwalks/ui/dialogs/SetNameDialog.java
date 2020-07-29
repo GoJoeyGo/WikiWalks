@@ -1,0 +1,101 @@
+package com.wikiwalks.wikiwalks.ui.dialogs;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.JsonElement;
+import com.wikiwalks.wikiwalks.MainActivity;
+import com.wikiwalks.wikiwalks.Path;
+import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.UUID;
+
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.content.Context.MODE_PRIVATE;
+
+public class SetNameDialog extends DialogFragment {
+
+    TextInputLayout name;
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.name_popup, null);
+        name = view.findViewById(R.id.name_path_name);
+        name.getEditText().setText(getContext().getSharedPreferences("preferences", MODE_PRIVATE).getString("name", ""));
+        Button saveButton = view.findViewById(R.id.name_popup_name_button);
+        saveButton.setOnClickListener(v -> {
+            submitName();
+        });
+        Button cancelButton = view.findViewById(R.id.name_popup_cancel_button);
+        cancelButton.setOnClickListener(v -> {
+            dismiss();
+        });
+        builder.setView(view);
+        return builder.create();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+    }
+
+    public void submitName() {
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+            attributes.put("device_id", MainActivity.getDeviceId(getContext()));
+            attributes.put("name", name.getEditText().getText().toString());
+            request.put("attributes", attributes);
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> setName = MainActivity.getRetrofitRequests(getContext()).setName(body);
+            setName.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    if (response.isSuccessful()) {
+
+                        dismiss();
+                        Toast.makeText(getContext(), "Name set successfully!", Toast.LENGTH_SHORT).show();
+                        getContext().getSharedPreferences("preferences", MODE_PRIVATE).edit().putString("name", name.getEditText().getText().toString()).apply();
+                    } else {
+                        Toast.makeText(getContext(), "Failed to set name...", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Toast.makeText(getContext(), "Failed to set name...", Toast.LENGTH_SHORT).show();
+                    Log.e("SET_NAME1", Arrays.toString(t.getStackTrace()));
+                }
+            });
+        } catch (JSONException e) {
+            Toast.makeText(getContext(), "Failed to set name...", Toast.LENGTH_SHORT).show();
+            Log.e("SET_NAME2", Arrays.toString(e.getStackTrace()));
+        }
+    }
+}

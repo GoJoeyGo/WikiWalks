@@ -13,6 +13,9 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface RetrofitRequests {
+    @POST("/setname")
+    Call<JsonElement> setName(@Body RequestBody body);
+
     @POST("/paths/")
     Call<JsonElement> getPaths(@Query("n") double north,
                                @Query("e") double east,

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -53,6 +54,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         final View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
         toolbar = rootView.findViewById(R.id.main_toolbar);
         toolbar.setTitle(R.string.app_name);
+        ImageButton settingsButton = rootView.findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, SettingsFragment.newInstance()).addToBackStack(null).commit());
         createPath = rootView.findViewById(R.id.create_path_button);
         createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack("Map").commit());
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);

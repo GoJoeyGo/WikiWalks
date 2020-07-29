@@ -41,6 +41,20 @@ def get_time():
     return time
 
 
+@posts.route("/setname", methods=["POST"])
+def set_name():
+    try:
+        user_schema = UserSchema()
+        request_json = request.get_json(force=True)["attributes"]
+        user = get_submitter(request_json["device_id"])
+        user.nickname = request_json["name"]
+        db.session.commit()
+        return jsonify({"user": user_schema.dump(user)})
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
+
+
 @posts.route("/routes/new", methods=["POST"])
 def add_route():
     try:
