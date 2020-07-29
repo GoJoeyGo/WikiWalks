@@ -48,7 +48,7 @@ public class Route implements Serializable {
         this.altitudes = altitudes;
     }
 
-    public static void submit(Context context, Path path, String title, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, RouteSubmitCallback callback) {
+    public static void submit(Context context, Path path, String title, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, RouteModifyCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -67,15 +67,16 @@ public class Route implements Serializable {
                     if (response.isSuccessful()) {
                         try {
                             JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("path");
-                            PathMap.getInstance().addPath(new Path(responseJson));
-                            callback.onRouteSubmitSuccess();
+                            Path newPath = new Path(responseJson);
+                            PathMap.getInstance().addPath(newPath);
+                            callback.onRouteModifySuccess(newPath);
                         } catch (JSONException e) {
                             Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                             Log.e("SUBMIT_PATH1", Arrays.toString(e.getStackTrace()));
-                            callback.onRouteSubmitFailure();
+                            callback.onRouteModifyFailure();
                         }
                     } else {
-                        callback.onRouteSubmitFailure();
+                        callback.onRouteModifyFailure();
                     }
                 }
 
@@ -83,13 +84,13 @@ public class Route implements Serializable {
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                     Log.e("SUBMIT_PATH2", Arrays.toString(t.getStackTrace()));
-                    callback.onRouteSubmitFailure();
+                    callback.onRouteModifyFailure();
                 }
             });
         } catch (JSONException e) {
             Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
             Log.e("SUBMIT_PATH3", Arrays.toString(e.getStackTrace()));
-            callback.onRouteSubmitFailure();
+            callback.onRouteModifyFailure();
         }
     }
 
@@ -129,7 +130,7 @@ public class Route implements Serializable {
         return editable;
     }
 
-    public void delete(final Context context, RouteSubmitCallback callback) {
+    public void delete(final Context context, RouteModifyCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
@@ -151,26 +152,26 @@ public class Route implements Serializable {
                         for (Polyline polyline : polylines) {
                             polyline.remove();
                         }
-                        callback.onRouteSubmitSuccess();
+                        callback.onRouteModifySuccess(null);
                     } else {
-                        callback.onRouteSubmitFailure();
+                        callback.onRouteModifyFailure();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Log.e("DELETE_PATH1", Arrays.toString(t.getStackTrace()));
-                    callback.onRouteSubmitFailure();
+                    callback.onRouteModifyFailure();
                 }
             });
         } catch (JSONException e) {
             Log.e("DELETE_PATH2", Arrays.toString(e.getStackTrace()));
-            callback.onRouteSubmitFailure();
+            callback.onRouteModifyFailure();
         }
     }
 
-    public interface RouteSubmitCallback {
-        void onRouteSubmitSuccess();
-        void onRouteSubmitFailure();
+    public interface RouteModifyCallback {
+        void onRouteModifySuccess(Path path);
+        void onRouteModifyFailure();
     }
 }

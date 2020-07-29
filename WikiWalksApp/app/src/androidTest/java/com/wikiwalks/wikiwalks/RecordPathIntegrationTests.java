@@ -90,7 +90,7 @@ public class RecordPathIntegrationTests {
             testPath = entry.getValue();
         }
         assertTrue(PathMap.getInstance().getPathList().containsValue(testPath));
-        testPath.getRoutes().get(0).delete(appContext, mock(Route.RouteSubmitCallback.class));
+        testPath.getRoutes().get(0).delete(appContext, mock(Route.RouteModifyCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         assertFalse(PathMap.getInstance().getPathList().containsValue(testPath));
     }

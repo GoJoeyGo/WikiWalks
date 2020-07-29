@@ -69,14 +69,14 @@ public class PointOfInterest {
                             PointOfInterest newPointOfInterest = new PointOfInterest(responseJson.getInt("id"), responseJson.getString("name"), responseJson.getDouble("average_rating"), responseJson.getDouble("latitude"), responseJson.getDouble("longitude"), path, true);
                             PathMap.getInstance().getPointOfInterestList().put(responseJson.getInt("id"), newPointOfInterest);
                             path.addPointOfInterest(newPointOfInterest);
-                            callback.onSuccess(newPointOfInterest);
+                            callback.onSubmitPointOfInterestSuccess(newPointOfInterest);
                         } catch (JSONException e) {
                             Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
                             Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
-                            callback.onFailure();
+                            callback.onSubmitPointOfInterestFailure();
                         }
                     } else {
-                        callback.onFailure();
+                        callback.onSubmitPointOfInterestFailure();
                     }
                 }
 
@@ -84,13 +84,13 @@ public class PointOfInterest {
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
                     Log.e("SUBMIT_POI", Arrays.toString(t.getStackTrace()));
-                    callback.onFailure();
+                    callback.onSubmitPointOfInterestFailure();
                 }
             });
         } catch (JSONException e) {
             Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
             Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
-            callback.onFailure();
+            callback.onSubmitPointOfInterestFailure();
         }
     }
 
@@ -266,8 +266,8 @@ public class PointOfInterest {
     }
 
     public interface PointOfInterestSubmitCallback {
-        void onSuccess(PointOfInterest pointOfInterest);
-        void onFailure();
+        void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest);
+        void onSubmitPointOfInterestFailure();
     }
 
 }

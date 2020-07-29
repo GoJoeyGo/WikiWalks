@@ -71,7 +71,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
 
     @Override
     public void onSubmitPictureSuccess() {
-        listener.onEdit();
+        listener.onEditPicture();
         dismiss();
     }
 
@@ -82,7 +82,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
 
     @Override
     public void onEditPictureSuccess() {
-        listener.onEdit();
+        listener.onEditPicture();
         dismiss();
     }
 
@@ -93,7 +93,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
 
     @Override
     public void onDeletePictureSuccess() {
-        listener.onDelete();
+        listener.onDeletePicture();
         dismiss();
     }
 
@@ -252,7 +252,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
 
     public interface EditPictureDialogListener {
         void setPictureDialog(EditPictureDialog editPictureDialog);
-        void onEdit();
-        void onDelete();
+        void onEditPicture();
+        void onDeletePicture();
     }
 }

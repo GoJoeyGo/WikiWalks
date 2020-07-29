@@ -122,7 +122,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     }
 
     @Override
-    public void onEdit(EditNameDialog.EditNameDialogType type, String name) {
+    public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
         if (name.equals("")) {
             name = String.format("Path at %f, %f", path.getMarkerPoint().latitude, path.getMarkerPoint().longitude);
         }

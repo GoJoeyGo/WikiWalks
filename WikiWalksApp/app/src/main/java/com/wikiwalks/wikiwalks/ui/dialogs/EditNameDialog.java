@@ -51,7 +51,7 @@ public class EditNameDialog extends DialogFragment {
         }
         editButton = view.findViewById(R.id.edit_popup_save_button);
         editButton.setOnClickListener(v -> {
-            listener.onEdit(type, title.getEditText().getText().toString());
+            listener.onEditName(type, title.getEditText().getText().toString());
         });
         cancelButton = view.findViewById(R.id.edit_popup_cancel_button);
         cancelButton.setOnClickListener(v -> {
@@ -71,6 +71,6 @@ public class EditNameDialog extends DialogFragment {
 
     public interface EditDialogListener {
         void setEditNameDialog(EditNameDialog editNameDialog);
-        void onEdit(EditNameDialogType type, String name);
+        void onEditName(EditNameDialogType type, String name);
     }
 }

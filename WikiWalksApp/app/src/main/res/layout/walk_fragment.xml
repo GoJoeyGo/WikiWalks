@@ -80,11 +80,25 @@
         <Button
             android:id="@+id/mark_poi_button"
             style="@style/ButtonTheme"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="MARK POINT"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/take_picture_button"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginRight="10dp"/>
+
+        <Button
+            android:id="@+id/take_picture_button"
+            style="@style/ButtonTheme"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:fontFamily="monospace"
+            android:text="ADD PHOTO"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/mark_poi_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

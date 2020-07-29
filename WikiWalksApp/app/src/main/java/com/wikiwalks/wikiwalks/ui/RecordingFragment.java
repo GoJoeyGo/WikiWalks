@@ -26,19 +26,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
 
 import java.util.ArrayList;
 
-public class RecordingFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Route.RouteSubmitCallback {
+public class RecordingFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Route.RouteModifyCallback, PointOfInterest.PointOfInterestSubmitCallback {
 
     GoogleMap mMap;
     Toolbar toolbar;
@@ -53,6 +55,10 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     private ArrayList<Double> longitudes = new ArrayList<>();
     private ArrayList<Double> altitudes = new ArrayList<>();
     private ArrayList<LatLng> latLngs = new ArrayList<>();
+    private ArrayList<String> poiNames = new ArrayList<>();
+    private ArrayList<Double> poiLatitudes = new ArrayList<>();
+    private ArrayList<Double> poiLongitudes = new ArrayList<>();
+    private int submittedPointsOfInterest = 0;
     private Location lastLocation;
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -143,6 +149,10 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
             }
         });
+        Button markPointButton = rootView.findViewById(R.id.recording_mark_poi_button);
+        markPointButton.setOnClickListener(v -> {
+            EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "SubmissionPopup");
+        });
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
         mapFragment.getMapAsync(this);
         context = getContext();
@@ -224,13 +234,17 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     }
 
     @Override
-    public void onRouteSubmitSuccess() {
+    public void onRouteModifySuccess(Path path) {
         if (editNameDialog != null) editNameDialog.dismiss();
-        getParentFragmentManager().popBackStack();
+        if (poiNames.size() > 0) {
+            for (int i = 0; i < poiNames.size(); i++) {
+                PointOfInterest.submit(getContext(), poiNames.get(i), poiLatitudes.get(i), poiLongitudes.get(i), path, this);
+            }
+        } else getParentFragmentManager().popBackStack();
     }
 
     @Override
-    public void onRouteSubmitFailure() {
+    public void onRouteModifyFailure() {
         Toast.makeText(getContext(), "Failed to submit route...", Toast.LENGTH_SHORT).show();
     }
 
@@ -256,7 +270,27 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     }
 
     @Override
-    public void onEdit(EditNameDialog.EditNameDialogType type, String name) {
-        submitRoute(name);
+    public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
+        if (type == EditNameDialog.EditNameDialogType.PATH) submitRoute(name);
+        else {
+            if (name.isEmpty())
+                name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());
+            poiNames.add(name);
+            poiLatitudes.add(lastLocation.getLatitude());
+            poiLongitudes.add(lastLocation.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude())));
+            editNameDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest) {
+        submittedPointsOfInterest++;
+        if (submittedPointsOfInterest == poiNames.size()) getParentFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onSubmitPointOfInterestFailure() {
+
     }
 }

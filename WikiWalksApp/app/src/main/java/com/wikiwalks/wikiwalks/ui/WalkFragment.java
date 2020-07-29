@@ -35,19 +35,22 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.EditPictureDialog;
 
 import java.util.ArrayList;
 
-public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestSubmitCallback {
+public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestSubmitCallback, EditPictureDialog.EditPictureDialogListener {
 
     TextView offTrackVariable;
     ImageView offTrackDirectionIndicator;
     Location lastLocation;
     EditNameDialog editNameDialog;
+    EditPictureDialog editPictureDialog;
     private int routeNumber;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -87,9 +90,9 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(path.getName());
         Button markPointButton = rootView.findViewById(R.id.mark_poi_button);
-        markPointButton.setOnClickListener(v -> {
-            EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "EditPopup");
-        });
+        markPointButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "EditPopup"));
+        Button addPhotoButton = rootView.findViewById(R.id.take_picture_button);
+        addPhotoButton.setOnClickListener(v -> EditPictureDialog.newInstance(Picture.PictureType.PATH, path.getId(), -1, null).show(getChildFragmentManager(), "PicturePopup"));
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
         mapFragment.getMapAsync(this);
         outOfRangeBanner = rootView.findViewById(R.id.out_of_range_banner);
@@ -198,21 +201,37 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
-    public void onEdit(EditNameDialog.EditNameDialogType type, String name) {
+    public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
         if (name.isEmpty())
             name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());
         PointOfInterest.submit(getContext(), name, lastLocation.getLatitude(), lastLocation.getLongitude(), path, this);
     }
 
     @Override
-    public void onSuccess(PointOfInterest pointOfInterest) {
+    public void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest) {
         editNameDialog.dismiss();
         Toast.makeText(getContext(), "Successfully submitted point of interest!", Toast.LENGTH_SHORT).show();
         pointOfInterest.makeMarker(mMap, BitmapDescriptorFactory.HUE_RED);
     }
 
     @Override
-    public void onFailure() {
+    public void onSubmitPointOfInterestFailure() {
         Toast.makeText(getContext(), "Failed to submit point of interest...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setPictureDialog(EditPictureDialog editPictureDialog) {
+        this.editPictureDialog = editPictureDialog;
+    }
+
+    @Override
+    public void onEditPicture() {
+        editPictureDialog.dismiss();
+        Toast.makeText(getContext(), "Successfully added picture!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDeletePicture() {
+
     }
 }

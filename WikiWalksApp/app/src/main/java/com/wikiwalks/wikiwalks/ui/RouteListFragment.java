@@ -29,7 +29,7 @@ import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.RouteListRecyclerViewAdap
 
 import java.util.ArrayList;
 
-public class RouteListFragment extends Fragment implements OnMapReadyCallback, Route.RouteSubmitCallback {
+public class RouteListFragment extends Fragment implements OnMapReadyCallback, Route.RouteModifyCallback {
 
     Button selectRouteButton;
     Button deleteButton;
@@ -118,7 +118,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     }
 
     @Override
-    public void onRouteSubmitSuccess() {
+    public void onRouteModifySuccess(Path path) {
         polylines.get(position).remove();
         polylines.remove(position);
         for (Polyline polyline : polylines) {
@@ -135,7 +135,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     }
 
     @Override
-    public void onRouteSubmitFailure() {
+    public void onRouteModifyFailure() {
         Toast.makeText(getContext(), "Failed to delete route...", Toast.LENGTH_SHORT).show();
         confirmationDialog.dismiss();
     }

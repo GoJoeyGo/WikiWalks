@@ -60,7 +60,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
     }
 
     @Override
-    public void onEdit(EditNameDialog.EditNameDialogType type, String name) {
+    public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {

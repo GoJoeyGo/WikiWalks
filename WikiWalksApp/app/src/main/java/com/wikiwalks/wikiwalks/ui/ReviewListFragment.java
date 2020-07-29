@@ -172,7 +172,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
     }
 
     @Override
-    public void onEdit() {
+    public void onEditReview() {
         updateRecyclerView();
     }
 }

@@ -155,12 +155,12 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
     }
 
     @Override
-    public void onEdit() {
+    public void onEditPicture() {
         updateRecyclerView();
     }
 
     @Override
-    public void onDelete() {
+    public void onDeletePicture() {
         recyclerViewAdapter.notifyItemRemoved(position);
         recyclerViewAdapter.notifyItemRangeChanged(position, pictures.size());
     }

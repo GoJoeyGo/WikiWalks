@@ -46,11 +46,25 @@
 
         <Button
             android:id="@+id/stop_recording_button"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="STOP RECORDING"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/recording_mark_poi_button"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"/>
+
+        <Button
+            android:id="@+id/recording_mark_poi_button"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:fontFamily="monospace"
+            android:text="MARK POINT"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/stop_recording_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

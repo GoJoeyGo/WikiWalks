@@ -42,7 +42,7 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
 
     @Override
     public void onEditReviewSuccess() {
-        listener.onEdit();
+        listener.onEditReview();
         dismiss();
     }
 
@@ -53,7 +53,7 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
 
     @Override
     public void onDeleteReviewSuccess() {
-        listener.onEdit();
+        listener.onEditReview();
         dismiss();
     }
 
@@ -64,7 +64,7 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
 
     @Override
     public void onSubmitReviewSuccess() {
-        listener.onEdit();
+        listener.onEditReview();
         dismiss();
     }
 
@@ -144,6 +144,6 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
 
     public interface EditReviewDialogListener {
         void setEditReviewDialog(EditReviewDialog editReviewDialog);
-        void onEdit();
+        void onEditReview();
     }
 }
