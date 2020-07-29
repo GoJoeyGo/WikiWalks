@@ -63,4 +63,9 @@ public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewLi
             message = itemView.findViewById(R.id.path_review_row_text);
         }
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
 }

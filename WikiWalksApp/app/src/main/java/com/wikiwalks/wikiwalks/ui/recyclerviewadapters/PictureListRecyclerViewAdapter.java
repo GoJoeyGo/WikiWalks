@@ -79,4 +79,9 @@ public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<Picture
             editButton = itemView.findViewById(R.id.path_picture_edit_button);
         }
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
 }
