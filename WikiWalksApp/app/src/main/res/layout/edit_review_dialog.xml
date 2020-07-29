@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -56,11 +56,11 @@
 
             <Button
                 android:id="@+id/edit_review_popup_save_button"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/edit_review_rating_bar"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/edit_review_popup_delete_button"
                 android:text="SAVE"
                 android:fontFamily="monospace"
                 android:enabled="false"
@@ -68,21 +68,23 @@
 
             <Button
                 android:id="@+id/edit_review_popup_delete_button"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/edit_review_popup_save_button"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_review_rating_bar"
+                app:layout_constraintStart_toEndOf="@id/edit_review_popup_save_button"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="DELETE"
                 android:fontFamily="monospace"
                 android:visibility="gone"
-                style="@style/ButtonTheme" />
+                style="@style/ButtonTheme"
+                android:paddingLeft="10dp"
+                android:paddingStart="10dp"/>
 
             <Button
                 android:id="@+id/edit_review_popup_cancel_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/edit_review_popup_delete_button"
+                app:layout_constraintTop_toBottomOf="@id/edit_review_popup_save_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="CANCEL"
@@ -95,4 +97,4 @@
     </androidx.cardview.widget.CardView>
 
 
-</LinearLayout>
+</ScrollView>

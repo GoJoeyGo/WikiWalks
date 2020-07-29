@@ -2,7 +2,6 @@ package com.wikiwalks.wikiwalks.ui.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -125,7 +124,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.edit_picture_popup, null);
+        View view = inflater.inflate(R.layout.edit_picture_dialog, null);
         imageView = view.findViewById(R.id.edit_picture_popup_selected_image);
         title = view.findViewById(R.id.edit_picture_popup_description);
         cameraButton = view.findViewById(R.id.picture_popup_camera_button);
