@@ -245,7 +245,12 @@ public class Path {
         });
     }
 
-    public void getReviews(Context context, Review.GetReviewCallback callback) {
+    public void getReviews(Context context, boolean refresh, Review.GetReviewCallback callback) {
+        if (refresh) {
+            reviews.clear();
+            nextReviewPage = 1;
+            isLoadingReviews = false;
+        }
         if (!isLoadingReviews) {
             isLoadingReviews = true;
             JSONObject request = new JSONObject();
@@ -312,7 +317,12 @@ public class Path {
         }
     }
 
-    public void getPictures(Context context, Picture.GetPicturesCallback callback) {
+    public void getPictures(Context context, boolean refresh, Picture.GetPicturesCallback callback) {
+        if (refresh) {
+            pictures.clear();
+            nextPicturePage = 1;
+            isLoadingPictures = false;
+        }
         if (!isLoadingPictures) {
             isLoadingPictures = true;
             JSONObject request = new JSONObject();
@@ -344,18 +354,18 @@ public class Path {
                                 }
                                 nextPicturePage++;
                                 isLoadingPictures = false;
-                                callback.onGetPictureSuccess();
+                                callback.onGetPicturesSuccess();
                             } catch (JSONException e) {
                                 Log.e("GET_PICTURES1", Arrays.toString(e.getStackTrace()));
                                 isLoadingPictures = false;
-                                callback.onGetPictureFailure();
+                                callback.onGetPicturesFailure();
                             }
                         } else {
                             if (nextPicturePage > 1) {
                                 Toast.makeText(context, "No more pictures!", Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingPictures = false;
-                                callback.onGetPictureFailure();
+                                callback.onGetPicturesFailure();
                             }
                         }
                     }
@@ -363,13 +373,13 @@ public class Path {
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
                         Log.e("GET_PICTURES2", Arrays.toString(t.getStackTrace()));
-                        callback.onGetPictureFailure();
+                        callback.onGetPicturesFailure();
                     }
                 });
             } catch (JSONException e) {
                 Log.e("GET_PICTURES3", Arrays.toString(e.getStackTrace()));
                 isLoadingPictures = false;
-                callback.onGetPictureFailure();
+                callback.onGetPicturesFailure();
             }
         }
     }

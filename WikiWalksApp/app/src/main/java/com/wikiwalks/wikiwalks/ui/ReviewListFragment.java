@@ -18,9 +18,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
@@ -37,7 +39,6 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
     ReviewListRecyclerViewAdapter recyclerViewAdapter;
     Toolbar toolbar;
     ArrayList<Review> reviews;
-    Review ownReview;
     ConstraintLayout ownReviewLayout;
     TextView ownReviewName;
     TextView ownReviewMessage;
@@ -48,6 +49,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
     Path path;
     PointOfInterest pointOfInterest;
     EditReviewDialog editReviewDialog;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     public static ReviewListFragment newInstance(Review.ReviewType type, int parentId) {
         Bundle args = new Bundle();
@@ -95,36 +97,32 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(1)) {
-                    if (type == Review.ReviewType.PATH) {
-                        path.getReviews(getContext(), ReviewListFragment.this);
-                    } else {
-                        pointOfInterest.getReviews(getContext(), ReviewListFragment.this);
-                    }
+                if (!recyclerView.canScrollVertically(1) && !swipeRefreshLayout.isRefreshing()) {
+                    updateReviewsList(false);
                 }
             }
         });
+        swipeRefreshLayout = rootView.findViewById(R.id.review_list_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(() -> updateReviewsList(true));
         writeReviewButton = rootView.findViewById(R.id.path_write_review_button);
         writeReviewButton.setOnClickListener(v -> {
             EditReviewDialog.newInstance(type, parentId).show(getChildFragmentManager(), "EditPopup");
         });
-        updateRecyclerView();
-        if (type == Review.ReviewType.PATH) {
-            path.getReviews(getContext(), ReviewListFragment.this);
-        } else {
-            pointOfInterest.getReviews(getContext(), ReviewListFragment.this);
-        }
+        updateReviewsList(true);
         return rootView;
     }
 
-    public void updateRecyclerView() {
+    public void updateReviewsList(boolean refresh) {
+        swipeRefreshLayout.setRefreshing(refresh);
         if (type == Review.ReviewType.PATH) {
-            reviews = path.getReviewsList();
-            ownReview = path.getOwnReview();
+            path.getReviews(getContext(), refresh, ReviewListFragment.this);
         } else {
-            reviews = pointOfInterest.getReviewsList();
-            ownReview = pointOfInterest.getOwnReview();
+            pointOfInterest.getReviews(getContext(), refresh, ReviewListFragment.this);
         }
+    }
+
+    public void updateRecyclerView() {
+        Review ownReview = (type == Review.ReviewType.PATH) ? path.getOwnReview() : pointOfInterest.getOwnReview();
         if (reviews.size() == 0 && ownReview == null) {
             recyclerView.setVisibility(View.GONE);
             noReviewsIndicator.setVisibility(View.VISIBLE);
@@ -153,6 +151,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
             }
             recyclerViewAdapter.notifyDataSetChanged();
         }
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override

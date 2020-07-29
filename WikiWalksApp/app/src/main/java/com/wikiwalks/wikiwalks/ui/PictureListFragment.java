@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
@@ -41,6 +42,7 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
     int position;
     EditPictureDialog editPictureDialog;
     Picture.PictureType type;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     public static PictureListFragment newInstance(Picture.PictureType type, int parentId) {
         Bundle args = new Bundle();
@@ -81,15 +83,13 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(1)) {
-                    if (type == Picture.PictureType.PATH) {
-                        PathMap.getInstance().getPathList().get(parentId).getPictures(getContext(), PictureListFragment.this);
-                    } else {
-                        PathMap.getInstance().getPointOfInterestList().get(parentId).getPictures(getContext(), PictureListFragment.this);
-                    }
+                if (!recyclerView.canScrollVertically(1) && !swipeRefreshLayout.isRefreshing()) {
+                    updatePicturesList(false);
                 }
             }
         });
+        swipeRefreshLayout = rootView.findViewById(R.id.picture_list_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(() -> updatePicturesList(true));
         submitPictureButton = rootView.findViewById(R.id.path_submit_picture_button);
         submitPictureButton.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -98,17 +98,20 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
                 launchEditDialog(-1, null);
             }
         });
-        updateRecyclerView();
-        if (type == Picture.PictureType.PATH) {
-            PathMap.getInstance().getPathList().get(parentId).getPictures(getContext(), PictureListFragment.this);
-        } else {
-            PathMap.getInstance().getPointOfInterestList().get(parentId).getPictures(getContext(), PictureListFragment.this);
-        }
+        updatePicturesList(true);
         return rootView;
     }
 
+    public void updatePicturesList(boolean refresh) {
+        swipeRefreshLayout.setRefreshing(refresh);
+        if (type == Picture.PictureType.PATH) {
+            PathMap.getInstance().getPathList().get(parentId).getPictures(getContext(), refresh, PictureListFragment.this);
+        } else {
+            PathMap.getInstance().getPointOfInterestList().get(parentId).getPictures(getContext(), refresh, PictureListFragment.this);
+        }
+    }
+
     public void updateRecyclerView() {
-        pictures = (type == Picture.PictureType.PATH) ? PathMap.getInstance().getPathList().get(parentId).getPicturesList() : PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList();
         if (pictures.size() == 0) {
             recyclerView.setVisibility(View.GONE);
             noPicturesIndicator.setVisibility(View.VISIBLE);
@@ -116,7 +119,9 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
             recyclerView.setVisibility(View.VISIBLE);
             noPicturesIndicator.setVisibility(View.GONE);
             recyclerViewAdapter.notifyDataSetChanged();
+            recyclerViewAdapter.notifyItemRangeChanged(0, pictures.size());
         }
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     public void launchEditDialog(int position, Bitmap bitmap) {
@@ -140,13 +145,14 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
     }
 
     @Override
-    public void onGetPictureSuccess() {
+    public void onGetPicturesSuccess() {
         updateRecyclerView();
     }
 
     @Override
-    public void onGetPictureFailure() {
-        Toast.makeText(getContext(), "Failed to get pictures", Toast.LENGTH_SHORT).show();
+    public void onGetPicturesFailure() {
+        Toast.makeText(getContext(), "Failed to get pictures...", Toast.LENGTH_SHORT).show();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -163,5 +169,6 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
     public void onDeletePicture() {
         recyclerViewAdapter.notifyItemRemoved(position);
         recyclerViewAdapter.notifyItemRangeChanged(position, pictures.size());
+        updateRecyclerView();
     }
 }

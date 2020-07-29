@@ -36,14 +36,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/path_picture_list_toolbar_wrapper" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/path_picture_list_recyclerview"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/picture_list_swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingBottom="0dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/path_submit_picture_background"
-        app:layout_constraintTop_toBottomOf="@id/path_picture_list_toolbar_wrapper" />
+        app:layout_constraintTop_toBottomOf="@id/path_picture_list_toolbar_wrapper">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/path_picture_list_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingBottom="0dp" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/path_submit_picture_background"

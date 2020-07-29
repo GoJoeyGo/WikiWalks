@@ -43,10 +43,6 @@ public class Picture {
         this.editable = editable;
     }
 
-    public Picture(Parcel in) {
-
-    }
-
     public static void submit(Context context, PictureType type, int parentId, String filename, Uri uri, String description, EditPictureCallback callback) {
         File file = new File(filename);
         RequestBody imageBody = RequestBody.create(MediaType.parse(context.getContentResolver().getType(uri)), file);
@@ -176,8 +172,8 @@ public class Picture {
     public enum PictureType {PATH, POINT_OF_INTEREST}
 
     public interface GetPicturesCallback {
-        void onGetPictureSuccess();
-        void onGetPictureFailure();
+        void onGetPicturesSuccess();
+        void onGetPicturesFailure();
     }
 
     public interface EditPictureCallback {
