@@ -113,7 +113,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     }
 
     @Override
-    public void onSuccess() {
+    public void onRouteSubmitSuccess() {
         polylines.get(position).remove();
         polylines.remove(position);
         for (Polyline polyline : polylines) {
@@ -130,7 +130,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     }
 
     @Override
-    public void onFailure() {
+    public void onRouteSubmitFailure() {
         Toast.makeText(getContext(), "Failed to delete route...", Toast.LENGTH_SHORT).show();
         confirmationDialog.dismiss();
     }

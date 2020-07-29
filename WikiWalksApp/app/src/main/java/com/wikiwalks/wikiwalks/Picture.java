@@ -2,6 +2,8 @@ package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.gson.JsonElement;
@@ -10,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Arrays;
 
 import okhttp3.MediaType;
@@ -19,7 +22,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Picture {
+public class Picture implements Parcelable {
     private int id;
     private int parentId;
     private String url;
@@ -30,19 +33,26 @@ public class Picture {
     private boolean editable;
     private PictureType type;
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+    }
+
     public enum PictureType {PATH, POINT_OF_INTEREST}
 
-    public interface GetPictureCallback {
+    public interface GetPicturesCallback {
         void onGetPictureSuccess();
         void onGetPictureFailure();
     }
 
-    public interface SubmitPictureCallback {
+    public interface EditPictureCallback {
         void onSubmitPictureSuccess();
         void onSubmitPictureFailure();
-    }
-
-    public interface EditPictureCallback {
         void onEditPictureSuccess();
         void onEditPictureFailure();
         void onDeletePictureSuccess();
@@ -60,6 +70,10 @@ public class Picture {
         this.description = description;
         this.submitter = submitter;
         this.editable = editable;
+    }
+
+    public Picture(Parcel in) {
+
     }
 
     public int getId() {
@@ -90,7 +104,7 @@ public class Picture {
         return editable;
     }
 
-    public static void submit(Context context, PictureType type, int parentId, String filename, Uri uri, String description, SubmitPictureCallback callback) {
+    public static void submit(Context context, PictureType type, int parentId, String filename, Uri uri, String description, EditPictureCallback callback) {
         File file = new File(filename);
         RequestBody imageBody = RequestBody.create(MediaType.parse(context.getContentResolver().getType(uri)), file);
         MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", file.getName(), imageBody);

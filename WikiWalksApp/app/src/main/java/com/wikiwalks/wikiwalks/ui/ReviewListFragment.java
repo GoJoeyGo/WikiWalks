@@ -47,6 +47,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
     Review.ReviewType type;
     Path path;
     PointOfInterest pointOfInterest;
+    EditReviewDialog editReviewDialog;
 
     public static ReviewListFragment newInstance(Review.ReviewType type, int parentId) {
         Bundle args = new Bundle();
@@ -105,9 +106,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
         });
         writeReviewButton = rootView.findViewById(R.id.path_write_review_button);
         writeReviewButton.setOnClickListener(v -> {
-            EditReviewDialog dialog = EditReviewDialog.newInstance(type, parentId);
-            dialog.setTargetFragment(this, 0);
-            dialog.show(getActivity().getSupportFragmentManager(), "EditPopup");
+            EditReviewDialog.newInstance(type, parentId).show(getChildFragmentManager(), "EditPopup");
         });
         updateRecyclerView();
         if (type == Review.ReviewType.PATH) {
@@ -165,6 +164,11 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
     @Override
     public void onGetReviewFailure() {
         Toast.makeText(getContext(), "Failed to get reviews", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setEditReviewDialog(EditReviewDialog editReviewDialog) {
+        this.editReviewDialog = editReviewDialog;
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.wikiwalks.wikiwalks.ui.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,7 @@ import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.R;
 
-public class EditReviewDialog extends DialogFragment implements Review.SubmitReviewCallback, Review.EditReviewCallback {
+public class EditReviewDialog extends DialogFragment implements Review.EditReviewCallback {
 
     @Override
     public void onEditReviewSuccess() {
@@ -44,6 +43,7 @@ public class EditReviewDialog extends DialogFragment implements Review.SubmitRev
     }
 
     public interface EditReviewDialogListener {
+        void setEditReviewDialog(EditReviewDialog editReviewDialog);
         void onEdit();
     }
 
@@ -81,6 +81,8 @@ public class EditReviewDialog extends DialogFragment implements Review.SubmitRev
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        listener = (EditReviewDialogListener) getParentFragment();
+        listener.setEditReviewDialog(this);
         parentId = getArguments().getInt("parentId");
         type = (Review.ReviewType) getArguments().getSerializable("type");
         if (type == Review.ReviewType.PATH) {
@@ -90,7 +92,7 @@ public class EditReviewDialog extends DialogFragment implements Review.SubmitRev
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.review_popup, null);
+        View view = inflater.inflate(R.layout.edit_review_dialog, null);
         rating = view.findViewById(R.id.edit_review_rating_bar);
         rating.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
             if ((int) rating > 0) {
@@ -130,13 +132,18 @@ public class EditReviewDialog extends DialogFragment implements Review.SubmitRev
             message.getEditText().setText(review.getMessage());
             rating.setRating(review.getRating());
         }
+        if (savedInstanceState != null && savedInstanceState.containsKey("review_text")) {
+            message.getEditText().setText(savedInstanceState.getString("review_text"));
+            rating.setRating(savedInstanceState.getInt("review_stars"));
+        }
         builder.setView(view);
         return builder.create();
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        listener = (EditReviewDialogListener) getTargetFragment();
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putString("review_text", message.getEditText().getText().toString());
+        outState.putInt("review_stars", (int) rating.getRating());
+        super.onSaveInstanceState(outState);
     }
 }

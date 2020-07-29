@@ -3,7 +3,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="25dp"
     android:gravity="center">
 
     <androidx.cardview.widget.CardView
@@ -13,27 +12,28 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:padding="10dp">
 
             <TextView
-                android:id="@+id/submit_popup_title"
+                android:id="@+id/edit_popup_title"
                 style="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
-                android:text="Submit Path?"
+                android:text="Set Name"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/submit_path_name"
+                android:id="@+id/edit_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/submit_popup_title"
+                app:layout_constraintTop_toBottomOf="@id/edit_popup_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:hint="Title"
+                android:hint="Name"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp">
 
@@ -46,24 +46,26 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
-                android:id="@+id/submit_popup_submit_button"
+                android:id="@+id/edit_popup_save_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/submit_path_name"
+                app:layout_constraintTop_toBottomOf="@id/edit_name"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:text="SUBMIT"
-                android:fontFamily="monospace" />
+                android:text="SAVE"
+                android:fontFamily="monospace"
+                style="@style/ButtonTheme" />
 
             <Button
-                android:id="@+id/submit_popup_cancel_button"
+                android:id="@+id/edit_popup_cancel_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/submit_popup_submit_button"
+                app:layout_constraintTop_toBottomOf="@id/edit_popup_save_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="CANCEL"
-                android:fontFamily="monospace" />
+                android:fontFamily="monospace"
+                style="@style/ButtonTheme" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

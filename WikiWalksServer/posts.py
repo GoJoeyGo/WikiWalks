@@ -166,12 +166,6 @@ def add_poi():
         request_json = request.get_json(force=True)["attributes"]
         request_json["created_time"] = get_time()
         user = get_submitter(request_json["device_id"])
-        path = get_submitter(request_json["path_id"])
-        latitude = get_submitter(request_json["latitude"])
-        longitude = get_submitter(request_json["longitude"])
-        altitude = get_submitter(request_json["altitude"])
-        rating = get_submitter(request_json["rating"])
-        average_rating = rating
         data = poi_schema.load(request_json)
         new_poi = PointOfInterest(**data, submitter=user.id, path=request_json["path"], rating_count=0,
                                   average_rating=0.0)

@@ -32,12 +32,9 @@ public class Review {
         void onGetReviewFailure();
     }
 
-    public interface SubmitReviewCallback {
+    public interface EditReviewCallback {
         void onSubmitReviewSuccess();
         void onSubmitReviewFailure();
-    }
-    
-    public interface EditReviewCallback {
         void onEditReviewSuccess();
         void onEditReviewFailure();
         void onDeleteReviewSuccess();
@@ -69,7 +66,7 @@ public class Review {
         return message;
     }
 
-    public static void submit(Context context, ReviewType type, int parentId, String message, int rating, SubmitReviewCallback callback) {
+    public static void submit(Context context, ReviewType type, int parentId, String message, int rating, EditReviewCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {

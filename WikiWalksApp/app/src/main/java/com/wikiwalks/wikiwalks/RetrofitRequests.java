@@ -40,6 +40,17 @@ public interface RetrofitRequests {
     Call<JsonElement> deleteRoute(@Path("id") int id,
                                   @Body RequestBody body);
 
+    @POST("/pois/new")
+    Call<JsonElement> newPoI(@Body RequestBody body);
+
+    @POST("/pois/{id}/edit")
+    Call<JsonElement> editPoI(@Path("id") int id,
+                              @Body RequestBody body);
+
+    @POST("/pois/{id}/delete")
+    Call<JsonElement> deletePoI(@Path("id") int id,
+                                @Body RequestBody body);
+
     @POST("/paths/{id}/reviews")
     Call<JsonElement> getPathReviews(@Path("id") int id,
                                      @Query("page") int page,

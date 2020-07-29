@@ -23,12 +23,11 @@ import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditPictureDialog;
-import com.wikiwalks.wikiwalks.ui.dialogs.SubmitPictureDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PictureListRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
-public class PictureListFragment extends Fragment implements Picture.GetPictureCallback, SubmitPictureDialog.PictureDialogListener, EditPictureDialog.EditPictureDialogListener {
+public class PictureListFragment extends Fragment implements Picture.GetPicturesCallback, EditPictureDialog.EditPictureDialogListener {
 
     Button submitPictureButton;
     int parentId;
@@ -38,6 +37,7 @@ public class PictureListFragment extends Fragment implements Picture.GetPictureC
     ArrayList<Picture> pictures;
     TextView noPicturesIndicator;
     int position;
+    EditPictureDialog editPictureDialog;
     Picture.PictureType type;
 
 
@@ -96,7 +96,7 @@ public class PictureListFragment extends Fragment implements Picture.GetPictureC
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions((new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}), REQUEST_CODE_ASK_PERMISSIONS);
             } else {
-                launchSubmitDialog();
+                launchEditDialog(-1, null);
             }
         });
         updateRecyclerView();
@@ -120,24 +120,16 @@ public class PictureListFragment extends Fragment implements Picture.GetPictureC
         }
     }
 
-    public void launchSubmitDialog() {
-        SubmitPictureDialog dialog = SubmitPictureDialog.newInstance(type, parentId);
-        dialog.setTargetFragment(this, 0);
-        dialog.show(getActivity().getSupportFragmentManager(), "PicturePopup");
-    }
-
     public void launchEditDialog(int position, Bitmap bitmap) {
         this.position = position;
-        EditPictureDialog dialog = new EditPictureDialog(pictures.get(position), bitmap);
-        dialog.setTargetFragment(this, 0);
-        dialog.show(getActivity().getSupportFragmentManager(), "PicturePopup");
+        EditPictureDialog.newInstance(type, parentId, position, bitmap).show(getChildFragmentManager(), "PicturePopup");
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_CODE_ASK_PERMISSIONS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                launchSubmitDialog();
+                launchEditDialog(-1, null);
             } else {
                 getParentFragmentManager().beginTransaction()
                         .add(R.id.main_frame, PermissionsFragment.newInstance(PermissionsFragment.PermissionType.STORAGE)).addToBackStack(null)
@@ -159,8 +151,8 @@ public class PictureListFragment extends Fragment implements Picture.GetPictureC
     }
 
     @Override
-    public void onSubmit() {
-        updateRecyclerView();
+    public void setPictureDialog(EditPictureDialog editPictureDialog) {
+        this.editPictureDialog = editPictureDialog;
     }
 
     @Override

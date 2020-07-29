@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -21,7 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
-                android:text="Edit Picture"
+                android:text="Picture"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,11 +36,34 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:maxHeight="300dp" />
 
+            <Button
+                android:id="@+id/picture_popup_camera_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_selected_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/picture_popup_gallery_button"
+                android:text="FROM CAMERA"
+                android:fontFamily="monospace"
+                style="@style/ButtonTheme"
+                android:layout_marginRight="10dp"/>
+
+            <Button
+                android:id="@+id/picture_popup_gallery_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_selected_image"
+                app:layout_constraintStart_toEndOf="@id/picture_popup_camera_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="FROM GALLERY"
+                android:fontFamily="monospace"
+                style="@style/ButtonTheme" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/edit_picture_popup_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_selected_image"
+                app:layout_constraintTop_toBottomOf="@id/picture_popup_camera_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -58,31 +81,34 @@
 
             <Button
                 android:id="@+id/edit_picture_popup_submit_button"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_description"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/edit_picture_popup_delete_button"
                 android:text="SAVE"
                 android:fontFamily="monospace"
                 style="@style/ButtonTheme"/>
 
             <Button
                 android:id="@+id/edit_picture_popup_delete_button"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_submit_button"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_description"
+                app:layout_constraintStart_toEndOf="@id/edit_picture_popup_submit_button"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="DELETE"
                 android:fontFamily="monospace"
-                style="@style/ButtonTheme"/>
+                style="@style/ButtonTheme"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                />
 
             <Button
                 android:id="@+id/edit_picture_popup_cancel_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_delete_button"
+                app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_submit_button"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="CANCEL"
@@ -95,4 +121,4 @@
     </androidx.cardview.widget.CardView>
 
 
-</LinearLayout>
+</ScrollView>

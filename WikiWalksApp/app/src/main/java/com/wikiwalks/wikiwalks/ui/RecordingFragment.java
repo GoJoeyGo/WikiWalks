@@ -34,11 +34,11 @@ import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
-import com.wikiwalks.wikiwalks.ui.dialogs.SubmissionDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
 
 import java.util.ArrayList;
 
-public class RecordingFragment extends Fragment implements OnMapReadyCallback, SubmissionDialog.SubmissionDialogListener, Route.RouteSubmitCallback {
+public class RecordingFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Route.RouteSubmitCallback {
 
     private boolean recording = true;
     GoogleMap mMap;
@@ -53,6 +53,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private Location lastLocation;
     Toolbar toolbar;
+    EditNameDialog editNameDialog;
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -124,12 +125,12 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
                     if (!inRange) {
                         new MaterialAlertDialogBuilder(context).setTitle("Make new path?").setMessage("Your route does not connect to the path and cannot be submitted. Make it a new path instead?").setPositiveButton("Yes", (dialog, which) -> {
                             path = null;
-                            showSubmissionDialog();
+                            showSubmissionDialog(true);
                         }).setNegativeButton("No", (dialog, which) -> {
 
                         }).show();
-                    } else showSubmissionDialog();
-                } else showSubmissionDialog();
+                    } else showSubmissionDialog(false);
+                } else showSubmissionDialog(true);
             } else {
                 MainActivity.checkLocationPermission(this.getActivity());
                 fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
@@ -208,14 +209,14 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         }
     }
 
-    public void showSubmissionDialog() {
-        SubmissionDialog dialog = new SubmissionDialog(path == null);
-        dialog.setTargetFragment(this, 0);
-        dialog.show(getParentFragmentManager(), "SubmissionPopup");
+    public void showSubmissionDialog(boolean newPath) {
+        new MaterialAlertDialogBuilder(context).setTitle("Submit?").setPositiveButton("Yes", (dialog, which) -> {
+            if (newPath) EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
+            else submitRoute("");
+        }).setNegativeButton("No", (dialog, which) -> dialog.dismiss()).show();
     }
 
-    @Override
-    public void onPositiveClick(String title) {
+    public void submitRoute(String title) {
         if (title.equals("")) {
             title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
         }
@@ -223,18 +224,14 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
     }
 
     @Override
-    public void onNegativeClick() {
-
-    }
-
-    @Override
-    public void onSuccess() {
+    public void onRouteSubmitSuccess() {
+        if (editNameDialog != null) editNameDialog.dismiss();
         getParentFragmentManager().popBackStack();
     }
 
     @Override
-    public void onFailure() {
-        Toast.makeText(getContext(), "Failed to submit...", Toast.LENGTH_SHORT).show();
+    public void onRouteSubmitFailure() {
+        Toast.makeText(getContext(), "Failed to submit route...", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -251,5 +248,15 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, S
         outState.putDoubleArray("longitudes", longitudeArray);
         outState.putDoubleArray("altitudes", altitudeArray);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void setEditNameDialog(EditNameDialog editNameDialog) {
+        this.editNameDialog = editNameDialog;
+    }
+
+    @Override
+    public void onEdit(EditNameDialog.EditNameDialogType type, String name) {
+        submitRoute(name);
     }
 }

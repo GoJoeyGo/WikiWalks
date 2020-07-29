@@ -40,8 +40,8 @@ public class Route implements Serializable {
     private ArrayList<Polyline> polylines = new ArrayList<>();
 
     public interface RouteSubmitCallback {
-        void onSuccess();
-        void onFailure();
+        void onRouteSubmitSuccess();
+        void onRouteSubmitFailure();
     }
 
     public Route(int id, Path path, boolean editable, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes) {
@@ -109,14 +109,14 @@ public class Route implements Serializable {
                         try {
                             JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("path");
                             PathMap.getInstance().addPath(new Path(responseJson));
-                            callback.onSuccess();
+                            callback.onRouteSubmitSuccess();
                         } catch (JSONException e) {
                             Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                             Log.e("SUBMIT_PATH1", Arrays.toString(e.getStackTrace()));
-                            callback.onFailure();
+                            callback.onRouteSubmitFailure();
                         }
                     } else {
-                        callback.onFailure();
+                        callback.onRouteSubmitFailure();
                     }
                 }
 
@@ -124,13 +124,13 @@ public class Route implements Serializable {
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
                     Log.e("SUBMIT_PATH2", Arrays.toString(t.getStackTrace()));
-                    callback.onFailure();
+                    callback.onRouteSubmitFailure();
                 }
             });
         } catch (JSONException e) {
             Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
             Log.e("SUBMIT_PATH3", Arrays.toString(e.getStackTrace()));
-            callback.onFailure();
+            callback.onRouteSubmitFailure();
         }
     }
 
@@ -156,21 +156,21 @@ public class Route implements Serializable {
                         for (Polyline polyline : polylines) {
                             polyline.remove();
                         }
-                        callback.onSuccess();
+                        callback.onRouteSubmitSuccess();
                     } else {
-                        callback.onFailure();
+                        callback.onRouteSubmitFailure();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Log.e("DELETE_PATH1", Arrays.toString(t.getStackTrace()));
-                    callback.onFailure();
+                    callback.onRouteSubmitFailure();
                 }
             });
         } catch (JSONException e) {
             Log.e("DELETE_PATH2", Arrays.toString(e.getStackTrace()));
-            callback.onFailure();
+            callback.onRouteSubmitFailure();
         }
     }
 }
