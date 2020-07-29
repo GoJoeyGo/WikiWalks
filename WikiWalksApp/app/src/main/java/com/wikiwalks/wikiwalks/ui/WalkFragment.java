@@ -44,18 +44,18 @@ import java.util.ArrayList;
 
 public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestSubmitCallback {
 
+    TextView offTrackVariable;
+    ImageView offTrackDirectionIndicator;
+    Location lastLocation;
+    EditNameDialog editNameDialog;
     private int routeNumber;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
     private ConstraintLayout outOfRangeBanner;
-    TextView offTrackVariable;
-    ImageView offTrackDirectionIndicator;
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
     private Toolbar toolbar;
-    Location lastLocation;
-    EditNameDialog editNameDialog;
 
     public static WalkFragment newInstance(int pathId, int routeNumber) {
         Bundle args = new Bundle();
@@ -71,7 +71,8 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         new CountDownTimer(60000, 60000) {
             @Override
-            public void onTick(long millisUntilFinished) {}
+            public void onTick(long millisUntilFinished) {
+            }
 
             @Override
             public void onFinish() {
@@ -198,7 +199,8 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public void onEdit(EditNameDialog.EditNameDialogType type, String name) {
-        if (name.isEmpty()) name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());
+        if (name.isEmpty())
+            name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());
         PointOfInterest.submit(getContext(), name, lastLocation.getLatitude(), lastLocation.getLongitude(), path, this);
     }
 

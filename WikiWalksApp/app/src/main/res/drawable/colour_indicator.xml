@@ -6,17 +6,18 @@
     android:tint="?attr/colorOnBackground">
 
     <padding
+        android:bottom="4dp"
         android:left="4dp"
-        android:top="4dp"
         android:right="4dp"
-        android:bottom="4dp" />
+        android:top="4dp" />
 
     <corners
-        android:topLeftRadius="3dp"
-        android:topRightRadius="3dp"
         android:bottomLeftRadius="3dp"
-        android:bottomRightRadius="3dp" />
+        android:bottomRightRadius="3dp"
+        android:topLeftRadius="3dp"
+        android:topRightRadius="3dp" />
 
-    <size android:width="16dp"
-        android:height="16dp"/>
+    <size
+        android:width="16dp"
+        android:height="16dp" />
 </shape>

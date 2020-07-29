@@ -17,10 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorBackgroundFloating"
-            app:titleTextColor="?attr/colorOnBackground"
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
-            app:layout_constraintHorizontal_bias="1.0">
+            app:layout_constraintHorizontal_bias="1.0"
+            app:titleTextColor="?attr/colorOnBackground">
 
             <ImageButton
                 android:id="@+id/settings_button"
@@ -47,18 +47,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_background"
+        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        android:padding="10dp">
+        app:layout_constraintHorizontal_bias="1.0">
 
         <Button
             android:id="@+id/create_path_button"
+            style="@style/ButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="CREATE NEW PATH"
-            style="@style/ButtonTheme"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

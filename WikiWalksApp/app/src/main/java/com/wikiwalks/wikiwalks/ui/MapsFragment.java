@@ -32,13 +32,13 @@ import java.util.Map;
 public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, PathMap.PathMapListener {
 
     GoogleMap mMap;
+    Toolbar toolbar;
     private SupportMapFragment mapFragment;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private HashMap<Integer, Polyline> polylines = new HashMap<>();
     private HashMap<Integer, Marker> markers = new HashMap<>();
     private Button createPath;
     private boolean hasFailed = false;
-    Toolbar toolbar;
 
     public static MapsFragment newInstance() {
         Bundle args = new Bundle();

@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.R;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 
 public class PictureListFragment extends Fragment implements Picture.GetPicturesCallback, EditPictureDialog.EditPictureDialogListener {
 
+    private static final int REQUEST_CODE_ASK_PERMISSIONS = 0;
     Button submitPictureButton;
     int parentId;
     RecyclerView recyclerView;
@@ -39,9 +41,6 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
     int position;
     EditPictureDialog editPictureDialog;
     Picture.PictureType type;
-
-
-    private static final int REQUEST_CODE_ASK_PERMISSIONS = 0;
 
     public static PictureListFragment newInstance(Picture.PictureType type, int parentId) {
         Bundle args = new Bundle();

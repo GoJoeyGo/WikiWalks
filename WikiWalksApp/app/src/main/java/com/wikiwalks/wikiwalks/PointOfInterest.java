@@ -10,6 +10,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonElement;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,9 +25,9 @@ import retrofit2.Response;
 
 public class PointOfInterest {
 
+    LatLng coordinates;
     private int id;
     private String name;
-
     private ArrayList<Picture> picturesList = new ArrayList<>();
     private ArrayList<Review> reviewsList = new ArrayList<>();
     private Review ownReview;
@@ -36,8 +37,6 @@ public class PointOfInterest {
     private boolean isLoadingPictures = false;
     private double rating;
     private boolean editable;
-    LatLng coordinates;
-
     private Path path;
 
     public PointOfInterest(int id, String name, double rating, double latitude, double longitude, Path path, boolean editable) {
@@ -48,50 +47,47 @@ public class PointOfInterest {
         this.path = path;
         this.editable = editable;
     }
-    public interface PointOfInterestSubmitCallback {
-        void onSuccess(PointOfInterest pointOfInterest);
-        void onFailure();
-    }
 
-    public static void submit(Context context, String name, double latitude, double longitude, Path path, PointOfInterestSubmitCallback callback)  {
+    public static void submit(Context context, String name, double latitude, double longitude, Path path, PointOfInterestSubmitCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-        attributes.put("device_id", MainActivity.getDeviceId(context));
-        attributes.put("path", path.getId());
-        attributes.put("latitude", latitude);
-        attributes.put("longitude", longitude);
-        attributes.put("name", name);
-        request.put("attributes", attributes);
-        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-        Call<JsonElement> newPointOfInterest = MainActivity.getRetrofitRequests(context).newPoI(body);
-        newPointOfInterest.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                if (response.isSuccessful()) {
-                    try {
-                        JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("poi");
-                        PointOfInterest newPointOfInterest = new PointOfInterest(responseJson.getInt("id"), responseJson.getString("name"), responseJson.getDouble("average_rating"), responseJson.getDouble("latitude"), responseJson.getDouble("longitude"), path, true);
-                        PathMap.getInstance().getPointOfInterestList().put(responseJson.getInt("id"), newPointOfInterest);
-                        path.addPointOfInterest(newPointOfInterest);
-                        callback.onSuccess(newPointOfInterest);
-                    } catch (JSONException e) {
-                        Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
-                        Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
+            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("path", path.getId());
+            attributes.put("latitude", latitude);
+            attributes.put("longitude", longitude);
+            attributes.put("name", name);
+            request.put("attributes", attributes);
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> newPointOfInterest = MainActivity.getRetrofitRequests(context).newPoI(body);
+            newPointOfInterest.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    if (response.isSuccessful()) {
+                        try {
+                            JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("poi");
+                            PointOfInterest newPointOfInterest = new PointOfInterest(responseJson.getInt("id"), responseJson.getString("name"), responseJson.getDouble("average_rating"), responseJson.getDouble("latitude"), responseJson.getDouble("longitude"), path, true);
+                            PathMap.getInstance().getPointOfInterestList().put(responseJson.getInt("id"), newPointOfInterest);
+                            path.addPointOfInterest(newPointOfInterest);
+                            callback.onSuccess(newPointOfInterest);
+                        } catch (JSONException e) {
+                            Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
+                            Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
+                            callback.onFailure();
+                        }
+                    } else {
                         callback.onFailure();
                     }
-                } else {
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
+                    Log.e("SUBMIT_POI", Arrays.toString(t.getStackTrace()));
                     callback.onFailure();
                 }
-            }
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
-                Log.e("SUBMIT_POI", Arrays.toString(t.getStackTrace()));
-                callback.onFailure();
-            }
-        });
-    } catch (JSONException e) {
+            });
+        } catch (JSONException e) {
             Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
             Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
             callback.onFailure();
@@ -124,12 +120,12 @@ public class PointOfInterest {
         return marker;
     }
 
-    public void setOwnReview(Review pointOfInterestReview) {
-        ownReview = pointOfInterestReview;
-    }
-
     public Review getOwnReview() {
         return ownReview;
+    }
+
+    public void setOwnReview(Review pointOfInterestReview) {
+        ownReview = pointOfInterestReview;
     }
 
     public ArrayList<Review> getReviewsList() {
@@ -267,6 +263,11 @@ public class PointOfInterest {
                 callback.onGetPictureFailure();
             }
         }
+    }
+
+    public interface PointOfInterestSubmitCallback {
+        void onSuccess(PointOfInterest pointOfInterest);
+        void onFailure();
     }
 
 }

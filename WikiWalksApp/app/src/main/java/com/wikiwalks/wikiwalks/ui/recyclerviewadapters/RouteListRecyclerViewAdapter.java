@@ -19,23 +19,23 @@ import com.wikiwalks.wikiwalks.ui.RouteListFragment;
 import java.util.ArrayList;
 
 public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteListRecyclerViewAdapter.ViewHolder> {
-    ArrayList<Button> buttons = new ArrayList<>();
+    ArrayList<AppCompatButton> buttons = new ArrayList<>();
     ArrayList<Route> routeList;
-    RouteListFragment context;
+    RouteListFragment routeListFragment;
 
-    public RouteListRecyclerViewAdapter(RouteListFragment context, ArrayList<Route> routeList) {
-        this.context = context;
+    public RouteListRecyclerViewAdapter(RouteListFragment routeListFragment, ArrayList<Route> routeList) {
+        this.routeListFragment = routeListFragment;
         this.routeList = routeList;
     }
 
-    public ArrayList<Button> getButtons() {
+    public ArrayList<AppCompatButton> getButtons() {
         return buttons;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context.getContext());
+        LayoutInflater inflater = LayoutInflater.from(routeListFragment.getContext());
         View view = inflater.inflate(R.layout.route_list_row, parent, false);
         return new ViewHolder(view);
     }
@@ -45,10 +45,10 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
         holder.button.setText(String.format("Route %d", position + 1));
         holder.button.setOnClickListener(v -> {
             for (Button button : buttons) {
-                button.setBackgroundColor(0x00000000);
+                button.getBackground().setColorFilter(0x00000000, PorterDuff.Mode.MULTIPLY);
             }
-            holder.button.setBackgroundColor(0xFF777777);
-            context.selectRoute(position);
+            holder.button.getBackground().setColorFilter(0xFF777777, PorterDuff.Mode.MULTIPLY);
+            routeListFragment.selectRoute(position);
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.button.getCompoundDrawablesRelative()[0].setTint(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}));

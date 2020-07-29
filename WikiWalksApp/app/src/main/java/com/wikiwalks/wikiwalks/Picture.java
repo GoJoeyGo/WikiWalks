@@ -3,7 +3,6 @@ package com.wikiwalks.wikiwalks;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.gson.JsonElement;
@@ -12,7 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.Arrays;
 
 import okhttp3.MediaType;
@@ -33,23 +31,6 @@ public class Picture {
     private boolean editable;
     private PictureType type;
 
-    public enum PictureType {PATH, POINT_OF_INTEREST}
-
-    public interface GetPicturesCallback {
-        void onGetPictureSuccess();
-        void onGetPictureFailure();
-    }
-
-    public interface EditPictureCallback {
-        void onSubmitPictureSuccess();
-        void onSubmitPictureFailure();
-        void onEditPictureSuccess();
-        void onEditPictureFailure();
-        void onDeletePictureSuccess();
-        void onDeletePictureFailure();
-    }
-
-
     public Picture(PictureType type, int id, int parentId, String url, int width, int height, String description, String submitter, boolean editable) {
         this.type = type;
         this.id = id;
@@ -64,6 +45,40 @@ public class Picture {
 
     public Picture(Parcel in) {
 
+    }
+
+    public static void submit(Context context, PictureType type, int parentId, String filename, Uri uri, String description, EditPictureCallback callback) {
+        File file = new File(filename);
+        RequestBody imageBody = RequestBody.create(MediaType.parse(context.getContentResolver().getType(uri)), file);
+        MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", file.getName(), imageBody);
+        RequestBody deviceIdBody = RequestBody.create(MultipartBody.FORM, MainActivity.getDeviceId(context));
+        RequestBody descriptionBody = RequestBody.create(MultipartBody.FORM, description);
+        Call<JsonElement> newPicture = (type == PictureType.PATH) ? MainActivity.getRetrofitRequests(context).newPathPicture(parentId, imagePart, deviceIdBody, descriptionBody) : MainActivity.getRetrofitRequests(context).newPoIPicture(parentId, imagePart, deviceIdBody, descriptionBody);
+        newPicture.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("picture");
+                        Picture newPicture = new Picture(type, responseJson.getInt("id"), parentId, responseJson.getString("url"), responseJson.getInt("width"), responseJson.getInt("height"), responseJson.getString("description"), responseJson.getString("submitter"), true);
+                        if (type == PictureType.PATH)
+                            PathMap.getInstance().getPathList().get(parentId).getPicturesList().add(0, newPicture);
+                        else
+                            PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().add(0, newPicture);
+                        callback.onSubmitPictureSuccess();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        callback.onSubmitPictureFailure();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                t.printStackTrace();
+                callback.onSubmitPictureFailure();
+            }
+        });
     }
 
     public int getId() {
@@ -92,38 +107,6 @@ public class Picture {
 
     public boolean isEditable() {
         return editable;
-    }
-
-    public static void submit(Context context, PictureType type, int parentId, String filename, Uri uri, String description, EditPictureCallback callback) {
-        File file = new File(filename);
-        RequestBody imageBody = RequestBody.create(MediaType.parse(context.getContentResolver().getType(uri)), file);
-        MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", file.getName(), imageBody);
-        RequestBody deviceIdBody = RequestBody.create(MultipartBody.FORM, MainActivity.getDeviceId(context));
-        RequestBody descriptionBody = RequestBody.create(MultipartBody.FORM, description);
-        Call<JsonElement> newPicture = (type == PictureType.PATH) ? MainActivity.getRetrofitRequests(context).newPathPicture(parentId, imagePart, deviceIdBody, descriptionBody) : MainActivity.getRetrofitRequests(context).newPoIPicture(parentId, imagePart, deviceIdBody, descriptionBody);
-        newPicture.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                if (response.isSuccessful()) {
-                    try {
-                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("picture");
-                        Picture newPicture = new Picture(type, responseJson.getInt("id"), parentId, responseJson.getString("url"), responseJson.getInt("width"), responseJson.getInt("height"), responseJson.getString("description"), responseJson.getString("submitter"), true);
-                        if (type == PictureType.PATH) PathMap.getInstance().getPathList().get(parentId).getPicturesList().add(0, newPicture);
-                        else PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().add(0, newPicture);
-                        callback.onSubmitPictureSuccess();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        callback.onSubmitPictureFailure();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                t.printStackTrace();
-                callback.onSubmitPictureFailure();
-            }
-        });
     }
 
     public void edit(Context context, String description, EditPictureCallback callback) {
@@ -168,8 +151,10 @@ public class Picture {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                        if (type == PictureType.PATH) PathMap.getInstance().getPathList().get(parentId).getPicturesList().remove(Picture.this);
-                        else PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().remove(Picture.this);
+                        if (type == PictureType.PATH)
+                            PathMap.getInstance().getPathList().get(parentId).getPicturesList().remove(Picture.this);
+                        else
+                            PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().remove(Picture.this);
                         callback.onDeletePictureSuccess();
                     } else {
                         callback.onDeletePictureFailure();
@@ -186,5 +171,21 @@ public class Picture {
             Log.e("DELETE_PATH_PICTURE2", Arrays.toString(e.getStackTrace()));
             callback.onDeletePictureFailure();
         }
+    }
+
+    public enum PictureType {PATH, POINT_OF_INTEREST}
+
+    public interface GetPicturesCallback {
+        void onGetPictureSuccess();
+        void onGetPictureFailure();
+    }
+
+    public interface EditPictureCallback {
+        void onSubmitPictureSuccess();
+        void onSubmitPictureFailure();
+        void onEditPictureSuccess();
+        void onEditPictureFailure();
+        void onDeletePictureSuccess();
+        void onDeletePictureFailure();
     }
 }

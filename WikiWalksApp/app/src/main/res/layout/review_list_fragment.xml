@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="?attr/colorBackgroundFloating">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -10,42 +10,42 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorBackgroundFloating"
-        app:titleTextColor="?attr/colorOnBackground"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:titleTextColor="?attr/colorOnBackground">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/path_review_list_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/path_review_list_own_review"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/path_review_list_toolbar_wrapper"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingLeft="32dp"
         android:paddingTop="16dp"
-        android:paddingBottom="16dp"
         android:paddingRight="32dp"
-        android:paddingLeft="32dp">
+        android:paddingBottom="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/path_review_list_toolbar_wrapper">
 
         <TextView
-            android:text="You"
             android:id="@+id/path_review_own_review_row_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:text="You"
+            android:textStyle="bold|italic"
             app:layout_constraintEnd_toStartOf="@id/path_review_own_review_row_rating"
-            android:textStyle="bold|italic" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <RatingBar
             android:id="@+id/path_review_own_review_row_rating"
@@ -54,73 +54,73 @@
             android:layout_height="wrap_content"
             android:isIndicator="true"
             android:numStars="5"
-            app:layout_constraintStart_toEndOf="@id/path_review_own_review_row_name"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/path_review_own_review_row_name"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/path_review_own_review_row_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/path_review_own_review_row_name"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/path_review_own_review_row_name" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/no_reviews_indicator"
+        style="@style/TextTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/path_review_list_toolbar_wrapper"
-        app:layout_constraintBottom_toTopOf="@id/path_write_review_background"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:text="No reviews!"
-        style="@style/TextTheme"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/path_write_review_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/path_review_list_toolbar_wrapper" />
 
     <View
         android:id="@+id/path_review_separator"
-        app:layout_constraintTop_toBottomOf="@id/path_review_list_own_review"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/path_review_list_own_review" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="0dp"
         android:id="@+id/path_review_list_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/path_review_separator"
-        app:layout_constraintBottom_toTopOf="@id/path_write_review_background" />
+        app:layout_constraintBottom_toTopOf="@id/path_write_review_background"
+        app:layout_constraintTop_toBottomOf="@id/path_review_separator" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/path_write_review_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_background"
+        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        android:padding="10dp">
+        app:layout_constraintHorizontal_bias="1.0">
 
         <Button
             android:id="@+id/path_write_review_button"
+            style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="50dp"
+            android:layout_marginBottom="10dp"
+            android:enabled="false"
             android:fontFamily="monospace"
             android:text="WRITE REVIEW"
-            style="@style/ButtonTheme"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:enabled="false"
-            android:layout_marginBottom="10dp" />
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

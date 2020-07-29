@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_gravity="center"
     android:background="?attr/colorBackgroundFloating">
 
@@ -17,20 +17,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
+            android:gravity="center_horizontal"
             android:padding="10dp"
             android:textAlignment="center"
             android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@id/permissions_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            android:gravity="center_horizontal" />
+            app:layout_constraintVertical_bias="0.0" />
 
         <Button
             android:id="@+id/permissions_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="OPEN SETTINGS"
             android:fontFamily="monospace"
+            android:text="OPEN SETTINGS"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/permission_info" />

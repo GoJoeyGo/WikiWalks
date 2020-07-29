@@ -17,13 +17,6 @@ import com.wikiwalks.wikiwalks.R;
 
 public class EditNameDialog extends DialogFragment {
 
-    public interface EditDialogListener {
-        void setEditNameDialog(EditNameDialog editNameDialog);
-        void onEdit(EditNameDialogType type, String name);
-    }
-
-    public enum EditNameDialogType {PATH, POINT_OF_INTEREST, USERNAME}
-
     EditDialogListener listener;
     TextInputLayout title;
     Button editButton;
@@ -48,10 +41,13 @@ public class EditNameDialog extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.edit_name_dialog, null);
         title = view.findViewById(R.id.edit_name);
-        if (savedInstanceState != null && savedInstanceState.containsKey("name")) title.getEditText().setText(savedInstanceState.getString("name"));
+        if (savedInstanceState != null && savedInstanceState.containsKey("name"))
+            title.getEditText().setText(savedInstanceState.getString("name"));
         else if (getArguments().getInt("parent_id") > -1) {
-            if (type == EditNameDialogType.PATH) title.getEditText().setText(PathMap.getInstance().getPathList().get(getArguments().getInt("parent_id")).getName());
-            else if (type == EditNameDialogType.POINT_OF_INTEREST) title.getEditText().setText(PathMap.getInstance().getPointOfInterestList().get(getArguments().getInt("parent_id")).getName());
+            if (type == EditNameDialogType.PATH)
+                title.getEditText().setText(PathMap.getInstance().getPathList().get(getArguments().getInt("parent_id")).getName());
+            else if (type == EditNameDialogType.POINT_OF_INTEREST)
+                title.getEditText().setText(PathMap.getInstance().getPointOfInterestList().get(getArguments().getInt("parent_id")).getName());
         }
         editButton = view.findViewById(R.id.edit_popup_save_button);
         editButton.setOnClickListener(v -> {
@@ -69,5 +65,12 @@ public class EditNameDialog extends DialogFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putString("name", title.getEditText().getText().toString());
         super.onSaveInstanceState(outState);
+    }
+
+    public enum EditNameDialogType {PATH, POINT_OF_INTEREST, USERNAME}
+
+    public interface EditDialogListener {
+        void setEditNameDialog(EditNameDialog editNameDialog);
+        void onEdit(EditNameDialogType type, String name);
     }
 }

@@ -23,16 +23,9 @@ import retrofit2.Response;
 public class PathMap {
 
     private static PathMap instance = null;
+    public ArrayList<PathMapListener> changeListeners = new ArrayList<>();
     private LinkedHashMap<Integer, Path> pathList = new LinkedHashMap<>();
     private LinkedHashMap<Integer, PointOfInterest> pointOfInterestList = new LinkedHashMap<>();
-
-    public interface PathMapListener {
-        void OnPathMapChange();
-
-        void OnPathMapUpdateFailure();
-    }
-
-    public ArrayList<PathMapListener> changeListeners = new ArrayList<>();
 
     private PathMap() {
     }
@@ -122,5 +115,11 @@ public class PathMap {
 
     public LinkedHashMap<Integer, PointOfInterest> getPointOfInterestList() {
         return pointOfInterestList;
+    }
+
+    public interface PathMapListener {
+        void OnPathMapChange();
+
+        void OnPathMapUpdateFailure();
     }
 }

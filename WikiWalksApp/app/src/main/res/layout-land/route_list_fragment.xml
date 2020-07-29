@@ -11,17 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorBackgroundFloating"
-        app:titleTextColor="?attr/colorOnBackground"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:titleTextColor="?attr/colorOnBackground">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/route_list_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/path_frag_toolbar_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/path_frag_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:contentInsetEnd="16dp"
-            app:contentInsetStart="16dp"
             android:background="?attr/colorBackgroundFloating"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:contentInsetEnd="16dp"
+            app:contentInsetStart="16dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:titleTextColor="?attr/colorOnBackground">
 
@@ -29,9 +29,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
                 android:background="#00FFFFFF"
+                android:contentDescription="Edit Title"
                 android:scaleType="center"
-                android:src="@drawable/ic_baseline_edit_24"
-                android:contentDescription="Edit Title" />
+                android:src="@drawable/ic_baseline_edit_24" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -40,8 +40,8 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/walk_path_option_selector"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/path_frag_toolbar_wrapper"
         app:layout_constraintWidth_percent="0.5"
         tools:context=".ui.main.PathFragment" />
@@ -50,13 +50,13 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        app:layout_constraintHorizontal_weight="0.5"
         android:background="?attr/colorBackgroundFloating"
-        app:layout_constraintTop_toBottomOf="@id/path_frag_toolbar_wrapper"
-        app:layout_constraintStart_toEndOf="@id/map_path_preview_frag"
+        android:clipToPadding="false"
         app:layout_constraintBottom_toTopOf="@id/walk_path_option_selector"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="0.5"
+        app:layout_constraintStart_toEndOf="@id/map_path_preview_frag"
+        app:layout_constraintTop_toBottomOf="@id/path_frag_toolbar_wrapper">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -68,9 +68,9 @@
                 android:id="@+id/path_frag_walk_count"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@id/path_frag_rating_bar"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/path_frag_rating_bar" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <RatingBar
                 android:id="@+id/path_frag_rating_bar"
@@ -79,8 +79,8 @@
                 android:layout_height="wrap_content"
                 android:isIndicator="true"
                 android:numStars="5"
-                app:layout_constraintStart_toEndOf="@id/path_frag_walk_count"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/path_frag_walk_count"
                 app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -136,39 +136,39 @@
 
         <Button
             android:id="@+id/select_route_button"
+            style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
             android:fontFamily="monospace"
             android:text="SELECT ROUTE"
-            style="@style/ButtonTheme"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/new_route_button"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/new_route_button"
+            style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="RECORD NEW ROUTE"
-            style="@style/ButtonTheme"
-            app:layout_constraintStart_toEndOf="@id/select_route_button"
             app:layout_constraintEnd_toStartOf="@id/explore_button"
+            app:layout_constraintStart_toEndOf="@id/select_route_button"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/explore_button"
+            style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
             android:fontFamily="monospace"
             android:text="EXPLORE"
-            style="@style/ButtonTheme"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/new_route_button"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp" />
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

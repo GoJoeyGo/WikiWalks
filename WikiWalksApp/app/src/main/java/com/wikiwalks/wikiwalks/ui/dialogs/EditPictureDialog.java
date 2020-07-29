@@ -40,6 +40,35 @@ import static android.app.Activity.RESULT_OK;
 
 public class EditPictureDialog extends DialogFragment implements Picture.EditPictureCallback {
 
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_SELECT = 1;
+    Picture.PictureType type;
+    EditPictureDialogListener listener;
+    TextInputLayout title;
+    int parentId;
+    ImageView imageView;
+    Button cameraButton;
+    Button galleryButton;
+    Button submitButton;
+    Button deleteButton;
+    Button cancelButton;
+    Picture picture;
+    AlertDialog confirmationDialog;
+    Bitmap bitmap;
+    Uri photoURI;
+    String filename;
+
+    public static EditPictureDialog newInstance(Picture.PictureType type, int parentId, int position, Bitmap bitmap) {
+        Bundle args = new Bundle();
+        EditPictureDialog fragment = new EditPictureDialog();
+        args.putSerializable("picture_type", type);
+        args.putInt("parent_id", parentId);
+        if (position > -1) args.putInt("position", position);
+        if (bitmap != null) args.putParcelable("image", bitmap);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onSubmitPictureSuccess() {
         listener.onEdit();
@@ -73,43 +102,6 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         Toast.makeText(getContext(), "Failed to delete picture!", Toast.LENGTH_SHORT).show();
     }
 
-    public interface EditPictureDialogListener {
-        void setPictureDialog(EditPictureDialog editPictureDialog);
-        void onEdit();
-        void onDelete();
-    }
-
-
-    Picture.PictureType type;
-    EditPictureDialogListener listener;
-    TextInputLayout title;
-    int parentId;
-    ImageView imageView;
-    Button cameraButton;
-    Button galleryButton;
-    Button submitButton;
-    Button deleteButton;
-    Button cancelButton;
-    Picture picture;
-    AlertDialog confirmationDialog;
-    Bitmap bitmap;
-    Uri photoURI;
-    String filename;
-
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    static final int REQUEST_IMAGE_SELECT = 1;
-
-    public static EditPictureDialog newInstance(Picture.PictureType type, int parentId, int position, Bitmap bitmap) {
-        Bundle args = new Bundle();
-        EditPictureDialog fragment = new EditPictureDialog();
-        args.putSerializable("picture_type", type);
-        args.putInt("parent_id", parentId);
-        if (position > -1) args.putInt("position", position);
-        if (bitmap != null) args.putParcelable("image", bitmap);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -118,8 +110,10 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         type = (Picture.PictureType) getArguments().getSerializable("picture_type");
         parentId = getArguments().getInt("parent_id");
         if (getArguments().containsKey("position")) {
-            if (type == Picture.PictureType.PATH) picture = PathMap.getInstance().getPathList().get(parentId).getPicturesList().get(getArguments().getInt("position"));
-            else picture = PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().get(getArguments().getInt("position"));
+            if (type == Picture.PictureType.PATH)
+                picture = PathMap.getInstance().getPathList().get(parentId).getPicturesList().get(getArguments().getInt("position"));
+            else
+                picture = PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().get(getArguments().getInt("position"));
             bitmap = getArguments().getParcelable("image");
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -251,8 +245,14 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         if (photoURI != null) {
             outState.putString("uri", photoURI.toString());
             outState.putString("filename", filename);
-        };
+        }
         outState.putString("description", title.getEditText().getText().toString());
         super.onSaveInstanceState(outState);
+    }
+
+    public interface EditPictureDialogListener {
+        void setPictureDialog(EditPictureDialog editPictureDialog);
+        void onEdit();
+        void onDelete();
     }
 }

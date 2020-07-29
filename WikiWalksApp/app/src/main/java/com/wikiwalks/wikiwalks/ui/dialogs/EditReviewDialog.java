@@ -15,10 +15,30 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.wikiwalks.wikiwalks.PathMap;
-import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.Review;
 
 public class EditReviewDialog extends DialogFragment implements Review.EditReviewCallback {
+
+    EditReviewDialogListener listener;
+    TextInputLayout message;
+    RatingBar rating;
+    Button saveButton;
+    Button deleteButton;
+    Button cancelButton;
+    Review review;
+    AlertDialog confirmationDialog;
+    int parentId;
+    Review.ReviewType type;
+
+    public static EditReviewDialog newInstance(Review.ReviewType type, int parentId) {
+        Bundle args = new Bundle();
+        args.putInt("parentId", parentId);
+        args.putSerializable("type", type);
+        EditReviewDialog dialog = new EditReviewDialog();
+        dialog.setArguments(args);
+        return dialog;
+    }
 
     @Override
     public void onEditReviewSuccess() {
@@ -42,11 +62,6 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
         Toast.makeText(getContext(), "Failed to delete review!", Toast.LENGTH_SHORT).show();
     }
 
-    public interface EditReviewDialogListener {
-        void setEditReviewDialog(EditReviewDialog editReviewDialog);
-        void onEdit();
-    }
-
     @Override
     public void onSubmitReviewSuccess() {
         listener.onEdit();
@@ -56,26 +71,6 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
     @Override
     public void onSubmitReviewFailure() {
         Toast.makeText(getContext(), "Failed to submit review!", Toast.LENGTH_SHORT).show();
-    }
-
-    EditReviewDialogListener listener;
-    TextInputLayout message;
-    RatingBar rating;
-    Button saveButton;
-    Button deleteButton;
-    Button cancelButton;
-    Review review;
-    AlertDialog confirmationDialog;
-    int parentId;
-    Review.ReviewType type;
-
-    public static EditReviewDialog newInstance(Review.ReviewType type, int parentId) {
-        Bundle args = new Bundle();
-        args.putInt("parentId", parentId);
-        args.putSerializable("type", type);
-        EditReviewDialog dialog = new EditReviewDialog();
-        dialog.setArguments(args);
-        return dialog;
     }
 
     @NonNull
@@ -145,5 +140,10 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
         outState.putString("review_text", message.getEditText().getText().toString());
         outState.putInt("review_stars", (int) rating.getRating());
         super.onSaveInstanceState(outState);
+    }
+
+    public interface EditReviewDialogListener {
+        void setEditReviewDialog(EditReviewDialog editReviewDialog);
+        void onEdit();
     }
 }

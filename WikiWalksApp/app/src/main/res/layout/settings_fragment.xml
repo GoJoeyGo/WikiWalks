@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorBackgroundFloating">
@@ -18,20 +17,20 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorBackgroundFloating"
-            app:titleTextColor="?attr/colorOnBackground"
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
-            app:title="Settings"/>
+            app:title="Settings"
+            app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:paddingHorizontal="16dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settings_toolbar_wrapper"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settings_toolbar_wrapper">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -42,41 +41,40 @@
                 style="@style/TextButtonTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:drawableRight="@drawable/chevron"
                 android:drawableEnd="@drawable/chevron"
-                app:layout_constraintTop_toTopOf="parent"
+                android:drawableRight="@drawable/chevron"
+                android:gravity="center_vertical"
+                android:text="SET NAME"
                 app:layout_constraintStart_toStartOf="parent"
-                android:text="SET NAME" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/settings_import_settings_button"
                 style="@style/TextButtonTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:drawableRight="@drawable/chevron"
                 android:drawableEnd="@drawable/chevron"
-                app:layout_constraintTop_toBottomOf="@id/settings_set_name_button"
+                android:drawableRight="@drawable/chevron"
+                android:gravity="center_vertical"
+                android:text="IMPORT DATA"
                 app:layout_constraintStart_toStartOf="parent"
-                android:text="IMPORT DATA" />
+                app:layout_constraintTop_toBottomOf="@id/settings_set_name_button" />
 
             <Button
                 android:id="@+id/settings_export_settings_button"
                 style="@style/TextButtonTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:drawableRight="@drawable/chevron"
                 android:drawableEnd="@drawable/chevron"
-                app:layout_constraintTop_toBottomOf="@id/settings_import_settings_button"
+                android:drawableRight="@drawable/chevron"
+                android:gravity="center_vertical"
+                android:text="EXPORT DATA"
                 app:layout_constraintStart_toStartOf="parent"
-                android:text="EXPORT DATA" />
+                app:layout_constraintTop_toBottomOf="@id/settings_import_settings_button" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

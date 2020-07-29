@@ -9,49 +9,49 @@
         android:id="@+id/walk_toolbar_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/colorBackgroundFloating"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="?attr/colorBackgroundFloating">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/walk_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:contentInsetEnd="16dp"
-            app:contentInsetStart="16dp" />
+            app:contentInsetStart="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/out_of_range_banner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             android:padding="10dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/off_track_variable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?attr/colorOnBackground"
+                app:layout_constraintBottom_toBottomOf="@id/off_track_direction_indicator"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="@id/off_track_direction_indicator" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/off_track_direction_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/off_track_variable"
-                app:srcCompat="@drawable/ic_arrow_upward_black_24dp"
-                tools:ignore="VectorDrawableCompat"
+                android:contentDescription="Direction Arrow"
                 android:pivotX="50%"
                 android:pivotY="50%"
-                android:contentDescription="Direction Arrow" />
+                app:layout_constraintStart_toEndOf="@id/off_track_variable"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_arrow_upward_black_24dp"
+                tools:ignore="VectorDrawableCompat" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -60,30 +60,30 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="?attr/actionBarSize"
         app:layout_constraintBottom_toTopOf="@id/walk_frag_button_wrapper"
         app:layout_constraintStart_toStartOf="parent"
-        tools:context=".ui.main.WalkFragment"
-        android:layout_marginTop="?attr/actionBarSize" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".ui.main.WalkFragment" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/walk_frag_button_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_background"
+        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        android:padding="10dp">
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/mark_poi_button"
+            style="@style/ButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="MARK POINT"
-            style="@style/ButtonTheme"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

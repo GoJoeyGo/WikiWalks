@@ -39,11 +39,6 @@ public class Route implements Serializable {
 
     private ArrayList<Polyline> polylines = new ArrayList<>();
 
-    public interface RouteSubmitCallback {
-        void onRouteSubmitSuccess();
-        void onRouteSubmitFailure();
-    }
-
     public Route(int id, Path path, boolean editable, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes) {
         this.id = id;
         this.path = path;
@@ -51,42 +46,6 @@ public class Route implements Serializable {
         this.latitudes = latitudes;
         this.longitudes = longitudes;
         this.altitudes = altitudes;
-    }
-
-    public Polyline makePolyline(GoogleMap map) {
-        ArrayList<LatLng> coordinates = new ArrayList<>();
-        for (int i = 0; i < latitudes.size(); i++) {
-            coordinates.add(new LatLng(latitudes.get(i), longitudes.get(i)));
-        }
-        Polyline polyline = map.addPolyline(new PolylineOptions().addAll(coordinates));
-        int walkCount = path.getWalkCount();
-        if (walkCount < 10) polyline.setColor(0xffffe49c);
-        else if (walkCount < 100) polyline.setColor(0xffff9100);
-        else if (walkCount < 1000) polyline.setColor(0xffff1e00);
-        else polyline.setColor(0xff000000);
-        polyline.setWidth(20);
-        polylines.add(polyline);
-        return polyline;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public ArrayList<Double> getLatitudes() {
-        return latitudes;
-    }
-
-    public ArrayList<Double> getLongitudes() {
-        return longitudes;
-    }
-
-    public ArrayList<Double> getAltitudes() {
-        return altitudes;
-    }
-
-    public boolean isEditable() {
-        return editable;
     }
 
     public static void submit(Context context, Path path, String title, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, RouteSubmitCallback callback) {
@@ -134,6 +93,42 @@ public class Route implements Serializable {
         }
     }
 
+    public Polyline makePolyline(GoogleMap map) {
+        ArrayList<LatLng> coordinates = new ArrayList<>();
+        for (int i = 0; i < latitudes.size(); i++) {
+            coordinates.add(new LatLng(latitudes.get(i), longitudes.get(i)));
+        }
+        Polyline polyline = map.addPolyline(new PolylineOptions().addAll(coordinates));
+        int walkCount = path.getWalkCount();
+        if (walkCount < 10) polyline.setColor(0xffffe49c);
+        else if (walkCount < 100) polyline.setColor(0xffff9100);
+        else if (walkCount < 1000) polyline.setColor(0xffff1e00);
+        else polyline.setColor(0xff000000);
+        polyline.setWidth(20);
+        polylines.add(polyline);
+        return polyline;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public ArrayList<Double> getLatitudes() {
+        return latitudes;
+    }
+
+    public ArrayList<Double> getLongitudes() {
+        return longitudes;
+    }
+
+    public ArrayList<Double> getAltitudes() {
+        return altitudes;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
     public void delete(final Context context, RouteSubmitCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
@@ -172,5 +167,10 @@ public class Route implements Serializable {
             Log.e("DELETE_PATH2", Arrays.toString(e.getStackTrace()));
             callback.onRouteSubmitFailure();
         }
+    }
+
+    public interface RouteSubmitCallback {
+        void onRouteSubmitSuccess();
+        void onRouteSubmitFailure();
     }
 }

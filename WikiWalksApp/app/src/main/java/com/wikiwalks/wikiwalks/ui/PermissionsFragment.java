@@ -22,8 +22,6 @@ public class PermissionsFragment extends Fragment {
     Button permissionsButton;
     PermissionType type;
 
-    public enum PermissionType {LOCATION, STORAGE}
-
     public static PermissionsFragment newInstance(PermissionType type) {
         Bundle args = new Bundle();
         args.putSerializable("type", type);
@@ -63,6 +61,8 @@ public class PermissionsFragment extends Fragment {
             }
         }
     }
+
+    public enum PermissionType {LOCATION, STORAGE}
 
 
 }

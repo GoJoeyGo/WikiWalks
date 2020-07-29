@@ -23,8 +23,29 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 0;
-    Bundle savedInstanceState = null;
     static RetrofitRequests retrofitRequests;
+    Bundle savedInstanceState = null;
+
+    public static String getDeviceId(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences("preferences", MODE_PRIVATE);
+        if (!preferences.contains("device_id")) {
+            preferences.edit().putString("device_id", UUID.randomUUID().toString()).apply();
+        }
+        return preferences.getString("device_id", null);
+    }
+
+    public static void checkLocationPermission(FragmentActivity fragmentActivity) {
+        if (ActivityCompat.checkSelfPermission(fragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(fragmentActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            fragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, PermissionsFragment.newInstance(PermissionsFragment.PermissionType.LOCATION)).commitNow();
+        }
+    }
+
+    public static RetrofitRequests getRetrofitRequests(Context context) {
+        if (retrofitRequests == null) {
+            retrofitRequests = new Retrofit.Builder().baseUrl(context.getString(R.string.local_url)).addConverterFactory(GsonConverterFactory.create()).build().create(RetrofitRequests.class);
+        }
+        return retrofitRequests;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,31 +92,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static String getDeviceId(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences("preferences", MODE_PRIVATE);
-        if (!preferences.contains("device_id")) {
-            preferences.edit().putString("device_id", UUID.randomUUID().toString()).apply();
-        }
-        return preferences.getString("device_id", null);
-    }
-
-    public static void checkLocationPermission(FragmentActivity fragmentActivity) {
-        if (ActivityCompat.checkSelfPermission(fragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(fragmentActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            fragmentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, PermissionsFragment.newInstance(PermissionsFragment.PermissionType.LOCATION)).commitNow();
-        }
-    }
-
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
-    }
-
-    public static RetrofitRequests getRetrofitRequests(Context context) {
-        if (retrofitRequests == null) {
-            retrofitRequests = new Retrofit.Builder().baseUrl(context.getString(R.string.local_url)).addConverterFactory(GsonConverterFactory.create()).build().create(RetrofitRequests.class);
-        }
-        return retrofitRequests;
     }
 
     @Override

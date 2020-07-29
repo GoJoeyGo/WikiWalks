@@ -40,8 +40,10 @@ import java.util.ArrayList;
 
 public class RecordingFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Route.RouteSubmitCallback {
 
-    private boolean recording = true;
     GoogleMap mMap;
+    Toolbar toolbar;
+    EditNameDialog editNameDialog;
+    private boolean recording = true;
     private Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
@@ -52,9 +54,6 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     private ArrayList<Double> altitudes = new ArrayList<>();
     private ArrayList<LatLng> latLngs = new ArrayList<>();
     private Location lastLocation;
-    Toolbar toolbar;
-    EditNameDialog editNameDialog;
-
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -211,7 +210,8 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
     public void showSubmissionDialog(boolean newPath) {
         new MaterialAlertDialogBuilder(context).setTitle("Submit?").setPositiveButton("Yes", (dialog, which) -> {
-            if (newPath) EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
+            if (newPath)
+                EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
             else submitRoute("");
         }).setNegativeButton("No", (dialog, which) -> dialog.dismiss()).show();
     }

@@ -74,7 +74,7 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
         for (Route route : path.getRoutes()) polylines.add(route.makePolyline(mMap));
         for (int i = 0; i < pointOfInterestList.size(); i++) {
             markers.add(pointOfInterestList.get(i).makeMarker(googleMap, ((i * 50) % 360)));
-        };
+        }
         googleMap.getUiSettings().setAllGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));

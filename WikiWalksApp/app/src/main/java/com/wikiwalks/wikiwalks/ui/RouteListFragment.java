@@ -34,7 +34,6 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     Button selectRouteButton;
     Button deleteButton;
     SupportMapFragment mapFragment;
-    private GoogleMap routeListMap;
     Path path;
     ArrayList<Route> routes;
     ArrayList<Polyline> polylines = new ArrayList<>();
@@ -43,6 +42,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     AlertDialog confirmationDialog;
     RouteListRecyclerViewAdapter recyclerViewAdapter;
     Toolbar toolbar;
+    private GoogleMap routeListMap;
 
     public static RouteListFragment newInstance(int pathId) {
         Bundle args = new Bundle();

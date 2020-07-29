@@ -22,8 +22,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
-import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.R;
+import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditReviewDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.ReviewListRecyclerViewAdapter;
 

@@ -5,7 +5,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditReviewDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,22 +24,6 @@ public class Review {
     private String message;
     private ReviewType type;
 
-    public enum ReviewType {PATH, POINT_OF_INTEREST}
-
-    public interface GetReviewCallback {
-        void onGetReviewSuccess();
-        void onGetReviewFailure();
-    }
-
-    public interface EditReviewCallback {
-        void onSubmitReviewSuccess();
-        void onSubmitReviewFailure();
-        void onEditReviewSuccess();
-        void onEditReviewFailure();
-        void onDeleteReviewSuccess();
-        void onDeleteReviewFailure();
-    }
-
     public Review(ReviewType type, int id, int parentId, String name, int rating, String message) {
         this.type = type;
         this.id = id;
@@ -48,22 +31,6 @@ public class Review {
         this.name = name;
         this.rating = rating;
         this.message = message;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     public static void submit(Context context, ReviewType type, int parentId, String message, int rating, EditReviewCallback callback) {
@@ -83,8 +50,10 @@ public class Review {
                         try {
                             JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("review");
                             Review newReview = new Review(type, responseJson.getInt("id"), parentId, responseJson.getString("submitter"), rating, message);
-                            if (type == ReviewType.PATH) PathMap.getInstance().getPathList().get(parentId).setOwnReview(newReview);
-                            else PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(newReview);
+                            if (type == ReviewType.PATH)
+                                PathMap.getInstance().getPathList().get(parentId).setOwnReview(newReview);
+                            else
+                                PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(newReview);
                             callback.onSubmitReviewSuccess();
                         } catch (JSONException e) {
                             Log.e("SUBMIT_PATH_REVIEW1", Arrays.toString(e.getStackTrace()));
@@ -105,6 +74,22 @@ public class Review {
             Log.e("SUBMIT_PATH_REVIEW3", Arrays.toString(e.getStackTrace()));
             callback.onSubmitReviewFailure();
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public void edit(Context context, String message, int rating, EditReviewCallback callback) {
@@ -156,8 +141,10 @@ public class Review {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                        if (type == ReviewType.PATH) PathMap.getInstance().getPathList().get(parentId).setOwnReview(null);
-                        else PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(null);
+                        if (type == ReviewType.PATH)
+                            PathMap.getInstance().getPathList().get(parentId).setOwnReview(null);
+                        else
+                            PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(null);
                         callback.onDeleteReviewSuccess();
                     } else {
                         callback.onDeleteReviewFailure();
@@ -176,5 +163,21 @@ public class Review {
             Log.e("DELETE_PATH_REVIEW2", Arrays.toString(e.getStackTrace()));
             callback.onDeleteReviewFailure();
         }
+    }
+
+    public enum ReviewType {PATH, POINT_OF_INTEREST}
+
+    public interface GetReviewCallback {
+        void onGetReviewSuccess();
+        void onGetReviewFailure();
+    }
+
+    public interface EditReviewCallback {
+        void onSubmitReviewSuccess();
+        void onSubmitReviewFailure();
+        void onEditReviewSuccess();
+        void onEditReviewFailure();
+        void onDeleteReviewSuccess();
+        void onDeleteReviewFailure();
     }
 }
