@@ -38,6 +38,7 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
     ArrayList<PointOfInterest> pointOfInterestList;
     RecyclerView recyclerView;
     PointOfInterestListRecyclerViewAdapter recyclerViewAdapter;
+    SupportMapFragment mapFragment;
 
     public static PointOfInterestListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -62,9 +63,14 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
         recyclerViewAdapter = new PointOfInterestListRecyclerViewAdapter(this, pointOfInterestList);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_poi_list_frag);
-        mapFragment.getMapAsync(this);
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_poi_list_frag);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        mapFragment.getMapAsync(this);
+        super.onStart();
     }
 
     @Override

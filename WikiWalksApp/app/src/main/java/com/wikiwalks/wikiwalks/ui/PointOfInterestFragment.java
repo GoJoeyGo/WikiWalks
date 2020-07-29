@@ -63,8 +63,13 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
         RatingBar ratingBar = rootView.findViewById(R.id.poi_frag_rating_bar);
         ratingBar.setRating((float) pointOfInterest.getRating());
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_poi_preview_frag);
-        mapFragment.getMapAsync(this);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        mapFragment.getMapAsync(this);
+        super.onStart();
     }
 
     @Override

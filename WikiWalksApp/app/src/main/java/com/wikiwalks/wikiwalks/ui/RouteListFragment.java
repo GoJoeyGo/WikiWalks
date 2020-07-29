@@ -68,8 +68,13 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
         deleteButton = rootView.findViewById(R.id.edit_route_button);
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_route_list_frag);
-        mapFragment.getMapAsync(this);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        mapFragment.getMapAsync(this);
+        super.onStart();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,8 +60,6 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         PathMap.getInstance().addListener(this);
         final View rootView = inflater.inflate(R.layout.path_fragment, container, false);
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
-        mapFragment.getMapAsync(this);
         walkPathOptions = rootView.findViewById(R.id.walk_path_option_selector);
         toolbar = rootView.findViewById(R.id.path_frag_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
@@ -96,7 +93,14 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
             walkCountString = String.format("Path has been walked %s times.", path.getWalkCount());
         }
         walkCount.setText(walkCountString);
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        mapFragment.getMapAsync(this);
+        super.onStart();
     }
 
     @Override
@@ -105,7 +109,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         for (Route route : path.getRoutes()) polylines.add(route.makePolyline(googleMap));
         googleMap.getUiSettings().setAllGesturesEnabled(false);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), 20));
     }
 
     public void setPath(Path path) {
@@ -148,7 +152,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
                 polylines.add(route.makePolyline(mMap));
             }
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), 20));
     }
 
     @Override
