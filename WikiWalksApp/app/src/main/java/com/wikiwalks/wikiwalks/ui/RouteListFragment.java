@@ -1,6 +1,7 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -75,8 +76,10 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
     public void onMapReady(GoogleMap googleMap) {
         routeListMap = googleMap;
         routeListMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        for (Route route : routes) {
-            polylines.add(route.makePolyline(routeListMap));
+        for (int i = 0; i < routes.size(); i++) {
+            Polyline newPolyline = routes.get(i).makePolyline(routeListMap);
+            newPolyline.setColor(Color.HSVToColor(new float[]{(i * 50) % 360, 1, 1}));
+            polylines.add(newPolyline);
         }
         routeListMap.getUiSettings().setAllGesturesEnabled(false);
         routeListMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));

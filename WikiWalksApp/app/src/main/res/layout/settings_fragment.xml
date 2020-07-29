@@ -19,7 +19,7 @@
             android:background="?attr/colorBackgroundFloating"
             app:titleTextColor="?attr/colorOnBackground"
             app:contentInsetEnd="16dp"
-            app:contentInsetStart="16dp"></androidx.appcompat.widget.Toolbar>
+            app:contentInsetStart="16dp" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <Button

@@ -16,9 +16,10 @@
             android:fitsSystemWindows="true"
             app:expandedTitleMarginEnd="56dp"
             app:expandedTitleMarginStart="40dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:titleEnabled="false">
 
-            <fragment
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/map_poi_list_frag"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
@@ -33,10 +34,13 @@
                 android:id="@+id/poi_list_frag_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:contentInsetEnd="16dp"
+                app:contentInsetStart="16dp"
                 android:background="#00FFFFFF"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="@android:color/primary_text_light" />
+                app:titleTextColor="?attr/colorOnBackground"
+                app:layout_collapseMode="pin"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -52,21 +56,13 @@
             android:layout_height="match_parent"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/poi_list_frag_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:text="Points of Interest" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/poi_list_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/poi_list_frag_title" />
+                tools:layout_editor_absoluteY="49dp" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

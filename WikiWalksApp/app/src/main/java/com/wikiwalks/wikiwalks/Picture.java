@@ -102,7 +102,7 @@ public class Picture {
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
                     try {
-                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_picture");
+                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("picture");
                         Picture newPicture = new Picture(type, responseJson.getInt("id"), parentId, responseJson.getString("url"), responseJson.getInt("width"), responseJson.getInt("height"), responseJson.getString("description"), responseJson.getString("submitter"), true);
                         if (type == PictureType.PATH) PathMap.getInstance().getPathList().get(parentId).getPicturesList().add(0, newPicture);
                         else PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().add(0, newPicture);

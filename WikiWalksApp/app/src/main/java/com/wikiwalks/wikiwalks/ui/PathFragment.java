@@ -83,6 +83,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditPa
         editPathDialog.setTargetFragment(this, 0);
         editButton.setOnClickListener(v -> editPathDialog.show(getActivity().getSupportFragmentManager(), "EditPopup"));
         pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);
+        pointOfInterestButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestListFragment.newInstance(path.getId())).addToBackStack(null).commit());
         reviewButton = rootView.findViewById(R.id.path_frag_reviews_button);
         reviewButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, ReviewListFragment.newInstance(Review.ReviewType.PATH, path.getId())).addToBackStack(null).commit());
         picturesButton = rootView.findViewById(R.id.path_frag_pictures_button);

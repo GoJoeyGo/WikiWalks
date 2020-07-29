@@ -84,8 +84,6 @@
 
         <Button
             android:id="@+id/edit_route_button"
-
-
             style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="50dp"

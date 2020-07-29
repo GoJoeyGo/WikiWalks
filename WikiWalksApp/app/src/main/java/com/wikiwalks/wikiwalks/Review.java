@@ -84,12 +84,12 @@ public class Review {
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
                         try {
-                            JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path_review");
+                            JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("review");
                             Review newReview = new Review(type, responseJson.getInt("id"), parentId, responseJson.getString("submitter"), rating, message);
                             if (type == ReviewType.PATH) PathMap.getInstance().getPathList().get(parentId).setOwnReview(newReview);
+                            else PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(newReview);
                             callback.onSubmitReviewSuccess();
                         } catch (JSONException e) {
-                            Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
                             Log.e("SUBMIT_PATH_REVIEW1", Arrays.toString(e.getStackTrace()));
                             callback.onSubmitReviewFailure();
                         }
@@ -100,13 +100,11 @@ public class Review {
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
                     Log.e("SUBMIT_PATH_REVIEW2", Arrays.toString(t.getStackTrace()));
                     callback.onSubmitReviewFailure();
                 }
             });
         } catch (JSONException e) {
-            Toast.makeText(context, "Failed to submit review...", Toast.LENGTH_SHORT).show();
             Log.e("SUBMIT_PATH_REVIEW3", Arrays.toString(e.getStackTrace()));
             callback.onSubmitReviewFailure();
         }
