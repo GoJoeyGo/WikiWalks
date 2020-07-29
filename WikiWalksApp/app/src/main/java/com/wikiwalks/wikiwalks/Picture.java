@@ -22,7 +22,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Picture implements Parcelable {
+public class Picture {
     private int id;
     private int parentId;
     private String url;
@@ -32,16 +32,6 @@ public class Picture implements Parcelable {
     private String submitter;
     private boolean editable;
     private PictureType type;
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-    }
 
     public enum PictureType {PATH, POINT_OF_INTEREST}
 
