@@ -49,6 +49,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
         Toolbar toolbar = rootView.findViewById(R.id.settings_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle("Settings");
         Button setNameButton = rootView.findViewById(R.id.settings_set_name_button);
         setNameButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
         return rootView;

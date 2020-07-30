@@ -1,13 +1,16 @@
 package com.wikiwalks.wikiwalks.ui;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,8 +29,10 @@ import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.Route;
+import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
+import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PointOfInterestListRecyclerViewAdapter;
 
-public class PointOfInterestFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class PointOfInterestFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestEditCallback {
 
     Toolbar toolbar;
     GoogleMap mMap;
@@ -35,6 +40,7 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
     Button reviewsButton;
     Button picturesButton;
     SupportMapFragment mapFragment;
+    EditNameDialog editNameDialog;
 
     public static PointOfInterestFragment newInstance(int pointOfInterestId) {
         Bundle args = new Bundle();
@@ -53,6 +59,23 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
         toolbar = rootView.findViewById(R.id.poi_frag_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        if (pointOfInterest.isEditable()) toolbar.getMenu().getItem(0).setVisible(true);
+        toolbar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.point_of_interest_menu_edit:
+                    EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, pointOfInterest.getId()).show(getChildFragmentManager(), "EditPopup");
+                    break;
+
+                case R.id.point_of_interest_menu_delete:
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Confirm Deletion")
+                            .setMessage("Are you sure you want to delete this route?")
+                            .setPositiveButton("Yes", (dialog, which) -> pointOfInterest.delete(getContext(), this))
+                            .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create().show();
+                    break;
+            }
+            return false;
+        });
         toolbar.setTitle(pointOfInterest.getName());
         TextView description = rootView.findViewById(R.id.poi_frag_description);
         description.setText("Point of interest on " + pointOfInterest.getPath().getName());
@@ -86,5 +109,39 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
     @Override
     public boolean onMarkerClick(Marker marker) {
         return true;
+    }
+
+    @Override
+    public void setEditNameDialog(EditNameDialog editNameDialog) {
+        this.editNameDialog = editNameDialog;
+    }
+
+    @Override
+    public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
+        pointOfInterest.edit(getContext(), name, this);
+    }
+
+    @Override
+    public void onEditPointOfInterestSuccess() {
+        toolbar.setTitle(pointOfInterest.getName());
+        editNameDialog.dismiss();
+    }
+
+    @Override
+    public void onEditPointOfInterestFailure() {
+        Toast.makeText(getContext(), "Failed to edit point of interest...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDeletePointOfInterestSuccess() {
+        if (getTargetFragment() instanceof PointOfInterestListFragment) {
+            ((PointOfInterestListFragment) getTargetFragment()).update();
+        }
+        getParentFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onDeletePointOfInterestFailure() {
+        Toast.makeText(getContext(), "Failed to delete point of interest...", Toast.LENGTH_SHORT).show();
     }
 }

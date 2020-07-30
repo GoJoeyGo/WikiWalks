@@ -14,11 +14,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 /**
@@ -49,7 +51,7 @@ public class GetPathIntegrationTests {
         bounds = new LatLngBounds(new LatLng(-90, -180), new LatLng(90, 179));
         pathMap.updatePaths(bounds, appContext);
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(bounds.northeast.longitude == 180);
+        assertTrue(PathMap.getInstance().getPathList().size() > 0);
     }
 
     @Test
@@ -65,6 +67,17 @@ public class GetPathIntegrationTests {
             }
         }
         assertTrue(inRange);
+    }
+
+    @Test
+    public void makeNewRoute() {
+        ArrayList<Double> latitudes = new ArrayList<>();
+        ArrayList<Double> longitudes = new ArrayList<>();
+        ArrayList<Double> altitudes = new ArrayList<>();
+        latitudes.add(1.00);
+        longitudes.add(1.00);
+        altitudes.add(1.00);
+        Route.submit(appContext, null, "Test Path", latitudes, longitudes, altitudes, mock(Route.RouteModifyCallback.class));
     }
 
 }

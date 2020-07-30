@@ -1,4 +1,36 @@
 <resources>
     <string name="app_name">WikiWalks</string>
     <string name="title_activity_maps">Map</string>
+    <string name="reviews">Reviews</string>
+    <string name="pictures">Pictures</string>
+    <string name="points_of_interest">Points of Interest</string>
+    <string name="select_route">SELECT ROUTE</string>
+    <string name="record_new_route">RECORD NEW ROUTE</string>
+    <string name="explore">EXPLORE</string>
+    <string name="delete_route">DELETE ROUTE</string>
+    <string name="no_bookmarks">No bookmarks!</string>
+    <string name="set_name">Set Name</string>
+    <string name="name">Name</string>
+    <string name="save">SAVE</string>
+    <string name="cancel">CANCEL</string>
+    <string name="picture">Picture</string>
+    <string name="from_camera">FROM CAMERA</string>
+    <string name="from_gallery">FROM GALLERY</string>
+    <string name="description">Description</string>
+    <string name="delete">DELETE</string>
+    <string name="review">Review</string>
+    <string name="create_new_path">CREATE NEW PATH</string>
+    <string name="open_settings">OPEN SETTINGS</string>
+    <string name="no_pictures">No pictures!</string>
+    <string name="submit_picture">SUBMIT PICTURE</string>
+    <string name="stop_recording">STOP RECORDING</string>
+    <string name="mark_point">MARK POINT</string>
+    <string name="no_reviews">No reviews!</string>
+    <string name="you">You</string>
+    <string name="write_review">WRITE REVIEW</string>
+    <string name="import_data">IMPORT DATA</string>
+    <string name="export_data">EXPORT DATA</string>
+    <string name="direction_arrow">Direction Arrow</string>
+    <string name="add_photo">ADD PHOTO</string>
+    <string name="no_points_of_interest">No points of interest!</string>
 </resources>

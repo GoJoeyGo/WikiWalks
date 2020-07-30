@@ -21,17 +21,8 @@
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="?attr/colorOnBackground">
-
-            <ImageButton
-                android:id="@+id/edit_title_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:background="#00FFFFFF"
-                android:contentDescription="Edit Title"
-                android:scaleType="center"
-                android:src="@drawable/ic_baseline_edit_24" />
+            app:titleTextColor="?attr/colorOnBackground"
+            app:menu="@menu/path_menu">
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -92,7 +83,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Points of Interest"
+                android:text="@string/points_of_interest"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/path_frag_walk_count" />
 
@@ -105,7 +96,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Reviews"
+                android:text="@string/reviews"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/path_frag_pois_button" />
 
@@ -117,7 +108,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Pictures"
+                android:text="@string/pictures"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/path_frag_reviews_button" />
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -142,7 +133,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:fontFamily="monospace"
-            android:text="SELECT ROUTE"
+            android:text="@string/select_route"
             app:layout_constraintEnd_toStartOf="@id/new_route_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -153,7 +144,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="RECORD NEW ROUTE"
+            android:text="@string/record_new_route"
             app:layout_constraintEnd_toStartOf="@id/explore_button"
             app:layout_constraintStart_toEndOf="@id/select_route_button"
             app:layout_constraintTop_toTopOf="parent" />
@@ -166,7 +157,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:fontFamily="monospace"
-            android:text="EXPLORE"
+            android:text="@string/explore"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/new_route_button"
             app:layout_constraintTop_toTopOf="parent" />

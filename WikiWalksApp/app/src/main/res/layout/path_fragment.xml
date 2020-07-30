@@ -40,28 +40,8 @@
                 app:contentInsetStart="16dp"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="?attr/colorOnBackground">
-
-                <ImageButton
-                    android:id="@+id/edit_title_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|end"
-                    android:background="#00FFFFFF"
-                    android:contentDescription="Edit Title"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_baseline_edit_24"
-                    android:layout_marginLeft="8dp"/>
-
-                <ImageButton
-                    android:id="@+id/bookmark_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|end"
-                    android:background="#00FFFFFF"
-                    android:contentDescription="Bookmark"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_baseline_bookmark_border_24" />
+                app:titleTextColor="?attr/colorOnBackground"
+                app:menu="@menu/path_menu">
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -107,7 +87,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Points of Interest"
+                android:text="@string/points_of_interest"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/path_frag_walk_count" />
 
@@ -120,7 +100,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Reviews"
+                android:text="@string/reviews"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/path_frag_pois_button" />
 
@@ -132,7 +112,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Pictures"
+                android:text="@string/pictures"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/path_frag_reviews_button" />
 
@@ -157,7 +137,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="SELECT ROUTE"
+            android:text="@string/select_route"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -168,7 +148,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="RECORD NEW ROUTE"
+            android:text="@string/record_new_route"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/select_route_button" />
@@ -179,7 +159,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="EXPLORE"
+            android:text="@string/explore"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/new_route_button" />

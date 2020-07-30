@@ -10,7 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="?attr/colorBackgroundFloating"
+        app:titleTextColor="?attr/colorOnBackground">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/settings_toolbar"
@@ -19,7 +21,6 @@
             android:background="?attr/colorBackgroundFloating"
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
-            app:title="Settings"
             app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -44,7 +45,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="SET NAME"
+                android:text="@string/set_name"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -56,7 +57,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="IMPORT DATA"
+                android:text="@string/import_data"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/settings_set_name_button" />
 
@@ -68,7 +69,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="EXPORT DATA"
+                android:text="@string/export_data"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/settings_import_settings_button" />
 

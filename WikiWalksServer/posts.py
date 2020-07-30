@@ -182,13 +182,9 @@ def edit_poi(poi_id):
     try:
         poi_schema = PointOfInterestSchema()
         request_json = request.get_json(force=True)["attributes"]
-        user = get_submitter(request_json["device_id"])
         poi = PointOfInterest.query.filter_by(id=poi_id)
-        if poi.first() in user.points_of_interest:
-            poi.update(dict(poi_schema.load(request_json, partial=True)))
-            db.session.commit()
-        else:
-            return jsonify({"status": "failed"}), 403
+        poi.update(dict(poi_schema.load(request_json, partial=True)))
+        db.session.commit()
         return jsonify({"status": "success"}), 201
     except Exception as e:
         print(e)

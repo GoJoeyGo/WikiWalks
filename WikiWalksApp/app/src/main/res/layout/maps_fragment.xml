@@ -20,24 +20,8 @@
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
             app:layout_constraintHorizontal_bias="1.0"
-            app:titleTextColor="?attr/colorOnBackground">
-
-            <ImageButton
-                android:id="@+id/settings_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:background="@drawable/ic_settings_black_24dp"
-                android:contentDescription="Settings"
-                android:layout_marginLeft="8dp"/>
-
-            <ImageButton
-                android:id="@+id/bookmarks_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:background="@drawable/ic_baseline_bookmarks_24"
-                android:contentDescription="Settings" />
+            app:titleTextColor="?attr/colorOnBackground"
+            app:menu="@menu/maps_menu">
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -67,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="CREATE NEW PATH"
+            android:text="@string/create_new_path"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

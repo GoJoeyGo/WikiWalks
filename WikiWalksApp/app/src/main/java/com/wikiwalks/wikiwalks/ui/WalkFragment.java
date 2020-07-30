@@ -59,6 +59,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
     private Toolbar toolbar;
+    Button markPointButton;
 
     public static WalkFragment newInstance(int pathId, int routeNumber) {
         Bundle args = new Bundle();
@@ -89,7 +90,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(path.getName());
-        Button markPointButton = rootView.findViewById(R.id.mark_poi_button);
+        markPointButton = rootView.findViewById(R.id.mark_poi_button);
         markPointButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "EditPopup"));
         Button addPhotoButton = rootView.findViewById(R.id.take_picture_button);
         addPhotoButton.setOnClickListener(v -> EditPictureDialog.newInstance(Picture.PictureType.PATH, path.getId(), -1, null).show(getChildFragmentManager(), "PicturePopup"));
@@ -155,6 +156,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
 
     private void onLocationChanged(Location location) {
         lastLocation = location;
+        markPointButton.setEnabled(true);
         CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom).bearing(location.getBearing()).build();
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
         boolean inRange = false;

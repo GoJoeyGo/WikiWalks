@@ -21,8 +21,7 @@
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
-            app:titleTextColor="?attr/colorOnBackground">
-        </androidx.appcompat.widget.Toolbar>
+            app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
@@ -30,7 +29,7 @@
         style="@style/TextTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No bookmarks!"
+        android:text="@string/no_bookmarks"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

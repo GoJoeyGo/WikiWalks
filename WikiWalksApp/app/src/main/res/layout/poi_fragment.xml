@@ -40,7 +40,8 @@
                 app:contentInsetStart="16dp"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="?attr/colorOnBackground" />
+                app:titleTextColor="?attr/colorOnBackground"
+                app:menu="@menu/point_of_interest_menu"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -85,7 +86,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Reviews"
+                android:text="@string/reviews"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/poi_frag_description" />
 
@@ -97,7 +98,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Pictures"
+                android:text="@string/pictures"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/poi_frag_reviews_button" />
 

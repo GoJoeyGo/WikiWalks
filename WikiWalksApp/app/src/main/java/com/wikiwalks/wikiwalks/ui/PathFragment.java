@@ -7,6 +7,7 @@ import android.util.ArraySet;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -47,8 +48,6 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     Button selectRouteButton;
     Button recordRouteButton;
     Button exploreButton;
-    ImageButton editButton;
-    ImageButton bookmarkButton;
     SupportMapFragment mapFragment;
     Path path;
     ConstraintLayout walkPathOptions;
@@ -78,6 +77,18 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         toolbar = rootView.findViewById(R.id.path_frag_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setOnMenuItemClickListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.path_menu_edit:
+                    EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, path.getId()).show(getChildFragmentManager(), "EditPopup");
+                    break;
+
+                case R.id.path_menu_bookmark:
+                    bookmark();
+                    menuItem.setIcon((bookmarked) ? R.drawable.ic_baseline_bookmark_24 : R.drawable.ic_baseline_bookmark_border_24);
+            }
+            return true;
+        });
         toolbar.setTitle(path.getName());
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
         selectRouteButton.setOnClickListener(view -> {
@@ -89,10 +100,6 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         recordRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path.getId())).addToBackStack(null).commit());
         exploreButton = rootView.findViewById(R.id.explore_button);
         exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path.getId(), -1)).addToBackStack(null).commit());
-        editButton = rootView.findViewById(R.id.edit_title_button);
-        editButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, path.getId()).show(getChildFragmentManager(), "EditPopup"));
-        bookmarkButton = rootView.findViewById(R.id.bookmark_button);
-        bookmarkButton.setOnClickListener(v -> bookmark());
         SharedPreferences preferences = getContext().getSharedPreferences("preferences", MODE_PRIVATE);
         String bookmarks = preferences.getString("bookmarks", "");
         String[] bookmarksArray = bookmarks.split(",");
@@ -100,7 +107,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
             for (String bookmark : bookmarksArray) {
                 if (Integer.parseInt(bookmark) == path.getId()) {
                     bookmarked = true;
-                    bookmarkButton.setImageResource(R.drawable.ic_baseline_bookmark_24);
+                    toolbar.getMenu().getItem(0).setIcon(R.drawable.ic_baseline_bookmark_24);
                     break;
                 }
             }
@@ -130,11 +137,9 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         String bookmarks = preferences.getString("bookmarks", "");
         ArrayList<String> bookmarksList = (bookmarks == "") ? new ArrayList<>() : new ArrayList<>(Arrays.asList(bookmarks.split(",")));
         if (!bookmarked) {
-            bookmarkButton.setImageResource(R.drawable.ic_baseline_bookmark_24);
             bookmarksList.add(String.valueOf(path.getId()));
             bookmarked = true;
         } else {
-            bookmarkButton.setImageResource(R.drawable.ic_baseline_bookmark_border_24);
             bookmarksList.remove(String.valueOf(path.getId()));
             bookmarked = false;
         }

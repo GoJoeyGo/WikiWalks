@@ -46,7 +46,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     Toolbar toolbar;
     EditNameDialog editNameDialog;
     private boolean recording = true;
-    private Context context;
+    public Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
     private Button stopRecordingButton;
@@ -60,6 +60,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     private ArrayList<Double> poiLongitudes = new ArrayList<>();
     private int submittedPointsOfInterest = 0;
     private Location lastLocation;
+    Button markPointButton;
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -149,7 +150,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
             }
         });
-        Button markPointButton = rootView.findViewById(R.id.recording_mark_poi_button);
+        markPointButton = rootView.findViewById(R.id.recording_mark_poi_button);
         markPointButton.setOnClickListener(v -> {
             EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "SubmissionPopup");
         });
@@ -157,10 +158,6 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         mapFragment.getMapAsync(this);
         context = getContext();
         return rootView;
-    }
-
-    public void setmMap(GoogleMap mMap) {
-        this.mMap = mMap;
     }
 
     @Override
@@ -201,7 +198,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
     public void onLocationChanged(Location location) {
         addLocation(location);
-
+        markPointButton.setEnabled(true);
         CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom).bearing(location.getBearing()).build();
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
 
@@ -222,15 +219,15 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         new MaterialAlertDialogBuilder(context).setTitle("Submit?").setPositiveButton("Yes", (dialog, which) -> {
             if (newPath)
                 EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
-            else submitRoute("");
+            else submitRoute("", this);
         }).setNegativeButton("No", (dialog, which) -> dialog.dismiss()).show();
     }
 
-    public void submitRoute(String title) {
+    public void submitRoute(String title, Route.RouteModifyCallback callback) {
         if (title.equals("")) {
             title = String.format("Path at %f, %f", latitudes.get(0), longitudes.get(0));
         }
-        Route.submit(this.getContext(), path, title, latitudes, longitudes, altitudes, this);
+        Route.submit(this.context, path, title, latitudes, longitudes, altitudes, callback);
     }
 
     @Override
@@ -238,7 +235,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         if (editNameDialog != null) editNameDialog.dismiss();
         if (poiNames.size() > 0) {
             for (int i = 0; i < poiNames.size(); i++) {
-                PointOfInterest.submit(getContext(), poiNames.get(i), poiLatitudes.get(i), poiLongitudes.get(i), path, this);
+                PointOfInterest.submit(this.context, poiNames.get(i), poiLatitudes.get(i), poiLongitudes.get(i), path, this);
             }
         } else getParentFragmentManager().popBackStack();
     }
@@ -271,7 +268,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
     @Override
     public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
-        if (type == EditNameDialog.EditNameDialogType.PATH) submitRoute(name);
+        if (type == EditNameDialog.EditNameDialogType.PATH) submitRoute(name, this);
         else {
             if (name.isEmpty())
                 name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());

@@ -20,10 +20,10 @@
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="?attr/colorOnBackground"></androidx.appcompat.widget.Toolbar>
+            app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.fragment.app.FragmentContainerView
+    <com.google.android.gms.maps.MapView
         android:id="@+id/map_poi_preview_frag"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
@@ -80,7 +80,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Reviews"
+                android:text="@string/reviews"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/poi_frag_description" />
 
@@ -92,7 +92,7 @@
                 android:drawableEnd="@drawable/chevron"
                 android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="Pictures"
+                android:text="@string/pictures"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/poi_frag_reviews_button" />
 

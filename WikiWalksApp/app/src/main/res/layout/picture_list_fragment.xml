@@ -29,7 +29,7 @@
         style="@style/TextTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No pictures!"
+        android:text="@string/no_pictures"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/path_submit_picture_background"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +69,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="10dp"
             android:fontFamily="monospace"
-            android:text="SUBMIT PICTURE"
+            android:text="@string/add_photo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

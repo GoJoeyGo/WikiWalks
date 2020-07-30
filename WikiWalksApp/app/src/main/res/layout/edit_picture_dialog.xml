@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="Picture"
+            android:text="@string/picture"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,10 +39,11 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:fontFamily="monospace"
-            android:text="FROM CAMERA"
+            android:text="@string/from_camera"
             app:layout_constraintEnd_toStartOf="@id/picture_popup_gallery_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_selected_image" />
+            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_selected_image"
+            android:layout_marginEnd="10dp" />
 
         <Button
             android:id="@+id/picture_popup_gallery_button"
@@ -50,7 +51,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="FROM GALLERY"
+            android:text="@string/from_gallery"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/picture_popup_camera_button"
             app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_selected_image" />
@@ -60,7 +61,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Description"
+            android:hint="@string/description"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -81,7 +82,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="SAVE"
+            android:text="@string/save"
             app:layout_constraintEnd_toStartOf="@id/edit_picture_popup_delete_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_description" />
@@ -94,7 +95,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:fontFamily="monospace"
-            android:text="DELETE"
+            android:text="@string/delete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/edit_picture_popup_submit_button"
             app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_description" />
@@ -105,7 +106,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="CANCEL"
+            android:text="@string/cancel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_submit_button" />

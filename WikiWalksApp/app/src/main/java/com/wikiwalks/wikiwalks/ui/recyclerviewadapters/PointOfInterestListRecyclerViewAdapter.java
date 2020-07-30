@@ -38,7 +38,11 @@ public class PointOfInterestListRecyclerViewAdapter extends RecyclerView.Adapter
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.button.setText(pointOfInterestList.get(position).getName());
-        holder.button.setOnClickListener(v -> context.getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestFragment.newInstance(pointOfInterestList.get(position).getId())).addToBackStack(null).commit());
+        holder.button.setOnClickListener(v -> {
+            PointOfInterestFragment newFragment = PointOfInterestFragment.newInstance(pointOfInterestList.get(position).getId());
+            newFragment.setTargetFragment(context, 0);
+            context.getParentFragmentManager().beginTransaction().add(R.id.main_frame, newFragment).addToBackStack("point_of_interest_list").commit();
+        });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.button.getCompoundDrawablesRelative()[0].setTint(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}));
         } else {

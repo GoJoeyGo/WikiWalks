@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.dx.command.Main;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -38,6 +39,7 @@ public class PointOfInterest {
     private double rating;
     private boolean editable;
     private Path path;
+    private ArrayList<Marker> markers = new ArrayList<>();
 
     public PointOfInterest(int id, String name, double rating, double latitude, double longitude, Path path, boolean editable) {
         this.id = id;
@@ -116,6 +118,7 @@ public class PointOfInterest {
 
     public Marker makeMarker(GoogleMap map, float hue) {
         Marker marker = map.addMarker(new MarkerOptions().position(coordinates).icon(BitmapDescriptorFactory.defaultMarker(hue)));
+        markers.add(marker);
         marker.setTag(id);
         return marker;
     }
@@ -134,6 +137,71 @@ public class PointOfInterest {
 
     public ArrayList<Picture> getPicturesList() {
         return picturesList;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void edit(Context context, String name, PointOfInterestEditCallback callback) {
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+            attributes.put("name", name);
+            request.put("attributes", attributes);
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> editPointOfInterest = MainActivity.getRetrofitRequests(context).editPoI(id, body);
+            editPointOfInterest.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    if (response.isSuccessful()) {
+                        PointOfInterest.this.name = name;
+                        callback.onEditPointOfInterestSuccess();
+                    }
+                    else callback.onEditPointOfInterestFailure();
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    callback.onEditPointOfInterestFailure();
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+            callback.onEditPointOfInterestFailure();
+        }
+    }
+
+    public void delete(Context context, PointOfInterestEditCallback callback) {
+        JSONObject request = new JSONObject();
+        JSONObject attributes = new JSONObject();
+        try {
+            attributes.put("device_id", MainActivity.getDeviceId(context));
+            request.put("attributes", attributes);
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> editPointOfInterest = MainActivity.getRetrofitRequests(context).deletePoI(id, body);
+            editPointOfInterest.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    if (response.isSuccessful()) {
+                        path.getPointsOfInterest().remove(PointOfInterest.this);
+                        for (Marker marker : markers) marker.remove();
+                        markers.clear();
+                        PathMap.getInstance().getPointOfInterestList().remove(id);
+                        callback.onDeletePointOfInterestSuccess();
+                    }
+                    else callback.onDeletePointOfInterestFailure();
+                }
+
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    callback.onEditPointOfInterestFailure();
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+            callback.onDeletePointOfInterestFailure();
+        }
     }
 
     public void getReviews(Context context, boolean refresh, Review.GetReviewCallback callback) {
@@ -278,6 +346,13 @@ public class PointOfInterest {
     public interface PointOfInterestSubmitCallback {
         void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest);
         void onSubmitPointOfInterestFailure();
+    }
+
+    public interface PointOfInterestEditCallback {
+        void onEditPointOfInterestSuccess();
+        void onEditPointOfInterestFailure();
+        void onDeletePointOfInterestSuccess();
+        void onDeletePointOfInterestFailure();
     }
 
 }

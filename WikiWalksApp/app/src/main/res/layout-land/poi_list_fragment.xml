@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorBackgroundFloating">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/poi_list_frag_toolbar_wrapper"
@@ -21,7 +22,7 @@
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="?attr/colorOnBackground"></androidx.appcompat.widget.Toolbar>
+            app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
@@ -35,32 +36,25 @@
         app:layout_constraintWidth_percent="0.5"
         tools:context=".ui.main.PointOfInterestListFragment" />
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/poi_list_recyclerview"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="?attr/colorBackgroundFloating"
-        android:clipToPadding="false"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintTop_toBottomOf="@id/poi_list_frag_toolbar_wrapper"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="0.5"
         app:layout_constraintStart_toEndOf="@id/map_poi_list_frag"
-        app:layout_constraintTop_toBottomOf="@id/poi_list_frag_toolbar_wrapper">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp">
+    <TextView
+        android:id="@+id/no_points_indicator"
+        style="@style/TextTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_points_of_interest"
+        app:layout_constraintTop_toBottomOf="@id/poi_list_frag_toolbar_wrapper"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/map_poi_list_frag"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/poi_list_recyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_editor_absoluteY="49dp" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

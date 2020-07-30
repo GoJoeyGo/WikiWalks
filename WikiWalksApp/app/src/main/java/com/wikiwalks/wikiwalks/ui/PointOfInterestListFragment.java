@@ -1,15 +1,18 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,7 +31,7 @@ import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PointOfInterestListRecycl
 
 import java.util.ArrayList;
 
-public class PointOfInterestListFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class PointOfInterestListFragment extends Fragment implements OnMapReadyCallback {
 
     Toolbar toolbar;
     Path path;
@@ -39,6 +42,7 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
     RecyclerView recyclerView;
     PointOfInterestListRecyclerViewAdapter recyclerViewAdapter;
     SupportMapFragment mapFragment;
+    TextView noPointsIndicator;
 
     public static PointOfInterestListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -59,12 +63,29 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Points of Interest - " + path.getName());
+        noPointsIndicator = rootView.findViewById(R.id.no_points_indicator);
         recyclerView = rootView.findViewById(R.id.poi_list_recyclerview);
         recyclerViewAdapter = new PointOfInterestListRecyclerViewAdapter(this, pointOfInterestList);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        if (pointOfInterestList.size() == 0) {
+            recyclerView.setVisibility(View.GONE);
+            noPointsIndicator.setVisibility(View.VISIBLE);
+        }
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_poi_list_frag);
         return rootView;
+    }
+
+    public void update() {
+        if (pointOfInterestList.size() == 0) {
+            recyclerView.setVisibility(View.GONE);
+            noPointsIndicator.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            noPointsIndicator.setVisibility(View.GONE);
+            recyclerViewAdapter.notifyDataSetChanged();
+            recyclerViewAdapter.notifyItemRangeChanged(0, pointOfInterestList.size());
+        }
     }
 
     @Override
@@ -82,12 +103,7 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
             markers.add(pointOfInterestList.get(i).makeMarker(googleMap, ((i * 50) % 360)));
         }
         googleMap.getUiSettings().setAllGesturesEnabled(false);
-        mMap.setOnMarkerClickListener(this);
+        googleMap.setOnMarkerClickListener(marker -> true);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
-    }
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        return true;
     }
 }

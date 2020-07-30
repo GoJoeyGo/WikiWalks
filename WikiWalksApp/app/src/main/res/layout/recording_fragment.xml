@@ -49,7 +49,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="STOP RECORDING"
+            android:text="@string/stop_recording"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/recording_mark_poi_button"
@@ -62,11 +62,12 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="MARK POINT"
+            android:text="@string/mark_point"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/stop_recording_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:enabled="false"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
