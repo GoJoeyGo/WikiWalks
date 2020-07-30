@@ -53,6 +53,7 @@ public class Path {
     }
 
     public Path() {
+        id = -1;
     }
 
     public Path(JSONObject pathJson) throws JSONException {
@@ -171,18 +172,20 @@ public class Path {
         return marker;
     }
 
-    public void update(Context context) {
+    public static void getPath(Context context, int id, GetPathCallback callback) {
         Call<JsonElement> updatePath = MainActivity.getRetrofitRequests(context).updatePath(id);
         updatePath.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
                     try {
-                        JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path");
-                        PathMap.getInstance().addPath(new Path(responseJson));
+                        Path newPath = new Path(new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path"));
+                        PathMap.getInstance().addPath(newPath);
+                        callback.onGetPathSuccess(newPath);
                     } catch (JSONException e) {
                         Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
                         Log.e("UPDATE_PATH1", Arrays.toString(e.getStackTrace()));
+                        callback.onGetPathFailure();
                     }
                 }
             }
@@ -191,6 +194,7 @@ public class Path {
             public void onFailure(Call<JsonElement> call, Throwable t) {
                 Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
                 Log.e("UPDATE_PATH2", Arrays.toString(t.getStackTrace()));
+                callback.onGetPathFailure();
             }
         });
     }
@@ -382,6 +386,11 @@ public class Path {
                 callback.onGetPicturesFailure();
             }
         }
+    }
+
+    public interface GetPathCallback {
+        void onGetPathSuccess(Path path);
+        void onGetPathFailure();
     }
 
     public interface PathChangeCallback {

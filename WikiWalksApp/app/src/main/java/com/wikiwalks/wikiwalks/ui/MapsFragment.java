@@ -54,8 +54,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         final View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
         toolbar = rootView.findViewById(R.id.main_toolbar);
         toolbar.setTitle(R.string.app_name);
+
         ImageButton settingsButton = rootView.findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, SettingsFragment.newInstance()).addToBackStack(null).commit());
+        ImageButton bookmarksButton = rootView.findViewById(R.id.bookmarks_button);
+        bookmarksButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, BookmarksFragment.newInstance()).addToBackStack(null).commit());
         createPath = rootView.findViewById(R.id.create_path_button);
         createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack("Map").commit());
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);

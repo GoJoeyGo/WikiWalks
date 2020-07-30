@@ -28,6 +28,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:background="@drawable/ic_settings_black_24dp"
+                android:contentDescription="Settings"
+                android:layout_marginLeft="8dp"/>
+
+            <ImageButton
+                android:id="@+id/bookmarks_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@drawable/ic_baseline_bookmarks_24"
                 android:contentDescription="Settings" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

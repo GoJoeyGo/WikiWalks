@@ -50,7 +50,18 @@
                     android:background="#00FFFFFF"
                     android:contentDescription="Edit Title"
                     android:scaleType="center"
-                    android:src="@drawable/ic_baseline_edit_24" />
+                    android:src="@drawable/ic_baseline_edit_24"
+                    android:layout_marginLeft="8dp"/>
+
+                <ImageButton
+                    android:id="@+id/bookmark_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:background="#00FFFFFF"
+                    android:contentDescription="Bookmark"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_baseline_bookmark_border_24" />
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>

@@ -1,7 +1,12 @@
 package com.wikiwalks.wikiwalks.ui;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.ArraySet;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -10,6 +15,10 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -28,6 +37,9 @@ import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class PathFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Path.PathChangeCallback, PathMap.PathMapListener {
 
@@ -36,6 +48,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     Button recordRouteButton;
     Button exploreButton;
     ImageButton editButton;
+    ImageButton bookmarkButton;
     SupportMapFragment mapFragment;
     Path path;
     ConstraintLayout walkPathOptions;
@@ -46,6 +59,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     EditNameDialog editNameDialog;
     ArrayList<Polyline> polylines = new ArrayList<>();
     GoogleMap mMap;
+    boolean bookmarked = false;
 
     public static PathFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -77,6 +91,20 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path.getId(), -1)).addToBackStack(null).commit());
         editButton = rootView.findViewById(R.id.edit_title_button);
         editButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, path.getId()).show(getChildFragmentManager(), "EditPopup"));
+        bookmarkButton = rootView.findViewById(R.id.bookmark_button);
+        bookmarkButton.setOnClickListener(v -> bookmark());
+        SharedPreferences preferences = getContext().getSharedPreferences("preferences", MODE_PRIVATE);
+        String bookmarks = preferences.getString("bookmarks", "");
+        String[] bookmarksArray = bookmarks.split(",");
+        if (!(bookmarksArray.length == 1 && bookmarksArray[0] == "")) {
+            for (String bookmark : bookmarksArray) {
+                if (Integer.parseInt(bookmark) == path.getId()) {
+                    bookmarked = true;
+                    bookmarkButton.setImageResource(R.drawable.ic_baseline_bookmark_24);
+                    break;
+                }
+            }
+        }
         pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);
         pointOfInterestButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestListFragment.newInstance(path.getId())).addToBackStack(null).commit());
         reviewButton = rootView.findViewById(R.id.path_frag_reviews_button);
@@ -95,6 +123,22 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         walkCount.setText(walkCountString);
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
         return rootView;
+    }
+
+    private void bookmark() {
+        SharedPreferences preferences = getContext().getSharedPreferences("preferences", MODE_PRIVATE);
+        String bookmarks = preferences.getString("bookmarks", "");
+        ArrayList<String> bookmarksList = (bookmarks == "") ? new ArrayList<>() : new ArrayList<>(Arrays.asList(bookmarks.split(",")));
+        if (!bookmarked) {
+            bookmarkButton.setImageResource(R.drawable.ic_baseline_bookmark_24);
+            bookmarksList.add(String.valueOf(path.getId()));
+            bookmarked = true;
+        } else {
+            bookmarkButton.setImageResource(R.drawable.ic_baseline_bookmark_border_24);
+            bookmarksList.remove(String.valueOf(path.getId()));
+            bookmarked = false;
+        }
+        preferences.edit().putString("bookmarks", TextUtils.join(",", bookmarksList)).apply();
     }
 
     @Override
