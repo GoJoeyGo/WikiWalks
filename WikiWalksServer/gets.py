@@ -128,6 +128,7 @@ def get_group_walks(path_id):
             upcoming_group_walks.append(group_walk)
     if request.method == "POST":
         request_json = request.get_json(force=True)["attributes"]
+        print(request.get_json(force=True))
         user = get_submitter(request_json["device_id"])
         for group_walk in upcoming_group_walks:
             if group_walk in user.group_walks:
