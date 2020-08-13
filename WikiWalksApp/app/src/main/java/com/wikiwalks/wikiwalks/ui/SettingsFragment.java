@@ -1,6 +1,7 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
@@ -27,10 +30,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -68,14 +78,14 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
         exportSettingsButton.setOnClickListener(v -> {
             Intent exportSettingsIntent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             exportSettingsIntent.addCategory(Intent.CATEGORY_OPENABLE);
-            exportSettingsIntent.setType("application/xml");
-            exportSettingsIntent.putExtra(Intent.EXTRA_TITLE, "wikiwalks_backup_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".xml");
+            exportSettingsIntent.setType("application/json");
+            exportSettingsIntent.putExtra(Intent.EXTRA_TITLE, "wikiwalks_backup_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".json");
             startActivityForResult(exportSettingsIntent, REQUEST_CODE_EXPORT);
         });
         Button importSettingsButton = rootView.findViewById(R.id.settings_import_settings_button);
         importSettingsButton.setOnClickListener(v -> {
             Intent importSettingsIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            importSettingsIntent.setType("application/xml");
+            importSettingsIntent.setType("application/json");
             importSettingsIntent.addCategory(Intent.CATEGORY_OPENABLE);
             startActivityForResult(importSettingsIntent, REQUEST_CODE_IMPORT);
         });
@@ -123,19 +133,33 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && data != null) {
-            File sharedPrefs = new File("/data/user/0/" + getContext().getPackageName() + "/shared_prefs/preferences.xml");
-            try {
-                InputStream inputStream = (requestCode == REQUEST_CODE_EXPORT) ? getContext().getContentResolver().openInputStream(Uri.fromFile(sharedPrefs)) : getContext().getContentResolver().openInputStream(data.getData());
-                OutputStream outputStream = (requestCode == REQUEST_CODE_EXPORT) ? getContext().getContentResolver().openOutputStream(data.getData()) : getContext().getContentResolver().openOutputStream(Uri.fromFile(sharedPrefs));
-                byte[] buffer = new byte[inputStream.available()];
-                inputStream.read(buffer);
-                outputStream.write(buffer);
-                outputStream.close();
-                inputStream.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("preferences", MODE_PRIVATE);
+            if (requestCode == REQUEST_CODE_EXPORT) {
+                JSONObject prefs = new JSONObject();
+                try {
+                    for (Map.Entry<String, ?> entry : sharedPreferences.getAll().entrySet()) {
+                        prefs.put(entry.getKey(), entry.getValue().toString());
+                    }
+                    OutputStream outputStream = getContext().getContentResolver().openOutputStream(data.getData());
+                    Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
+                    writer.write(prefs.toString());
+                    writer.close();
+                } catch (FileNotFoundException | JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    InputStream inputStream = getContext().getContentResolver().openInputStream(data.getData());
+                    JsonObject jsonObject = JsonParser.parseReader(new InputStreamReader(inputStream, "UTF-8")).getAsJsonObject();
+                    for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(entry.getKey(), entry.getValue().getAsString()).apply();
+                    }
+                } catch (FileNotFoundException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
