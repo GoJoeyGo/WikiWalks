@@ -2,9 +2,11 @@ package com.wikiwalks.wikiwalks.ui.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -40,7 +42,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class EditPictureDialog extends DialogFragment implements Picture.EditPictureCallback {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 0;
     static final int REQUEST_IMAGE_SELECT = 1;
     Picture.PictureType type;
     EditPictureDialogListener listener;
@@ -56,7 +58,6 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     AlertDialog confirmationDialog;
     Bitmap bitmap;
     Uri photoURI;
-    String filename;
 
     public static EditPictureDialog newInstance(Picture.PictureType type, int parentId, int position, Bitmap bitmap) {
         Bundle args = new Bundle();
@@ -125,14 +126,21 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         cameraButton.setOnClickListener(v -> {
             Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePicture.resolveActivity(getContext().getPackageManager()) != null) {
-                try {
-                    File photoFile = File.createTempFile(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + "_", ".jpg", getContext().getExternalFilesDir(Environment.DIRECTORY_DCIM));
-                    photoURI = FileProvider.getUriForFile(getContext(), "com.wikiwalks.wikiwalks.fileprovider", photoFile);
-                    takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
-                } catch (IOException ex) {
-                    Log.e("PATH_PHOTO", ex.toString());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg");
+                    contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+                    contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/" + getContext().getApplicationInfo().loadLabel(getContext().getPackageManager()).toString());
+                    photoURI = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                } else {
+                    File photoDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getContext().getApplicationInfo().loadLabel(getContext().getPackageManager()).toString());
+                    if (!photoDirectory.exists()) {
+                        photoDirectory.mkdir();
+                    }
+                    photoURI = FileProvider.getUriForFile(getContext(), "com.wikiwalks.wikiwalks.fileprovider", new File(photoDirectory, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg"));
                 }
+                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
             }
         });
         galleryButton = view.findViewById(R.id.picture_popup_gallery_button);
@@ -150,7 +158,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                 }
             } else {
                 if (photoURI != null) {
-                    Picture.submit(getContext(), type, parentId, filename, photoURI, title.getEditText().getText().toString(), this);
+                    Picture.submit(getContext(), type, parentId, photoURI, title.getEditText().getText().toString(), this);
                 }
             }
         });
@@ -178,7 +186,6 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         if (savedInstanceState != null) {
             title.getEditText().setText(savedInstanceState.getString("description"));
             if (savedInstanceState.containsKey("filename")) {
-                filename = savedInstanceState.getString("filename");
                 photoURI = Uri.parse(savedInstanceState.getString("uri"));
                 loadIntoImageView();
             }
@@ -218,22 +225,6 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_SELECT && data != null) {
                 photoURI = data.getData();
-                try {
-                    InputStream inputStream = getContext().getContentResolver().openInputStream(photoURI);
-                    byte[] buffer = new byte[inputStream.available()];
-                    inputStream.read(buffer);
-                    File targetFile = File.createTempFile(photoURI.getLastPathSegment(), ".jpg", getContext().getExternalCacheDir());
-                    filename = targetFile.getAbsolutePath();
-                    OutputStream outputStream = new FileOutputStream(targetFile);
-                    outputStream.write(buffer);
-                    outputStream.close();
-                    inputStream.close();
-                    targetFile.deleteOnExit();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                filename = getContext().getExternalFilesDir(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/" + photoURI.getLastPathSegment();
             }
             loadIntoImageView();
         }
@@ -244,7 +235,6 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     public void onSaveInstanceState(@NonNull Bundle outState) {
         if (photoURI != null) {
             outState.putString("uri", photoURI.toString());
-            outState.putString("filename", filename);
         }
         outState.putString("description", title.getEditText().getText().toString());
         super.onSaveInstanceState(outState);
