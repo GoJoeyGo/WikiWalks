@@ -23,6 +23,13 @@ public interface RetrofitRequests {
                                @Query("w") double west,
                                @Body RequestBody body);
 
+    @POST("/paths/{id}/group_walks/new")
+    Call<JsonElement> add_group_walk(@Path("id") int id, @Body RequestBody body
+    );
+
+    @POST("/paths/{Path_id}/group_walks/{id}/attend")
+    Call<JsonElement> toggle_group_walk_attendance(@Path("Path_id") int Path_id, @Path("id") int id, @Body RequestBody body
+    );
     @POST("/paths/{id}")
     Call<JsonElement> updatePath(@Path("id") int id);
 

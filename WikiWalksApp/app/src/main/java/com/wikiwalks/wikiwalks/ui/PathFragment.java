@@ -29,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
+import com.wikiwalks.wikiwalks.GroupWalk;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
@@ -48,6 +49,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     Button selectRouteButton;
     Button recordRouteButton;
     Button exploreButton;
+    Button groupWalkButton;
     SupportMapFragment mapFragment;
     Path path;
     ConstraintLayout walkPathOptions;
@@ -128,6 +130,8 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
             walkCountString = String.format("Path has been walked %s times.", path.getWalkCount());
         }
         walkCount.setText(walkCountString);
+        groupWalkButton  = rootView.findViewById(R.id.groupWalk_button);
+        groupWalkButton.setOnClickListener(v -> GroupWalk.createGroupWalk(getContext(),path.getId()));
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
         return rootView;
     }
