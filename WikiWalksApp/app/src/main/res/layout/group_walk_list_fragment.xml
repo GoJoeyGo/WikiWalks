@@ -6,7 +6,7 @@
     android:background="?attr/colorBackgroundFloating">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/path_picture_list_toolbar_wrapper"
+        android:id="@+id/group_walk_list_toolbar_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorBackgroundFloating"
@@ -15,7 +15,7 @@
         app:titleTextColor="?attr/colorOnBackground">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/path_picture_list_toolbar"
+            android:id="@+id/path_group_walk_list_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
@@ -25,27 +25,27 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
-        android:id="@+id/no_pictures_indicator"
+        android:id="@+id/no_group_walks_indicator"
         style="@style/TextTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_pictures"
+        android:text="@string/no_walks_scheduled"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/submit_group_walk_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/path_picture_list_toolbar_wrapper" />
+        app:layout_constraintTop_toBottomOf="@id/group_walk_list_toolbar_wrapper" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/picture_list_swipe_refresh_layout"
+        android:id="@+id/group_walk_list_swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/submit_group_walk_background"
-        app:layout_constraintTop_toBottomOf="@id/path_picture_list_toolbar_wrapper">
+        app:layout_constraintTop_toBottomOf="@id/group_walk_list_toolbar_wrapper">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/path_picture_list_recyclerview"
+            android:id="@+id/path_group_walk_list_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:paddingBottom="0dp" />
@@ -69,7 +69,7 @@
             android:layout_height="50dp"
             android:layout_marginBottom="10dp"
             android:fontFamily="monospace"
-            android:text="@string/add_photo"
+            android:text="@string/schedule_group_walk"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

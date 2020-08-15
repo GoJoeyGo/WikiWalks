@@ -34,6 +34,7 @@ public class Path {
     private ArrayList<PointOfInterest> pointsOfInterest = new ArrayList<>();
     private ArrayList<Picture> pictures = new ArrayList<>();
     private ArrayList<Review> reviews = new ArrayList<>();
+    private ArrayList<GroupWalk> groupWalks = new ArrayList<>();
     private Review ownReview;
     private int nextReviewPage = 1;
     private int nextPicturePage = 1;
@@ -43,6 +44,16 @@ public class Path {
     private ArrayList<Marker> markers = new ArrayList<>();
     private LatLng markerPoint;
     private LatLngBounds bounds;
+
+    public interface GetPathCallback {
+        void onGetPathSuccess(Path path);
+        void onGetPathFailure();
+    }
+
+    public interface PathChangeCallback {
+        void onEditSuccess();
+        void onEditFailure();
+    }
 
     public Path(int id, String name, int walkCount, double rating, double[] bounds) {
         this.id = id;
@@ -71,6 +82,17 @@ public class Path {
             pointsOfInterest.add(newPointOfInterest);
             PathMap.getInstance().getPointOfInterestList().put(newPointOfInterest.getId(), newPointOfInterest);
         }
+        JSONArray group_walks = pathJson.getJSONArray("group_walks");
+        for (int i = 0; i < group_walks.length(); i++) {
+            JSONObject groupWalk = group_walks.getJSONObject(i);
+            JSONArray attendees = groupWalk.getJSONArray("attendees");
+            ArrayList<String> attendeesList = new ArrayList<>();
+            for (int j = 0; j < attendees.length(); j++) {
+                attendeesList.add(attendees.getJSONObject(j).getString("nickname"));
+            }
+            GroupWalk newGroupWalk = new GroupWalk(this, groupWalk.getInt("id"), groupWalk.getString("title"), groupWalk.getLong("time"), attendeesList, groupWalk.getString("submitter"), groupWalk.getBoolean("attending"), groupWalk.getBoolean("editable"));
+            groupWalks.add(newGroupWalk);
+        }
         JSONArray routes = pathJson.getJSONArray("routes");
         for (int i = 0; i < routes.length(); i++) {
             JSONObject route = routes.getJSONObject(i);
@@ -86,6 +108,33 @@ public class Path {
             int routeId = route.getInt("id");
             routeList.add(new Route(routeId, this, editable, routeLatitudes, routeLongitudes, routeAltitudes));
         }
+    }
+
+    public static void getPath(Context context, int id, GetPathCallback callback) {
+        Call<JsonElement> updatePath = MainActivity.getRetrofitRequests(context).updatePath(id);
+        updatePath.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        Path newPath = new Path(new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path"));
+                        PathMap.getInstance().addPath(newPath);
+                        callback.onGetPathSuccess(newPath);
+                    } catch (JSONException e) {
+                        Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
+                        Log.e("UPDATE_PATH1", Arrays.toString(e.getStackTrace()));
+                        callback.onGetPathFailure();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
+                Log.e("UPDATE_PATH2", Arrays.toString(t.getStackTrace()));
+                callback.onGetPathFailure();
+            }
+        });
     }
 
     public void addPointOfInterest(PointOfInterest pointOfInterest) {
@@ -118,6 +167,10 @@ public class Path {
 
     public ArrayList<Review> getReviewsList() {
         return reviews;
+    }
+
+    public ArrayList<GroupWalk> getGroupWalks() {
+        return groupWalks;
     }
 
     public Review getOwnReview() {
@@ -170,33 +223,6 @@ public class Path {
         marker.setTitle(name);
         markers.add(marker);
         return marker;
-    }
-
-    public static void getPath(Context context, int id, GetPathCallback callback) {
-        Call<JsonElement> updatePath = MainActivity.getRetrofitRequests(context).updatePath(id);
-        updatePath.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                if (response.isSuccessful()) {
-                    try {
-                        Path newPath = new Path(new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path"));
-                        PathMap.getInstance().addPath(newPath);
-                        callback.onGetPathSuccess(newPath);
-                    } catch (JSONException e) {
-                        Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
-                        Log.e("UPDATE_PATH1", Arrays.toString(e.getStackTrace()));
-                        callback.onGetPathFailure();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
-                Log.e("UPDATE_PATH2", Arrays.toString(t.getStackTrace()));
-                callback.onGetPathFailure();
-            }
-        });
     }
 
     public void edit(Context context, String title, PathChangeCallback callback) {
@@ -386,15 +412,5 @@ public class Path {
                 callback.onGetPicturesFailure();
             }
         }
-    }
-
-    public interface GetPathCallback {
-        void onGetPathSuccess(Path path);
-        void onGetPathFailure();
-    }
-
-    public interface PathChangeCallback {
-        void onEditSuccess();
-        void onEditFailure();
     }
 }

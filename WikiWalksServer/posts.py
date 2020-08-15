@@ -4,7 +4,7 @@ import uuid
 
 from PIL import Image, ImageOps
 from flask import jsonify, request, Blueprint
-from sqlalchemy import func, desc
+from sqlalchemy import func
 
 from schemas import *
 
@@ -213,25 +213,20 @@ def add_group_walk(path_id):
     try:
         gw_schema = GroupWalkSchema()
         request_json = request.get_json(force=True)["attributes"]
-        path = Path.query.filter_by(id=request_json["path_id"]).first()
+        path = Path.query.filter_by(id=path_id).first()
         user = get_submitter(request_json["device_id"])
-        time = request_json["time"]
-        nowTime = get_time()
-        new_gw = GroupWalk(submitter=user.id, created_time=nowTime, path_id=path.id, time=request_json["time"])
+        new_gw = GroupWalk(submitter=user.id, created_time=get_time(), path_id=path.id, time=request_json["time"], title=request_json["title"])
         db.session.add(new_gw)
         db.session.commit()
-        group_walk_id = db.session.query(func.max(GroupWalk.id)).scalar()
-        group_walk = GroupWalk.query.get(group_walk_id)
-        group_walk.attendees.append(user)
-        db.session.commit()
+        new_gw.submitter = user.nickname
         return jsonify({"status": "success", "group_walk": gw_schema.dump(new_gw)}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/group_walks/<group_walk_id>/edit", methods=["POST"])
-def edit_group_walk(group_walk_id):
+@posts.route("/paths/<path_id>/group_walks/<group_walk_id>/edit", methods=["POST"])
+def edit_group_walk(path_id, group_walk_id):
     try:
         gw_schema = GroupWalkSchema()
         request_json = request.get_json(force=True)["attributes"]
@@ -248,12 +243,12 @@ def edit_group_walk(group_walk_id):
         return jsonify({"status": "failed"}), 500
 
 
-@posts.route("/group_walks/<group_walk_id>/delete", methods=["POST"])
-def delete_group_walk(group_walk_id):
+@posts.route("/paths/<path_id>/group_walks/<group_walk_id>/delete", methods=["POST"])
+def delete_group_walk(path_id, group_walk_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
-        group_walk = GroupWalk.query.get(group_walk_id.finc)
+        group_walk = GroupWalk.query.filter_by(id=group_walk_id).first()
         if group_walk in user.group_walks:
             db.session.delete(group_walk)
             db.session.commit()
@@ -266,17 +261,21 @@ def delete_group_walk(group_walk_id):
 
 
 @posts.route("/paths/<path_id>/group_walks/<group_walk_id>/attend", methods=["POST"])
-def toggle_group_walk_attendance(path_id,group_walk_id):
+def toggle_group_walk_attendance(path_id, group_walk_id):
     try:
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         group_walk = GroupWalk.query.get(group_walk_id)
+        gw_schema = GroupWalkSchema()
         if user in group_walk.attendees:
             group_walk.attendees.remove(user)
+            attending = False
         else:
             group_walk.attendees.append(user)
+            attending = True
         db.session.commit()
-        return jsonify({"status": "success"}), 201
+        group_walk.attending = attending
+        return jsonify({"status": "success", "group_walk": gw_schema.dump(group_walk)}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500

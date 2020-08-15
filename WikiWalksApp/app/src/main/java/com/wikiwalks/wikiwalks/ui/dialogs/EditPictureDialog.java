@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -31,10 +30,8 @@ import com.wikiwalks.wikiwalks.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -57,7 +54,13 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     Picture picture;
     AlertDialog confirmationDialog;
     Bitmap bitmap;
-    Uri photoURI;
+    Uri photoUri;
+
+    public interface EditPictureDialogListener {
+        void setPictureDialog(EditPictureDialog editPictureDialog);
+        void onEditPicture();
+        void onDeletePicture();
+    }
 
     public static EditPictureDialog newInstance(Picture.PictureType type, int parentId, int position, Bitmap bitmap) {
         Bundle args = new Bundle();
@@ -130,16 +133,16 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg");
                     contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
-                    contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/" + getContext().getApplicationInfo().loadLabel(getContext().getPackageManager()).toString());
-                    photoURI = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                    contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/" + getContext().getString(R.string.app_name));
+                    photoUri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
                 } else {
-                    File photoDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getContext().getApplicationInfo().loadLabel(getContext().getPackageManager()).toString());
+                    File photoDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getContext().getString(R.string.app_name));
                     if (!photoDirectory.exists()) {
                         photoDirectory.mkdir();
                     }
-                    photoURI = FileProvider.getUriForFile(getContext(), "com.wikiwalks.wikiwalks.fileprovider", new File(photoDirectory, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg"));
+                    photoUri = FileProvider.getUriForFile(getContext(), "com.wikiwalks.wikiwalks.fileprovider", new File(photoDirectory, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg"));
                 }
-                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
             }
         });
@@ -157,8 +160,8 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                     dismiss();
                 }
             } else {
-                if (photoURI != null) {
-                    Picture.submit(getContext(), type, parentId, photoURI, title.getEditText().getText().toString(), this);
+                if (photoUri != null) {
+                    Picture.submit(getContext(), type, parentId, photoUri, title.getEditText().getText().toString(), this);
                 }
             }
         });
@@ -186,7 +189,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         if (savedInstanceState != null) {
             title.getEditText().setText(savedInstanceState.getString("description"));
             if (savedInstanceState.containsKey("filename")) {
-                photoURI = Uri.parse(savedInstanceState.getString("uri"));
+                photoUri = Uri.parse(savedInstanceState.getString("uri"));
                 loadIntoImageView();
             }
         }
@@ -194,9 +197,18 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         return builder.create();
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        if (photoUri != null) {
+            outState.putString("uri", photoUri.toString());
+        }
+        outState.putString("description", title.getEditText().getText().toString());
+        super.onSaveInstanceState(outState);
+    }
+
     private void loadIntoImageView() {
         try {
-            InputStream inputStream = getContext().getContentResolver().openInputStream(photoURI);
+            InputStream inputStream = getContext().getContentResolver().openInputStream(photoUri);
             ExifInterface ei = new ExifInterface(inputStream);
             int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
             int degree = 0;
@@ -211,7 +223,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                     degree = 270;
                     break;
             }
-            Picasso.get().load(photoURI).rotate(degree).into(imageView);
+            Picasso.get().load(photoUri).rotate(degree).into(imageView);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -224,25 +236,10 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         submitButton.setEnabled(false);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_SELECT && data != null) {
-                photoURI = data.getData();
+                photoUri = data.getData();
             }
             loadIntoImageView();
         }
         submitButton.setEnabled(true);
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        if (photoURI != null) {
-            outState.putString("uri", photoURI.toString());
-        }
-        outState.putString("description", title.getEditText().getText().toString());
-        super.onSaveInstanceState(outState);
-    }
-
-    public interface EditPictureDialogListener {
-        void setPictureDialog(EditPictureDialog editPictureDialog);
-        void onEditPicture();
-        void onDeletePicture();
     }
 }

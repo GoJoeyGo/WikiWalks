@@ -2,15 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:title="Delete"
+    <item
         android:id="@+id/point_of_interest_menu_delete"
         android:icon="@drawable/ic_baseline_delete_24"
-        app:showAsAction="ifRoom"
-        android:visible="false"/>
+        android:title="Delete"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
 
 
-    <item android:title="Edit Name"
+    <item
         android:id="@+id/point_of_interest_menu_edit"
         android:icon="@drawable/ic_baseline_edit_24"
+        android:title="Edit Name"
         app:showAsAction="ifRoom" />
 </menu>

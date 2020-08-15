@@ -39,9 +39,9 @@
                 app:contentInsetEnd="16dp"
                 app:contentInsetStart="16dp"
                 app:layout_collapseMode="pin"
+                app:menu="@menu/point_of_interest_menu"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="?attr/colorOnBackground"
-                app:menu="@menu/point_of_interest_menu"/>
+                app:titleTextColor="?attr/colorOnBackground" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -84,7 +84,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/chevron"
-                android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
                 android:text="@string/reviews"
                 app:layout_constraintStart_toStartOf="parent"
@@ -96,7 +95,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/chevron"
-                android:drawableRight="@drawable/chevron"
                 android:gravity="center_vertical"
                 android:text="@string/pictures"
                 app:layout_constraintStart_toStartOf="parent"

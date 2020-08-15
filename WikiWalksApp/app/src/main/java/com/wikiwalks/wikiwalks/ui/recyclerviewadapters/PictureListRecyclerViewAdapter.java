@@ -60,6 +60,11 @@ public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<Picture
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public int getItemCount() {
         return pictureList.size();
     }
@@ -78,10 +83,5 @@ public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<Picture
             imageView = itemView.findViewById(R.id.path_picture_row_image);
             editButton = itemView.findViewById(R.id.path_picture_edit_button);
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return position;
     }
 }

@@ -22,6 +22,11 @@ public class EditNameDialog extends DialogFragment {
     Button editButton;
     Button cancelButton;
 
+    public interface EditDialogListener {
+        void setEditNameDialog(EditNameDialog editNameDialog);
+        void onEditName(EditNameDialogType type, String name);
+    }
+
     public static EditNameDialog newInstance(EditNameDialogType type, int parentId) {
         Bundle args = new Bundle();
         EditNameDialog fragment = new EditNameDialog();
@@ -68,9 +73,4 @@ public class EditNameDialog extends DialogFragment {
     }
 
     public enum EditNameDialogType {PATH, POINT_OF_INTEREST, USERNAME}
-
-    public interface EditDialogListener {
-        void setEditNameDialog(EditNameDialog editNameDialog);
-        void onEditName(EditNameDialogType type, String name);
-    }
 }

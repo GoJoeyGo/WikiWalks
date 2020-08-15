@@ -33,4 +33,11 @@
     <string name="direction_arrow">Direction Arrow</string>
     <string name="add_photo">ADD PHOTO</string>
     <string name="no_points_of_interest">No points of interest!</string>
+    <string name="schedule_group_walk">SCHEDULE GROUP WALK</string>
+    <string name="group_walks">GROUP WALKS</string>
+    <string name="no_attendees">no attendees</string>
+    <string name="select_time">SELECT TIME</string>
+    <string name="title">TITLE</string>
+    <string name="group_walk">Group Walk</string>
+    <string name="no_walks_scheduled">No walks scheduled!</string>
 </resources>

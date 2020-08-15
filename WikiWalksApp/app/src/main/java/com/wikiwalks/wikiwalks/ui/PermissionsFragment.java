@@ -64,5 +64,4 @@ public class PermissionsFragment extends Fragment {
 
     public enum PermissionType {LOCATION, STORAGE}
 
-
 }

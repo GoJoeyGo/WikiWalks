@@ -84,6 +84,7 @@ class GroupWalk(db.Model):
     submitter = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_time = db.Column(db.Integer, nullable=False)
     time = db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String, nullable=False)
 
     __mapper_args__ = {
         'confirm_deleted_rows': False

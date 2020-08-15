@@ -42,11 +42,12 @@ import java.util.ArrayList;
 
 public class RecordingFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Route.RouteModifyCallback, PointOfInterest.PointOfInterestSubmitCallback {
 
+    public Context context;
     GoogleMap mMap;
     Toolbar toolbar;
     EditNameDialog editNameDialog;
+    Button markPointButton;
     private boolean recording = true;
-    public Context context;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
     private Button stopRecordingButton;
@@ -60,7 +61,6 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     private ArrayList<Double> poiLongitudes = new ArrayList<>();
     private int submittedPointsOfInterest = 0;
     private Location lastLocation;
-    Button markPointButton;
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -161,6 +161,22 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        double[] latitudeArray = new double[latitudes.size()];
+        double[] longitudeArray = new double[longitudes.size()];
+        double[] altitudeArray = new double[altitudes.size()];
+        for (int i = 0; i < latitudes.size(); i++) {
+            latitudeArray[i] = latitudes.get(i);
+            longitudeArray[i] = longitudes.get(i);
+            altitudeArray[i] = altitudes.get(i);
+        }
+        outState.putDoubleArray("latitudes", latitudeArray);
+        outState.putDoubleArray("longitudes", longitudeArray);
+        outState.putDoubleArray("altitudes", altitudeArray);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
@@ -243,22 +259,6 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     @Override
     public void onRouteModifyFailure() {
         Toast.makeText(getContext(), "Failed to submit route...", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        double[] latitudeArray = new double[latitudes.size()];
-        double[] longitudeArray = new double[longitudes.size()];
-        double[] altitudeArray = new double[altitudes.size()];
-        for (int i = 0; i < latitudes.size(); i++) {
-            latitudeArray[i] = latitudes.get(i);
-            longitudeArray[i] = longitudes.get(i);
-            altitudeArray[i] = altitudes.get(i);
-        }
-        outState.putDoubleArray("latitudes", latitudeArray);
-        outState.putDoubleArray("longitudes", longitudeArray);
-        outState.putDoubleArray("altitudes", altitudeArray);
-        super.onSaveInstanceState(outState);
     }
 
     @Override

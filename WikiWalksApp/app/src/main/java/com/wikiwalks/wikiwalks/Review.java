@@ -24,6 +24,20 @@ public class Review {
     private String message;
     private ReviewType type;
 
+    public interface GetReviewCallback {
+        void onGetReviewSuccess();
+        void onGetReviewFailure();
+    }
+
+    public interface EditReviewCallback {
+        void onSubmitReviewSuccess();
+        void onSubmitReviewFailure();
+        void onEditReviewSuccess();
+        void onEditReviewFailure();
+        void onDeleteReviewSuccess();
+        void onDeleteReviewFailure();
+    }
+
     public Review(ReviewType type, int id, int parentId, String name, int rating, String message) {
         this.type = type;
         this.id = id;
@@ -166,18 +180,4 @@ public class Review {
     }
 
     public enum ReviewType {PATH, POINT_OF_INTEREST}
-
-    public interface GetReviewCallback {
-        void onGetReviewSuccess();
-        void onGetReviewFailure();
-    }
-
-    public interface EditReviewCallback {
-        void onSubmitReviewSuccess();
-        void onSubmitReviewFailure();
-        void onEditReviewSuccess();
-        void onEditReviewFailure();
-        void onDeleteReviewSuccess();
-        void onDeleteReviewFailure();
-    }
 }

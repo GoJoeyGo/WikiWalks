@@ -62,6 +62,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        for (File file : getExternalCacheDir().listFiles()) {
+            if (file.getAbsolutePath().endsWith(".jpg")) {
+                file.delete();
+            }
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_CODE_ASK_PERMISSIONS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -90,21 +106,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             finish();
         }
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
-
-    @Override
-    protected void onDestroy() {
-        for (File file : getExternalCacheDir().listFiles()) {
-            if (file.getAbsolutePath().endsWith(".jpg")) {
-                file.delete();
-            }
-        }
-        super.onDestroy();
     }
 }

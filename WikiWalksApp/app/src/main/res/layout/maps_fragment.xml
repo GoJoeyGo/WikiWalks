@@ -20,9 +20,8 @@
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
             app:layout_constraintHorizontal_bias="1.0"
-            app:titleTextColor="?attr/colorOnBackground"
-            app:menu="@menu/maps_menu">
-        </androidx.appcompat.widget.Toolbar>
+            app:menu="@menu/maps_menu"
+            app:titleTextColor="?attr/colorOnBackground"></androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView

@@ -39,6 +39,11 @@ public class Route implements Serializable {
 
     private ArrayList<Polyline> polylines = new ArrayList<>();
 
+    public interface RouteModifyCallback {
+        void onRouteModifySuccess(Path path);
+        void onRouteModifyFailure();
+    }
+
     public Route(int id, Path path, boolean editable, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes) {
         this.id = id;
         this.path = path;
@@ -168,10 +173,5 @@ public class Route implements Serializable {
             Log.e("DELETE_PATH2", Arrays.toString(e.getStackTrace()));
             callback.onRouteModifyFailure();
         }
-    }
-
-    public interface RouteModifyCallback {
-        void onRouteModifySuccess(Path path);
-        void onRouteModifyFailure();
     }
 }

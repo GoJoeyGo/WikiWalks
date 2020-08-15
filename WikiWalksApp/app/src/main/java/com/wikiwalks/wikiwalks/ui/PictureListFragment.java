@@ -53,55 +53,6 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
         return fragment;
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        parentId = getArguments().getInt("parentId");
-        type = (Picture.PictureType) getArguments().getSerializable("type");
-        String title;
-        if (type == Picture.PictureType.PATH) {
-            pictures = PathMap.getInstance().getPathList().get(parentId).getPicturesList();
-            title = PathMap.getInstance().getPathList().get(parentId).getName();
-        } else {
-            pictures = PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList();
-            title = PathMap.getInstance().getPointOfInterestList().get(parentId).getName();
-        }
-        final View rootView = inflater.inflate(R.layout.picture_list_fragment, container, false);
-        toolbar = rootView.findViewById(R.id.path_picture_list_toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Pictures - " + title);
-        noPicturesIndicator = rootView.findViewById(R.id.no_pictures_indicator);
-        recyclerView = rootView.findViewById(R.id.path_picture_list_recyclerview);
-        recyclerViewAdapter = new PictureListRecyclerViewAdapter(this, pictures);
-        recyclerView.setAdapter(recyclerViewAdapter);
-        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        } else {
-            recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        }
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(1) && !swipeRefreshLayout.isRefreshing()) {
-                    updatePicturesList(false);
-                }
-            }
-        });
-        swipeRefreshLayout = rootView.findViewById(R.id.picture_list_swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(() -> updatePicturesList(true));
-        submitPictureButton = rootView.findViewById(R.id.path_submit_picture_button);
-        submitPictureButton.setOnClickListener(v -> {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions((new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}), REQUEST_CODE_ASK_PERMISSIONS);
-            } else {
-                launchEditDialog(-1, null);
-            }
-        });
-        updatePicturesList(true);
-        return rootView;
-    }
-
     public void updatePicturesList(boolean refresh) {
         swipeRefreshLayout.setRefreshing(refresh);
         if (type == Picture.PictureType.PATH) {
@@ -142,6 +93,55 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        parentId = getArguments().getInt("parentId");
+        type = (Picture.PictureType) getArguments().getSerializable("type");
+        String title;
+        if (type == Picture.PictureType.PATH) {
+            pictures = PathMap.getInstance().getPathList().get(parentId).getPicturesList();
+            title = PathMap.getInstance().getPathList().get(parentId).getName();
+        } else {
+            pictures = PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList();
+            title = PathMap.getInstance().getPointOfInterestList().get(parentId).getName();
+        }
+        final View rootView = inflater.inflate(R.layout.picture_list_fragment, container, false);
+        toolbar = rootView.findViewById(R.id.path_picture_list_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle("Pictures - " + title);
+        noPicturesIndicator = rootView.findViewById(R.id.no_pictures_indicator);
+        recyclerView = rootView.findViewById(R.id.path_picture_list_recyclerview);
+        recyclerViewAdapter = new PictureListRecyclerViewAdapter(this, pictures);
+        recyclerView.setAdapter(recyclerViewAdapter);
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        } else {
+            recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        }
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (!recyclerView.canScrollVertically(1) && !swipeRefreshLayout.isRefreshing()) {
+                    updatePicturesList(false);
+                }
+            }
+        });
+        swipeRefreshLayout = rootView.findViewById(R.id.picture_list_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(() -> updatePicturesList(true));
+        submitPictureButton = rootView.findViewById(R.id.submit_group_walk_button);
+        submitPictureButton.setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions((new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}), REQUEST_CODE_ASK_PERMISSIONS);
+            } else {
+                launchEditDialog(-1, null);
+            }
+        });
+        updatePicturesList(true);
+        return rootView;
     }
 
     @Override

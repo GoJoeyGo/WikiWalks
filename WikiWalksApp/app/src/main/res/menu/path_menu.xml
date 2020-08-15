@@ -2,13 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:title="Bookmark"
+    <item
         android:id="@+id/path_menu_bookmark"
         android:icon="@drawable/ic_baseline_bookmark_border_24"
+        android:title="Bookmark"
         app:showAsAction="ifRoom" />
 
-    <item android:title="Edit Name"
+    <item
         android:id="@+id/path_menu_edit"
         android:icon="@drawable/ic_baseline_edit_24"
+        android:title="Edit Name"
         app:showAsAction="ifRoom" />
 </menu>

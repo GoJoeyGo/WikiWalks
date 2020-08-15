@@ -7,7 +7,6 @@ import android.location.LocationManager;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.wikiwalks.wikiwalks.ui.RecordingFragment;
 
 import org.junit.Before;
@@ -15,20 +14,14 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -38,10 +31,10 @@ import static org.mockito.Mockito.verify;
 @RunWith(AndroidJUnit4.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RecordPathIntegrationTests {
+    static Path path;
     Location[] exampleLocations;
     RecordingFragment fragment;
     Context appContext;
-    static Path path;
 
     @Before
     public void setup() {
@@ -119,6 +112,5 @@ public class RecordPathIntegrationTests {
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         assertFalse(PathMap.getInstance().getPathList().containsValue(path));
     }
-
 
 }

@@ -82,15 +82,14 @@
             style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:enabled="false"
             android:fontFamily="monospace"
             android:text="@string/mark_point"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/take_picture_button"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginRight="10dp"
-            android:enabled="false"
-            android:layout_marginEnd="10dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/take_picture_button"
@@ -100,8 +99,8 @@
             android:fontFamily="monospace"
             android:text="@string/add_photo"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/mark_poi_button"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/mark_poi_button"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

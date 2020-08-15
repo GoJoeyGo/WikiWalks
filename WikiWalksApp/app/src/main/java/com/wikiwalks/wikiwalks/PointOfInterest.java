@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.dx.command.Main;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -40,6 +39,18 @@ public class PointOfInterest {
     private boolean editable;
     private Path path;
     private ArrayList<Marker> markers = new ArrayList<>();
+
+    public interface PointOfInterestSubmitCallback {
+        void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest);
+        void onSubmitPointOfInterestFailure();
+    }
+
+    public interface PointOfInterestEditCallback {
+        void onEditPointOfInterestSuccess();
+        void onEditPointOfInterestFailure();
+        void onDeletePointOfInterestSuccess();
+        void onDeletePointOfInterestFailure();
+    }
 
     public PointOfInterest(int id, String name, double rating, double latitude, double longitude, Path path, boolean editable) {
         this.id = id;
@@ -157,8 +168,7 @@ public class PointOfInterest {
                     if (response.isSuccessful()) {
                         PointOfInterest.this.name = name;
                         callback.onEditPointOfInterestSuccess();
-                    }
-                    else callback.onEditPointOfInterestFailure();
+                    } else callback.onEditPointOfInterestFailure();
                 }
 
                 @Override
@@ -189,8 +199,7 @@ public class PointOfInterest {
                         markers.clear();
                         PathMap.getInstance().getPointOfInterestList().remove(id);
                         callback.onDeletePointOfInterestSuccess();
-                    }
-                    else callback.onDeletePointOfInterestFailure();
+                    } else callback.onDeletePointOfInterestFailure();
                 }
 
                 @Override
@@ -341,18 +350,6 @@ public class PointOfInterest {
                 callback.onGetPicturesFailure();
             }
         }
-    }
-
-    public interface PointOfInterestSubmitCallback {
-        void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest);
-        void onSubmitPointOfInterestFailure();
-    }
-
-    public interface PointOfInterestEditCallback {
-        void onEditPointOfInterestSuccess();
-        void onEditPointOfInterestFailure();
-        void onDeletePointOfInterestSuccess();
-        void onDeletePointOfInterestFailure();
     }
 
 }

@@ -1,7 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -76,6 +74,12 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
         return rootView;
     }
 
+    @Override
+    public void onStart() {
+        mapFragment.getMapAsync(this);
+        super.onStart();
+    }
+
     public void update() {
         if (pointOfInterestList.size() == 0) {
             recyclerView.setVisibility(View.GONE);
@@ -86,12 +90,6 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
             recyclerViewAdapter.notifyDataSetChanged();
             recyclerViewAdapter.notifyItemRangeChanged(0, pointOfInterestList.size());
         }
-    }
-
-    @Override
-    public void onStart() {
-        mapFragment.getMapAsync(this);
-        super.onStart();
     }
 
     @Override

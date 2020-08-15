@@ -51,6 +51,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     Location lastLocation;
     EditNameDialog editNameDialog;
     EditPictureDialog editPictureDialog;
+    Button markPointButton;
     private int routeNumber;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -59,7 +60,6 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
     private Toolbar toolbar;
-    Button markPointButton;
 
     public static WalkFragment newInstance(int pathId, int routeNumber) {
         Bundle args = new Bundle();

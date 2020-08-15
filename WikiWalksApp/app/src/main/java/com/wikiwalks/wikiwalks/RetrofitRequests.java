@@ -23,13 +23,6 @@ public interface RetrofitRequests {
                                @Query("w") double west,
                                @Body RequestBody body);
 
-    @POST("/paths/{id}/group_walks/new")
-    Call<JsonElement> add_group_walk(@Path("id") int id, @Body RequestBody body
-    );
-
-    @POST("/paths/{Path_id}/group_walks/{id}/attend")
-    Call<JsonElement> toggle_group_walk_attendance(@Path("Path_id") int Path_id, @Path("id") int id, @Body RequestBody body
-    );
     @POST("/paths/{id}")
     Call<JsonElement> updatePath(@Path("id") int id);
 
@@ -46,6 +39,25 @@ public interface RetrofitRequests {
     @POST("/routes/{id}/delete")
     Call<JsonElement> deleteRoute(@Path("id") int id,
                                   @Body RequestBody body);
+
+    @POST("/paths/{id}/group_walks/new")
+    Call<JsonElement> addGroupWalk(@Path("id") int id,
+                                   @Body RequestBody body);
+
+    @POST("/paths/{id}/group_walks/{group_walk_id}/attend")
+    Call<JsonElement> attendGroupWalk(@Path("id") int id,
+                                      @Path("group_walk_id") int groupWalkId,
+                                      @Body RequestBody body);
+
+    @POST("/paths/{id}/group_walks/{group_walk_id}/edit")
+    Call<JsonElement> editGroupWalk(@Path("id") int id,
+                                    @Path("group_walk_id") int groupWalkId,
+                                    @Body RequestBody body);
+
+    @POST("/paths/{id}/group_walks/{group_walk_id}/delete")
+    Call<JsonElement> deleteGroupWalk(@Path("id") int id,
+                                      @Path("group_walk_id") int groupWalkId,
+                                      @Body RequestBody body);
 
     @POST("/pois/new")
     Call<JsonElement> newPoI(@Body RequestBody body);
@@ -81,7 +93,6 @@ public interface RetrofitRequests {
     Call<JsonElement> getPoIReviews(@Path("id") int id,
                                     @Query("page") int page,
                                     @Body RequestBody body);
-
 
     @POST("/pois/{id}/reviews/new")
     Call<JsonElement> newPoIReview(@Path("id") int id,

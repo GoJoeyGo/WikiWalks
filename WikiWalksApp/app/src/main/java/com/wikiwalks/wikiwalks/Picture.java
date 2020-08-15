@@ -2,7 +2,6 @@ package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Parcel;
 import android.util.Log;
 
 import com.google.gson.JsonElement;
@@ -10,9 +9,6 @@ import com.google.gson.JsonElement;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
@@ -33,6 +29,20 @@ public class Picture {
     private String submitter;
     private boolean editable;
     private PictureType type;
+
+    public interface GetPicturesCallback {
+        void onGetPicturesSuccess();
+        void onGetPicturesFailure();
+    }
+
+    public interface EditPictureCallback {
+        void onSubmitPictureSuccess();
+        void onSubmitPictureFailure();
+        void onEditPictureSuccess();
+        void onEditPictureFailure();
+        void onDeletePictureSuccess();
+        void onDeletePictureFailure();
+    }
 
     public Picture(PictureType type, int id, int parentId, String url, int width, int height, String description, String submitter, boolean editable) {
         this.type = type;
@@ -180,18 +190,4 @@ public class Picture {
     }
 
     public enum PictureType {PATH, POINT_OF_INTEREST}
-
-    public interface GetPicturesCallback {
-        void onGetPicturesSuccess();
-        void onGetPicturesFailure();
-    }
-
-    public interface EditPictureCallback {
-        void onSubmitPictureSuccess();
-        void onSubmitPictureFailure();
-        void onEditPictureSuccess();
-        void onEditPictureFailure();
-        void onDeletePictureSuccess();
-        void onDeletePictureFailure();
-    }
 }

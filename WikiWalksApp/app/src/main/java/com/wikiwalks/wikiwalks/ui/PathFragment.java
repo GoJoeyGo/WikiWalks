@@ -3,23 +3,14 @@ package com.wikiwalks.wikiwalks.ui;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.ArraySet;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -29,7 +20,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
-import com.wikiwalks.wikiwalks.GroupWalk;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
@@ -49,7 +39,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     Button selectRouteButton;
     Button recordRouteButton;
     Button exploreButton;
-    Button groupWalkButton;
+    Button groupWalksButton;
     SupportMapFragment mapFragment;
     Path path;
     ConstraintLayout walkPathOptions;
@@ -116,6 +106,8 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         }
         pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);
         pointOfInterestButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestListFragment.newInstance(path.getId())).addToBackStack(null).commit());
+        groupWalksButton = rootView.findViewById(R.id.path_frag_group_walks_button);
+        groupWalksButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, GroupWalkListFragment.newInstance(path.getId())).addToBackStack(null).commit());
         reviewButton = rootView.findViewById(R.id.path_frag_reviews_button);
         reviewButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, ReviewListFragment.newInstance(Review.ReviewType.PATH, path.getId())).addToBackStack(null).commit());
         picturesButton = rootView.findViewById(R.id.path_frag_pictures_button);
@@ -130,16 +122,26 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
             walkCountString = String.format("Path has been walked %s times.", path.getWalkCount());
         }
         walkCount.setText(walkCountString);
-        groupWalkButton  = rootView.findViewById(R.id.groupWalk_button);
-        groupWalkButton.setOnClickListener(v -> GroupWalk.createGroupWalk(getContext(),path.getId()));
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        mapFragment.getMapAsync(this);
+        super.onStart();
+    }
+
+    @Override
+    public void onDestroy() {
+        PathMap.getInstance().removeListener(this);
+        super.onDestroy();
     }
 
     private void bookmark() {
         SharedPreferences preferences = getContext().getSharedPreferences("preferences", MODE_PRIVATE);
         String bookmarks = preferences.getString("bookmarks", "");
-        ArrayList<String> bookmarksList = (bookmarks == "") ? new ArrayList<>() : new ArrayList<>(Arrays.asList(bookmarks.split(",")));
+        ArrayList<String> bookmarksList = (bookmarks.equals("")) ? new ArrayList<>() : new ArrayList<>(Arrays.asList(bookmarks.split(",")));
         if (!bookmarked) {
             bookmarksList.add(String.valueOf(path.getId()));
             bookmarked = true;
@@ -148,12 +150,6 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
             bookmarked = false;
         }
         preferences.edit().putString("bookmarks", TextUtils.join(",", bookmarksList)).apply();
-    }
-
-    @Override
-    public void onStart() {
-        mapFragment.getMapAsync(this);
-        super.onStart();
     }
 
     @Override
@@ -211,11 +207,5 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     @Override
     public void OnPathMapUpdateFailure() {
 
-    }
-
-    @Override
-    public void onDestroy() {
-        PathMap.getInstance().removeListener(this);
-        super.onDestroy();
     }
 }

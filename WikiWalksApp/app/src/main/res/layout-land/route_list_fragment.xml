@@ -74,7 +74,7 @@
             style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:enabled="false"
             android:fontFamily="monospace"
             android:text="@string/select_route"

@@ -2,7 +2,6 @@ package com.wikiwalks.wikiwalks.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +25,6 @@ import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,12 +33,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -52,44 +48,15 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class SettingsFragment extends Fragment implements EditNameDialog.EditDialogListener {
 
-    EditNameDialog editNameDialog;
     private static final int REQUEST_CODE_EXPORT = 0;
     private static final int REQUEST_CODE_IMPORT = 1;
+    EditNameDialog editNameDialog;
 
     public static SettingsFragment newInstance() {
         Bundle args = new Bundle();
         SettingsFragment fragment = new SettingsFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        final View rootView = inflater.inflate(R.layout.settings_fragment, container, false);
-        Toolbar toolbar = rootView.findViewById(R.id.settings_toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Settings");
-        Button setNameButton = rootView.findViewById(R.id.settings_set_name_button);
-        setNameButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
-        Button exportSettingsButton = rootView.findViewById(R.id.settings_export_settings_button);
-        exportSettingsButton.setOnClickListener(v -> {
-            Intent exportSettingsIntent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-            exportSettingsIntent.addCategory(Intent.CATEGORY_OPENABLE);
-            exportSettingsIntent.setType("application/json");
-            exportSettingsIntent.putExtra(Intent.EXTRA_TITLE, "wikiwalks_backup_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".json");
-            startActivityForResult(exportSettingsIntent, REQUEST_CODE_EXPORT);
-        });
-        Button importSettingsButton = rootView.findViewById(R.id.settings_import_settings_button);
-        importSettingsButton.setOnClickListener(v -> {
-            Intent importSettingsIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            importSettingsIntent.setType("application/json");
-            importSettingsIntent.addCategory(Intent.CATEGORY_OPENABLE);
-            startActivityForResult(importSettingsIntent, REQUEST_CODE_IMPORT);
-        });
-        return rootView;
     }
 
     @Override
@@ -162,5 +129,34 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
                 }
             }
         }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        final View rootView = inflater.inflate(R.layout.settings_fragment, container, false);
+        Toolbar toolbar = rootView.findViewById(R.id.settings_toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
+        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle("Settings");
+        Button setNameButton = rootView.findViewById(R.id.settings_set_name_button);
+        setNameButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
+        Button exportSettingsButton = rootView.findViewById(R.id.settings_export_settings_button);
+        exportSettingsButton.setOnClickListener(v -> {
+            Intent exportSettingsIntent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            exportSettingsIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            exportSettingsIntent.setType("application/json");
+            exportSettingsIntent.putExtra(Intent.EXTRA_TITLE, "wikiwalks_backup_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".json");
+            startActivityForResult(exportSettingsIntent, REQUEST_CODE_EXPORT);
+        });
+        Button importSettingsButton = rootView.findViewById(R.id.settings_import_settings_button);
+        importSettingsButton.setOnClickListener(v -> {
+            Intent importSettingsIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            importSettingsIntent.setType("application/json");
+            importSettingsIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(importSettingsIntent, REQUEST_CODE_IMPORT);
+        });
+        return rootView;
     }
 }

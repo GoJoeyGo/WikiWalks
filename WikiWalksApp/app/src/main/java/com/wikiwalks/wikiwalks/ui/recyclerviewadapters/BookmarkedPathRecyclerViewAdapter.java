@@ -13,8 +13,6 @@ import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.PathFragment;
 
-import java.util.ArrayList;
-
 public class BookmarkedPathRecyclerViewAdapter extends RecyclerView.Adapter<BookmarkedPathRecyclerViewAdapter.ViewHolder> {
 
     private Path[] paths;

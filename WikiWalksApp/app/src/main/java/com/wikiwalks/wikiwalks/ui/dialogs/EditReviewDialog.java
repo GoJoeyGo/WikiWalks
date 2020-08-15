@@ -31,6 +31,11 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
     int parentId;
     Review.ReviewType type;
 
+    public interface EditReviewDialogListener {
+        void setEditReviewDialog(EditReviewDialog editReviewDialog);
+        void onEditReview();
+    }
+
     public static EditReviewDialog newInstance(Review.ReviewType type, int parentId) {
         Bundle args = new Bundle();
         args.putInt("parentId", parentId);
@@ -38,6 +43,17 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
         EditReviewDialog dialog = new EditReviewDialog();
         dialog.setArguments(args);
         return dialog;
+    }
+
+    @Override
+    public void onSubmitReviewSuccess() {
+        listener.onEditReview();
+        dismiss();
+    }
+
+    @Override
+    public void onSubmitReviewFailure() {
+        Toast.makeText(getContext(), "Failed to submit review!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -60,17 +76,6 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
     @Override
     public void onDeleteReviewFailure() {
         Toast.makeText(getContext(), "Failed to delete review!", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onSubmitReviewSuccess() {
-        listener.onEditReview();
-        dismiss();
-    }
-
-    @Override
-    public void onSubmitReviewFailure() {
-        Toast.makeText(getContext(), "Failed to submit review!", Toast.LENGTH_SHORT).show();
     }
 
     @NonNull
@@ -140,10 +145,5 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
         outState.putString("review_text", message.getEditText().getText().toString());
         outState.putInt("review_stars", (int) rating.getRating());
         super.onSaveInstanceState(outState);
-    }
-
-    public interface EditReviewDialogListener {
-        void setEditReviewDialog(EditReviewDialog editReviewDialog);
-        void onEditReview();
     }
 }

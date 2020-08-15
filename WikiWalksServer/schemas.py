@@ -26,6 +26,16 @@ class RouteSchema(ma.SQLAlchemyAutoSchema):
     editable = fields.fields.Boolean(default=False)
 
 
+class GroupWalkSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = GroupWalk
+        unknown = EXCLUDE
+    attendees = ma.Nested(UserSchema, exclude=["device_id"], many=True)
+    editable = fields.fields.Boolean(default=False)
+    attending = fields.fields.Boolean(default=False)
+    submitter = fields.fields.String(default="")
+
+
 class PathSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Path
@@ -33,14 +43,7 @@ class PathSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
     routes = ma.Nested(RouteSchema, many=True)
     points_of_interest = ma.Nested(PointOfInterestSchema, many=True)
-    editable = fields.fields.Boolean(default=False)
-
-
-class GroupWalkSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = GroupWalk
-        unknown = EXCLUDE
-    attendees = ma.Nested(UserSchema, exclude=["device_id"], many=True)
+    group_walks = ma.Nested(GroupWalkSchema, many=True)
     editable = fields.fields.Boolean(default=False)
 
 

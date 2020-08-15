@@ -46,6 +46,11 @@ public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewLi
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public int getItemCount() {
         return reviewList.size();
     }
@@ -62,10 +67,5 @@ public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewLi
             ratingBar = itemView.findViewById(R.id.path_review_row_rating);
             message = itemView.findViewById(R.id.path_review_row_text);
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return position;
     }
 }
