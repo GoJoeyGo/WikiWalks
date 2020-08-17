@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.wikiwalks.wikiwalks.Path.findDistance;
 
 public class PathFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Path.PathChangeCallback, PathMap.PathMapListener {
 
@@ -81,6 +82,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
             }
             return true;
         });
+        Toast.makeText(getContext(), String.format("%.2f", findDistance(path)/1000)+"KM", Toast.LENGTH_LONG).show();
         toolbar.setTitle(path.getName());
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
         selectRouteButton.setOnClickListener(view -> {

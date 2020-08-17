@@ -136,6 +136,30 @@ public class Path {
             }
         });
     }
+    public static double findDistance(Path path){
+        final int R = 6371; // this will be a tad off but it will only be really noticable if people do walks that are really long
+        ArrayList<Double> latitudes =  path.getAllLatitudes();
+        ArrayList<Double> longitudes =  path.getAllLongitudes();
+        ArrayList<Double> Altitudes =  path.getAllAltitudes();
+        double toatalDistance = 0.0;
+        for(int x = 1; x<latitudes.size();x++){
+            double lon1 = Math.toRadians(longitudes.get(x-1));
+            double lon2 = Math.toRadians(longitudes.get(x));
+            double lat1 = Math.toRadians(latitudes.get(x-1));
+            double lat2 = Math.toRadians(latitudes.get(x));
+            double height =  Altitudes.get(x-1) -  Altitudes.get(x);
+            double latDistance = lat2 - lat1;
+            double lonDistance = lon2 - lon1;
+            double a =
+                    Math.sin(latDistance/2)*Math.sin(latDistance/2) +
+                    Math.cos(lat1)*Math.cos(lat2)*
+                    Math.sin(lonDistance/2)*Math.sin(lonDistance/2);
+            double c = 2* Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            double distance = Math.sqrt(Math.pow( R * c * 1000, 2) + Math.pow(height, 2));
+            toatalDistance+=distance;
+        }
+        return toatalDistance;
+    }
 
     public void addPointOfInterest(PointOfInterest pointOfInterest) {
         pointsOfInterest.add(pointOfInterest);
@@ -180,6 +204,13 @@ public class Path {
     public void setOwnReview(Review ownReview) {
         this.ownReview = ownReview;
     }
+    public ArrayList<Double> getAllAltitudes() {
+        ArrayList<Double> allAltitudes = new ArrayList<>();
+        for (Route route : routeList) {
+            allAltitudes.addAll(route.getAltitudes());
+        }
+        return allAltitudes;
+    }
 
     public ArrayList<Double> getAllLatitudes() {
         ArrayList<Double> allLatitudes = new ArrayList<>();
@@ -196,7 +227,6 @@ public class Path {
         }
         return allLongitudes;
     }
-
     public ArrayList<PointOfInterest> getPointsOfInterest() {
         return pointsOfInterest;
     }
