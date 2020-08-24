@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorBackgroundFloating">
@@ -42,7 +43,9 @@
         android:layout_height="0dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/submit_group_walk_background"
-        app:layout_constraintTop_toBottomOf="@id/group_walk_list_toolbar_wrapper">
+        app:layout_constraintTop_toBottomOf="@id/group_walk_list_toolbar_wrapper"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/path_group_walk_list_recyclerview"
@@ -59,8 +62,7 @@
         android:background="@drawable/button_background"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/submit_group_walk_button"

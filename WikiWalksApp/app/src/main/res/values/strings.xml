@@ -40,4 +40,7 @@
     <string name="title">TITLE</string>
     <string name="group_walk">Group Walk</string>
     <string name="no_walks_scheduled">No walks scheduled!</string>
+    <string name="set_goal">Set Goal</string>
+    <string name="save_distance_goal">Save</string>
+    <string name="set_distance_goal_popup_title">Set Goal</string>
 </resources>

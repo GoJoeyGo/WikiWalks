@@ -140,6 +140,15 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Settings");
+
+        Button setGoalButton= rootView.findViewById(R.id.settings_set_goal_button);
+        setGoalButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(rootView.getContext(), SetDistanceGoalFragment.class);
+                startActivityForResult(intent, 0);
+            }
+        });
+
         Button setNameButton = rootView.findViewById(R.id.settings_set_name_button);
         setNameButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
         Button exportSettingsButton = rootView.findViewById(R.id.settings_export_settings_button);
