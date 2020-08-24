@@ -57,9 +57,8 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     Uri photoUri;
 
     public interface EditPictureDialogListener {
-        void setPictureDialog(EditPictureDialog editPictureDialog);
         void onEditPicture();
-        void onDeletePicture();
+        void onDeletePicture(int position);
     }
 
     public static EditPictureDialog newInstance(Picture.PictureType type, int parentId, int position, Bitmap bitmap) {
@@ -97,7 +96,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
 
     @Override
     public void onDeletePictureSuccess() {
-        listener.onDeletePicture();
+        listener.onDeletePicture(getArguments().getInt("position"));
         dismiss();
     }
 
@@ -110,7 +109,6 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         listener = (EditPictureDialogListener) getParentFragment();
-        listener.setPictureDialog(this);
         type = (Picture.PictureType) getArguments().getSerializable("picture_type");
         parentId = getArguments().getInt("parent_id");
         if (getArguments().containsKey("position")) {

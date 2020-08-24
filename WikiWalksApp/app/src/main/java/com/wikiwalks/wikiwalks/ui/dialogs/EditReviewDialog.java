@@ -32,7 +32,6 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
     Review.ReviewType type;
 
     public interface EditReviewDialogListener {
-        void setEditReviewDialog(EditReviewDialog editReviewDialog);
         void onEditReview();
     }
 
@@ -82,7 +81,6 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         listener = (EditReviewDialogListener) getParentFragment();
-        listener.setEditReviewDialog(this);
         parentId = getArguments().getInt("parentId");
         type = (Review.ReviewType) getArguments().getSerializable("type");
         if (type == Review.ReviewType.PATH) {

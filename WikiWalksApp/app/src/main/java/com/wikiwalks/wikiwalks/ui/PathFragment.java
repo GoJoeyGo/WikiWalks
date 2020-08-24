@@ -1,8 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,34 +20,22 @@ import com.google.android.gms.maps.model.Polyline;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
+import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class PathFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Path.PathChangeCallback, PathMap.PathMapListener {
 
-    Toolbar toolbar;
-    Button selectRouteButton;
-    Button recordRouteButton;
-    Button exploreButton;
-    Button groupWalksButton;
-    SupportMapFragment mapFragment;
-    Path path;
-    ConstraintLayout walkPathOptions;
-    Button pointOfInterestButton;
-    Button reviewButton;
-    Button picturesButton;
-    RatingBar ratingBar;
-    EditNameDialog editNameDialog;
-    ArrayList<Polyline> polylines = new ArrayList<>();
-    GoogleMap mMap;
-    boolean bookmarked = false;
+    private Toolbar toolbar;
+    private SupportMapFragment mapFragment;
+    private Path path;
+    private EditNameDialog editNameDialog;
+    private ArrayList<Polyline> polylines = new ArrayList<>();
+    private GoogleMap mMap;
 
     public static PathFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -62,11 +47,14 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.path_fragment, container, false);
+
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         PathMap.getInstance().addListener(this);
-        final View rootView = inflater.inflate(R.layout.path_fragment, container, false);
-        walkPathOptions = rootView.findViewById(R.id.walk_path_option_selector);
+
         toolbar = rootView.findViewById(R.id.path_frag_toolbar);
+        toolbar.setTitle(path.getName());
+        if (PreferencesManager.getInstance(getContext()).isBookmarked(path.getId())) toolbar.getMenu().getItem(0).setIcon(R.drawable.ic_baseline_bookmark_24);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setOnMenuItemClickListener(menuItem -> {
@@ -76,53 +64,46 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
                     break;
 
                 case R.id.path_menu_bookmark:
-                    bookmark();
-                    menuItem.setIcon((bookmarked) ? R.drawable.ic_baseline_bookmark_24 : R.drawable.ic_baseline_bookmark_border_24);
+                    menuItem.setIcon((PreferencesManager.getInstance(getContext()).toggleBookmark(path.getId())) ? R.drawable.ic_baseline_bookmark_24 : R.drawable.ic_baseline_bookmark_border_24);
+                    break;
             }
             return true;
         });
-        toolbar.setTitle(path.getName());
-        selectRouteButton = rootView.findViewById(R.id.select_route_button);
+
+        Button selectRouteButton = rootView.findViewById(R.id.select_route_button);
         selectRouteButton.setOnClickListener(view -> {
             RouteListFragment routeListFragment = RouteListFragment.newInstance(path.getId());
             routeListFragment.setTargetFragment(this, 0);
             getParentFragmentManager().beginTransaction().add(R.id.main_frame, routeListFragment).addToBackStack(null).commit();
         });
-        recordRouteButton = rootView.findViewById(R.id.new_route_button);
+
+        Button recordRouteButton = rootView.findViewById(R.id.new_route_button);
         recordRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path.getId())).addToBackStack(null).commit());
-        exploreButton = rootView.findViewById(R.id.explore_button);
+
+        Button exploreButton = rootView.findViewById(R.id.explore_button);
         exploreButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, WalkFragment.newInstance(path.getId(), -1)).addToBackStack(null).commit());
-        SharedPreferences preferences = getContext().getSharedPreferences("preferences", MODE_PRIVATE);
-        String bookmarks = preferences.getString("bookmarks", "");
-        String[] bookmarksArray = bookmarks.split(",");
-        if (!(bookmarksArray.length == 1 && bookmarksArray[0] == "")) {
-            for (String bookmark : bookmarksArray) {
-                if (Integer.parseInt(bookmark) == path.getId()) {
-                    bookmarked = true;
-                    toolbar.getMenu().getItem(0).setIcon(R.drawable.ic_baseline_bookmark_24);
-                    break;
-                }
-            }
-        }
-        pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);
+
+        Button pointOfInterestButton = rootView.findViewById(R.id.path_frag_pois_button);
         pointOfInterestButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestListFragment.newInstance(path.getId())).addToBackStack(null).commit());
-        groupWalksButton = rootView.findViewById(R.id.path_frag_group_walks_button);
+
+        Button groupWalksButton = rootView.findViewById(R.id.path_frag_group_walks_button);
         groupWalksButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, GroupWalkListFragment.newInstance(path.getId())).addToBackStack(null).commit());
-        reviewButton = rootView.findViewById(R.id.path_frag_reviews_button);
+
+        Button reviewButton = rootView.findViewById(R.id.path_frag_reviews_button);
         reviewButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, ReviewListFragment.newInstance(Review.ReviewType.PATH, path.getId())).addToBackStack(null).commit());
-        picturesButton = rootView.findViewById(R.id.path_frag_pictures_button);
+
+        Button picturesButton = rootView.findViewById(R.id.path_frag_pictures_button);
         picturesButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PictureListFragment.newInstance(Picture.PictureType.PATH, path.getId())).addToBackStack(null).commit());
-        ratingBar = rootView.findViewById(R.id.path_frag_rating_bar);
+
+        RatingBar ratingBar = rootView.findViewById(R.id.path_frag_rating_bar);
         ratingBar.setRating((float) path.getRating());
+
         TextView walkCount = rootView.findViewById(R.id.path_frag_walk_count);
-        String walkCountString;
-        if (path.getWalkCount() == 1) {
-            walkCountString = "Path has been walked once.";
-        } else {
-            walkCountString = String.format("Path has been walked %s times.", path.getWalkCount());
-        }
+        String walkCountString = (path.getWalkCount() == 1) ? "Path has been walked once." : String.format("Path has been walked %s times.", path.getWalkCount());
         walkCount.setText(walkCountString);
+
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
+
         return rootView;
     }
 
@@ -136,20 +117,6 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     public void onDestroy() {
         PathMap.getInstance().removeListener(this);
         super.onDestroy();
-    }
-
-    private void bookmark() {
-        SharedPreferences preferences = getContext().getSharedPreferences("preferences", MODE_PRIVATE);
-        String bookmarks = preferences.getString("bookmarks", "");
-        ArrayList<String> bookmarksList = (bookmarks.equals("")) ? new ArrayList<>() : new ArrayList<>(Arrays.asList(bookmarks.split(",")));
-        if (!bookmarked) {
-            bookmarksList.add(String.valueOf(path.getId()));
-            bookmarked = true;
-        } else {
-            bookmarksList.remove(String.valueOf(path.getId()));
-            bookmarked = false;
-        }
-        preferences.edit().putString("bookmarks", TextUtils.join(",", bookmarksList)).apply();
     }
 
     @Override
@@ -190,7 +157,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     }
 
     @Override
-    public void OnPathMapChange() {
+    public void onPathMapUpdateSuccess() {
         path = PathMap.getInstance().getPathList().get(path.getId());
         if (path != null) {
             for (Polyline polyline : polylines) {
@@ -205,7 +172,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     }
 
     @Override
-    public void OnPathMapUpdateFailure() {
+    public void onPathMapUpdateFailure() {
 
     }
 }

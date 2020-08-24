@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class GroupWalkListRecyclerViewAdapter extends RecyclerView.Adapter<GroupWalkListRecyclerViewAdapter.ViewHolder> {
-    ArrayList<GroupWalk> groupWalkList;
-    GroupWalkListFragment context;
+    private ArrayList<GroupWalk> groupWalkList;
+    private GroupWalkListFragment context;
 
     public GroupWalkListRecyclerViewAdapter(GroupWalkListFragment context, ArrayList<GroupWalk> groupWalkList) {
         this.context = context;

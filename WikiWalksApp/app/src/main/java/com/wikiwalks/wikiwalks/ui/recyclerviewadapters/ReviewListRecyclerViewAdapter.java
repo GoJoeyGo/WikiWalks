@@ -17,8 +17,8 @@ import com.wikiwalks.wikiwalks.ui.ReviewListFragment;
 import java.util.ArrayList;
 
 public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewListRecyclerViewAdapter.ViewHolder> {
-    ArrayList<Review> reviewList;
-    ReviewListFragment context;
+    private ArrayList<Review> reviewList;
+    private ReviewListFragment context;
 
     public ReviewListRecyclerViewAdapter(ReviewListFragment context, ArrayList<Review> reviewList) {
         this.context = context;

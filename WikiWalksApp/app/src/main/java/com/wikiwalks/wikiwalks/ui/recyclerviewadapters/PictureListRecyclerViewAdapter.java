@@ -20,8 +20,8 @@ import com.wikiwalks.wikiwalks.ui.PictureListFragment;
 import java.util.ArrayList;
 
 public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<PictureListRecyclerViewAdapter.ViewHolder> {
-    ArrayList<Picture> pictureList;
-    PictureListFragment context;
+    private ArrayList<Picture> pictureList;
+    private PictureListFragment context;
 
     public PictureListRecyclerViewAdapter(PictureListFragment context, ArrayList<Picture> pictureList) {
         this.context = context;

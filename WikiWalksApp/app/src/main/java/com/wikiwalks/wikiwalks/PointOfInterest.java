@@ -65,7 +65,7 @@ public class PointOfInterest {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             attributes.put("path", path.getId());
             attributes.put("latitude", latitude);
             attributes.put("longitude", longitude);
@@ -88,6 +88,7 @@ public class PointOfInterest {
                             Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
                             callback.onSubmitPointOfInterestFailure();
                         }
+                        PreferencesManager.getInstance(context).changePointsOfInterestMarked(false);
                     } else {
                         callback.onSubmitPointOfInterestFailure();
                     }
@@ -186,7 +187,7 @@ public class PointOfInterest {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> editPointOfInterest = MainActivity.getRetrofitRequests(context).deletePoI(id, body);
@@ -200,6 +201,7 @@ public class PointOfInterest {
                         PathMap.getInstance().getPointOfInterestList().remove(id);
                         callback.onDeletePointOfInterestSuccess();
                     } else callback.onDeletePointOfInterestFailure();
+                    PreferencesManager.getInstance(context).changePointsOfInterestMarked(true);
                 }
 
                 @Override
@@ -224,7 +226,7 @@ public class PointOfInterest {
             JSONObject request = new JSONObject();
             JSONObject attributes = new JSONObject();
             try {
-                attributes.put("device_id", MainActivity.getDeviceId(context));
+                attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
                 request.put("attributes", attributes);
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
                 Call<JsonElement> getReviews = MainActivity.getRetrofitRequests(context).getPoIReviews(id, nextReviewPage, body);
@@ -296,7 +298,7 @@ public class PointOfInterest {
             JSONObject request = new JSONObject();
             JSONObject attributes = new JSONObject();
             try {
-                attributes.put("device_id", MainActivity.getDeviceId(context));
+                attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
                 request.put("attributes", attributes);
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
                 Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPoIPictures(id, nextPicturePage, body);

@@ -57,7 +57,7 @@ public class Route implements Serializable {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             attributes.put("latitudes", new JSONArray(latitudes));
             attributes.put("longitudes", new JSONArray(longitudes));
             attributes.put("altitudes", new JSONArray(altitudes));
@@ -76,10 +76,11 @@ public class Route implements Serializable {
                             PathMap.getInstance().addPath(newPath);
                             callback.onRouteModifySuccess(newPath);
                         } catch (JSONException e) {
-                            Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Uploaded path, but something went wrong...", Toast.LENGTH_SHORT).show();
                             Log.e("SUBMIT_PATH1", Arrays.toString(e.getStackTrace()));
                             callback.onRouteModifyFailure();
                         }
+                        PreferencesManager.getInstance(context).changeRoutesRecorded(false);
                     } else {
                         callback.onRouteModifyFailure();
                     }
@@ -139,7 +140,7 @@ public class Route implements Serializable {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> deleteRoute = MainActivity.getRetrofitRequests(context).deleteRoute(id, body);
@@ -157,6 +158,7 @@ public class Route implements Serializable {
                         for (Polyline polyline : polylines) {
                             polyline.remove();
                         }
+                        PreferencesManager.getInstance(context).changeRoutesRecorded(true);
                         callback.onRouteModifySuccess(null);
                     } else {
                         callback.onRouteModifyFailure();

@@ -33,15 +33,12 @@ public class GetPathIntegrationTests {
     MapsFragment fragment;
     Context appContext;
     LatLngBounds bounds;
-
-    GoogleMap map;
     PathMap pathMap;
 
     @Before
     public void setup() {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         fragment = MapsFragment.newInstance();
-        fragment.setmMap(map);
         pathMap = spy(PathMap.getInstance());
 
     }

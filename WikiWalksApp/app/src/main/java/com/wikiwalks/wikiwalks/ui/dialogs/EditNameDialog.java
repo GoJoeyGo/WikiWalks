@@ -17,10 +17,8 @@ import com.wikiwalks.wikiwalks.R;
 
 public class EditNameDialog extends DialogFragment {
 
-    EditDialogListener listener;
-    TextInputLayout title;
-    Button editButton;
-    Button cancelButton;
+    private EditDialogListener listener;
+    private TextInputLayout title;
 
     public interface EditDialogListener {
         void setEditNameDialog(EditNameDialog editNameDialog);
@@ -54,11 +52,11 @@ public class EditNameDialog extends DialogFragment {
             else if (type == EditNameDialogType.POINT_OF_INTEREST)
                 title.getEditText().setText(PathMap.getInstance().getPointOfInterestList().get(getArguments().getInt("parent_id")).getName());
         }
-        editButton = view.findViewById(R.id.edit_popup_save_button);
+        Button editButton = view.findViewById(R.id.edit_popup_save_button);
         editButton.setOnClickListener(v -> {
             listener.onEditName(type, title.getEditText().getText().toString());
         });
-        cancelButton = view.findViewById(R.id.edit_popup_cancel_button);
+        Button cancelButton = view.findViewById(R.id.edit_popup_cancel_button);
         cancelButton.setOnClickListener(v -> {
             dismiss();
         });

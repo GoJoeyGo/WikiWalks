@@ -27,12 +27,10 @@ import java.util.ArrayList;
 
 public class GroupWalkListFragment extends Fragment {
 
-    Button scheduleButton;
-    Path path;
-    RecyclerView recyclerView;
-    TextView noWalksIndicator;
-    ArrayList<GroupWalk> walks;
-    int position;
+    private Path path;
+    private RecyclerView recyclerView;
+    private TextView noWalksIndicator;
+    private ArrayList<GroupWalk> walks;
 
     public static GroupWalkListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -46,18 +44,23 @@ public class GroupWalkListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.group_walk_list_fragment, container, false);
+
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
         walks = path.getGroupWalks();
-        final View rootView = inflater.inflate(R.layout.group_walk_list_fragment, container, false);
+
         Toolbar toolbar = rootView.findViewById(R.id.path_group_walk_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Group Walks - " + path.getName());
-        scheduleButton = rootView.findViewById(R.id.submit_group_walk_button);
+
+        Button scheduleButton = rootView.findViewById(R.id.submit_group_walk_button);
         scheduleButton.setOnClickListener(v -> launchEditDialog(-1));
+
         recyclerView = rootView.findViewById(R.id.path_group_walk_list_recyclerview);
         recyclerView.setAdapter(new GroupWalkListRecyclerViewAdapter(this, walks));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+
         noWalksIndicator = rootView.findViewById(R.id.no_group_walks_indicator);
         if (walks.size() == 0) {
             recyclerView.setVisibility(View.GONE);
@@ -66,6 +69,7 @@ public class GroupWalkListFragment extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
             noWalksIndicator.setVisibility(View.GONE);
         }
+
         return rootView;
     }
 
@@ -76,18 +80,14 @@ public class GroupWalkListFragment extends Fragment {
         } else {
             recyclerView.setVisibility(View.VISIBLE);
             noWalksIndicator.setVisibility(View.GONE);
-            recyclerView.getAdapter().notifyDataSetChanged();
-            recyclerView.getAdapter().notifyItemRangeChanged(0, walks.size());
         }
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.getAdapter().notifyItemRangeChanged(0, walks.size());
     }
 
-    public void launchEditDialog(int position) {
-        EditGroupWalkDialog.newInstance(path.getId(), position).show(getChildFragmentManager(), "GroupWalkPopup");
-    }
-
-    public void toggleAttendance(int position, View view) {
+    public void toggleAttendance(int position, View checkbox) {
         GroupWalk walk = path.getGroupWalks().get(position);
-        view.setEnabled(false);
+        checkbox.setEnabled(false);
         AlertDialog confirmationDialog = new AlertDialog.Builder(getContext())
                 .setTitle("Confirm")
                 .setMessage((walk.isAttending()) ? "Cancel attendance?" : "Attend walk?")
@@ -95,16 +95,21 @@ public class GroupWalkListFragment extends Fragment {
                     @Override
                     public void toggleAttendanceSuccess() {
                         recyclerView.getAdapter().notifyItemChanged(position);
+                        dialog.dismiss();
                     }
 
                     @Override
                     public void toggleAttendanceFailure() {
                         Toast.makeText(getContext(), "Failed to change attendance...", Toast.LENGTH_SHORT).show();
-                        view.setEnabled(true);
+                        checkbox.setEnabled(true);
                     }
                 }))
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
-                .setOnDismissListener(dialog -> view.setEnabled(true)).create();
+                .setOnDismissListener(dialog -> checkbox.setEnabled(true)).create();
         confirmationDialog.show();
+    }
+
+    public void launchEditDialog(int position) {
+        EditGroupWalkDialog.newInstance(path.getId(), position).show(getChildFragmentManager(), "GroupWalkPopup");
     }
 }

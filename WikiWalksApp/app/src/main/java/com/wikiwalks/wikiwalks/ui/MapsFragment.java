@@ -1,5 +1,8 @@
 package com.wikiwalks.wikiwalks.ui;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +11,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,13 +34,10 @@ import java.util.Map;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, PathMap.PathMapListener {
 
-    GoogleMap mMap;
-    Toolbar toolbar;
-    private SupportMapFragment mapFragment;
+    private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private HashMap<Integer, Polyline> polylines = new HashMap<>();
     private HashMap<Integer, Marker> markers = new HashMap<>();
-    private Button createPath;
     private boolean hasFailed = false;
 
     public static MapsFragment newInstance() {
@@ -48,10 +49,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
+
         PathMap.getInstance().addListener(this);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-        final View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
-        toolbar = rootView.findViewById(R.id.main_toolbar);
+
+        Toolbar toolbar = rootView.findViewById(R.id.main_toolbar);
         toolbar.setTitle(R.string.app_name);
         toolbar.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
@@ -64,15 +67,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             }
             return true;
         });
-        createPath = rootView.findViewById(R.id.create_path_button);
-        createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack("Map").commit());
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_frag);
-        mapFragment.getMapAsync(this);
-        return rootView;
-    }
 
-    public void setmMap(GoogleMap mMap) {
-        this.mMap = mMap;
+        Button createPath = rootView.findViewById(R.id.create_path_button);
+        createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack("Map").commit());
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_frag);
+        mapFragment.getMapAsync(this);
+
+        return rootView;
     }
 
     @Override
@@ -80,11 +82,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         setMapLocation();
-        MainActivity.checkLocationPermission(this.getActivity());
-        mMap.setMyLocationEnabled(true);
+        MainActivity.checkPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
+                if (granted) mMap.setMyLocationEnabled(true);
+            }
+        );
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
-        final PathMap pathMap = PathMap.getInstance();
+        PathMap pathMap = PathMap.getInstance();
         pathMap.addListener(this);
         mMap.setOnCameraIdleListener(() -> pathMap.updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getActivity()));
     }
@@ -95,17 +99,28 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         return true;
     }
 
+    @Override
+    public void onDestroy() {
+        PathMap.getInstance().removeListener(this);
+        super.onDestroy();
+    }
+
     public void setMapLocation() {
-        MainActivity.checkLocationPermission(this.getActivity());
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-            if (location != null)
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
-            else setMapLocation();
+        MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
+            if (granted) {
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                    if (location != null) mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                    else setMapLocation();
+                });
+            } else {
+                getParentFragmentManager().beginTransaction().add(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.ACCESS_FINE_LOCATION)).addToBackStack(null).commit();
+                setMapLocation();
+            }
         });
     }
 
     @Override
-    public void OnPathMapChange() {
+    public void onPathMapUpdateSuccess() {
         PathMap pathMap = PathMap.getInstance();
         HashMap<Integer, Path> paths = pathMap.getPathList();
         for (Map.Entry<Integer, Polyline> polylineEntry : polylines.entrySet()) {
@@ -128,7 +143,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
-    public void OnPathMapUpdateFailure() {
+    public void onPathMapUpdateFailure() {
         if (!hasFailed) {
             hasFailed = true;
             Toast.makeText(getContext(), "Failed to get paths...", Toast.LENGTH_LONG).show();

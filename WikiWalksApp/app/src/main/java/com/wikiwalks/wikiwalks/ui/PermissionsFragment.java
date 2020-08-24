@@ -16,15 +16,16 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.R;
 
 public class PermissionsFragment extends Fragment {
-    Button permissionsButton;
-    PermissionType type;
 
-    public static PermissionsFragment newInstance(PermissionType type) {
+    private String type;
+
+    public static PermissionsFragment newInstance(String type) {
         Bundle args = new Bundle();
-        args.putSerializable("type", type);
+        args.putString("type", type);
         PermissionsFragment fragment = new PermissionsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -32,36 +33,28 @@ public class PermissionsFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        final View rootView = inflater.inflate(R.layout.permissions_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.permissions_fragment, container, false);
+
+        type = getArguments().getString("type");
+
         TextView permissionInfo = rootView.findViewById(R.id.permission_info);
-        type = (PermissionType) getArguments().getSerializable("type");
-        if (type == PermissionType.LOCATION) {
+        if (type.equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
             permissionInfo.setText("WikiWalks needs location permissions to run.");
-            Toast.makeText(getContext(), "Test", Toast.LENGTH_SHORT).show();
-        } else if (type == PermissionType.STORAGE) {
-            permissionInfo.setText("WikiWalks needs storage permissions to submit photos.");
+        } else if (type.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            permissionInfo.setText("WikiWalks needs storage permissions to submit photos and import/export settings.");
         }
-        permissionsButton = rootView.findViewById(R.id.permissions_button);
+
+        Button permissionsButton = rootView.findViewById(R.id.permissions_button);
         permissionsButton.setOnClickListener(v -> startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()))));
+
         return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (type == PermissionType.LOCATION) {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                Handler handler = new Handler();
-                handler.post(() -> getParentFragmentManager().beginTransaction().replace(R.id.main_frame, MapsFragment.newInstance()).commitNow());
-            }
-        } else if (type == PermissionType.STORAGE) {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                Handler handler = new Handler();
-                handler.post(() -> getParentFragmentManager().popBackStack());
-            }
-        }
+        MainActivity.checkPermission(this.getActivity(), type, granted -> {
+            if (granted) getParentFragmentManager().popBackStack();
+        });
     }
-
-    public enum PermissionType {LOCATION, STORAGE}
-
 }

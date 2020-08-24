@@ -32,23 +32,20 @@ import java.util.ArrayList;
 
 public class ReviewListFragment extends Fragment implements Review.GetReviewCallback, EditReviewDialog.EditReviewDialogListener {
 
-    Button writeReviewButton;
-    int parentId;
-    RecyclerView recyclerView;
-    ReviewListRecyclerViewAdapter recyclerViewAdapter;
-    Toolbar toolbar;
-    ArrayList<Review> reviews;
-    ConstraintLayout ownReviewLayout;
-    TextView ownReviewName;
-    TextView ownReviewMessage;
-    RatingBar ownReviewRatingBar;
-    View separator;
-    TextView noReviewsIndicator;
-    Review.ReviewType type;
-    Path path;
-    PointOfInterest pointOfInterest;
-    EditReviewDialog editReviewDialog;
-    SwipeRefreshLayout swipeRefreshLayout;
+    private Button writeReviewButton;
+    private int parentId;
+    private RecyclerView recyclerView;
+    private Toolbar toolbar;
+    private ArrayList<Review> reviews;
+    private ConstraintLayout ownReviewLayout;
+    private TextView ownReviewMessage;
+    private RatingBar ownReviewRatingBar;
+    private View separator;
+    private TextView noReviewsIndicator;
+    private Review.ReviewType type;
+    private Path path;
+    private PointOfInterest pointOfInterest;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public static ReviewListFragment newInstance(Review.ReviewType type, int parentId) {
         Bundle args = new Bundle();
@@ -75,7 +72,6 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
         }
         final View rootView = inflater.inflate(R.layout.review_list_fragment, container, false);
         ownReviewLayout = rootView.findViewById(R.id.path_review_list_own_review);
-        ownReviewName = rootView.findViewById(R.id.path_review_own_review_row_name);
         ownReviewMessage = rootView.findViewById(R.id.path_review_own_review_row_text);
         ownReviewRatingBar = rootView.findViewById(R.id.path_review_own_review_row_rating);
         separator = rootView.findViewById(R.id.path_review_separator);
@@ -85,8 +81,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
         toolbar.setTitle("Reviews - " + title);
         noReviewsIndicator = rootView.findViewById(R.id.no_reviews_indicator);
         recyclerView = rootView.findViewById(R.id.path_review_list_recyclerview);
-        recyclerViewAdapter = new ReviewListRecyclerViewAdapter(this, reviews);
-        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setAdapter(new ReviewListRecyclerViewAdapter(this, reviews));
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         } else {
@@ -148,7 +143,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
                 separator.setVisibility(View.GONE);
                 writeReviewButton.setText("WRITE REVIEW");
             }
-            recyclerViewAdapter.notifyDataSetChanged();
+            recyclerView.getAdapter().notifyDataSetChanged();
         }
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -162,11 +157,6 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
     @Override
     public void onGetReviewFailure() {
         Toast.makeText(getContext(), "Failed to get reviews", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void setEditReviewDialog(EditReviewDialog editReviewDialog) {
-        this.editReviewDialog = editReviewDialog;
     }
 
     @Override

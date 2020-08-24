@@ -19,8 +19,8 @@ import com.wikiwalks.wikiwalks.ui.PointOfInterestListFragment;
 import java.util.ArrayList;
 
 public class PointOfInterestListRecyclerViewAdapter extends RecyclerView.Adapter<PointOfInterestListRecyclerViewAdapter.ViewHolder> {
-    ArrayList<PointOfInterest> pointOfInterestList;
-    PointOfInterestListFragment context;
+    private ArrayList<PointOfInterest> pointOfInterestList;
+    private PointOfInterestListFragment context;
 
     public PointOfInterestListRecyclerViewAdapter(PointOfInterestListFragment context, ArrayList<PointOfInterest> pointOfInterestList) {
         this.context = context;

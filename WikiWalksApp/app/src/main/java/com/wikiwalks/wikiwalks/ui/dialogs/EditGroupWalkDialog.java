@@ -27,17 +27,12 @@ import java.util.Calendar;
 
 public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.EditGroupWalkCallback {
 
-    int pathId;
-    int groupWalkPosition;
-    Path path;
-    GroupWalk walk;
-    TextView time;
-    TextInputLayout title;
-    Button selectTimeButton;
-    Button submitButton;
-    Button cancelButton;
-    Button deleteButton;
-    Calendar calendar;
+    private Path path;
+    private GroupWalk walk;
+    private TextView time;
+    private TextInputLayout title;
+    private Button submitButton;
+    private Calendar calendar;
 
     public static EditGroupWalkDialog newInstance(int pathId, int groupWalkPosition) {
         Bundle args = new Bundle();
@@ -51,8 +46,8 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        pathId = getArguments().getInt("path_id");
-        groupWalkPosition = getArguments().getInt("group_walk_position");
+        int pathId = getArguments().getInt("path_id");
+        int groupWalkPosition = getArguments().getInt("group_walk_position");
         path = PathMap.getInstance().getPathList().get(pathId);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
@@ -60,7 +55,7 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
         calendar = Calendar.getInstance();
         time = view.findViewById(R.id.edit_group_walk_popup_time);
         title = view.findViewById(R.id.edit_group_walk_title);
-        selectTimeButton = view.findViewById(R.id.edit_group_walk_select_time_button);
+        Button selectTimeButton = view.findViewById(R.id.edit_group_walk_select_time_button);
         selectTimeButton.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (datePicker, year, monthOfYear, dayOfMonth) -> {
                 calendar.set(year, monthOfYear, dayOfMonth);
@@ -83,9 +78,9 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
                 walk.edit(getContext(), calendar.getTimeInMillis() / 1000, walkTitle, this);
             }
         });
-        cancelButton = view.findViewById(R.id.edit_group_walk_popup_cancel_button);
+        Button cancelButton = view.findViewById(R.id.edit_group_walk_popup_cancel_button);
         cancelButton.setOnClickListener(v -> dismiss());
-        deleteButton = view.findViewById(R.id.edit_group_walk_popup_delete_button);
+        Button deleteButton = view.findViewById(R.id.edit_group_walk_popup_delete_button);
         deleteButton.setOnClickListener(v -> {
             AlertDialog confirmationDialog = new AlertDialog.Builder(getContext())
                     .setTitle("Confirm Deletion")

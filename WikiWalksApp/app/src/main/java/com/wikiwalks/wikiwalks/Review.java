@@ -51,7 +51,7 @@ public class Review {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             attributes.put("text", message);
             attributes.put("rating", rating);
             request.put("attributes", attributes);
@@ -68,6 +68,7 @@ public class Review {
                                 PathMap.getInstance().getPathList().get(parentId).setOwnReview(newReview);
                             else
                                 PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(newReview);
+                            PreferencesManager.getInstance(context).changeReviewsWritten(false);
                             callback.onSubmitReviewSuccess();
                         } catch (JSONException e) {
                             Log.e("SUBMIT_PATH_REVIEW1", Arrays.toString(e.getStackTrace()));
@@ -113,7 +114,7 @@ public class Review {
         try {
             attributes.put("text", message);
             attributes.put("rating", rating);
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> editReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).editPathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).editPoIReview(parentId, id, body);
@@ -147,7 +148,7 @@ public class Review {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> deleteReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).deletePathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).deletePoIReview(parentId, id, body);
@@ -159,6 +160,7 @@ public class Review {
                             PathMap.getInstance().getPathList().get(parentId).setOwnReview(null);
                         else
                             PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(null);
+                        PreferencesManager.getInstance(context).changeReviewsWritten(true);
                         callback.onDeleteReviewSuccess();
                     } else {
                         callback.onDeleteReviewFailure();

@@ -32,13 +32,10 @@ import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
 
 public class PointOfInterestFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestEditCallback {
 
-    Toolbar toolbar;
-    GoogleMap mMap;
-    PointOfInterest pointOfInterest;
-    Button reviewsButton;
-    Button picturesButton;
-    SupportMapFragment mapFragment;
-    EditNameDialog editNameDialog;
+    private Toolbar toolbar;
+    private PointOfInterest pointOfInterest;
+    private SupportMapFragment mapFragment;
+    private EditNameDialog editNameDialog;
 
     public static PointOfInterestFragment newInstance(int pointOfInterestId) {
         Bundle args = new Bundle();
@@ -52,8 +49,10 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.poi_fragment, container, false);
+
         pointOfInterest = PathMap.getInstance().getPointOfInterestList().get(getArguments().getInt("point_of_interest_id"));
-        final View rootView = inflater.inflate(R.layout.poi_fragment, container, false);
+
         toolbar = rootView.findViewById(R.id.poi_frag_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
@@ -75,15 +74,21 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
             return false;
         });
         toolbar.setTitle(pointOfInterest.getName());
+
         TextView description = rootView.findViewById(R.id.poi_frag_description);
         description.setText("Point of interest on " + pointOfInterest.getPath().getName());
-        reviewsButton = rootView.findViewById(R.id.poi_frag_reviews_button);
+
+        Button reviewsButton = rootView.findViewById(R.id.poi_frag_reviews_button);
         reviewsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, ReviewListFragment.newInstance(Review.ReviewType.POINT_OF_INTEREST, pointOfInterest.getId())).addToBackStack(null).commit());
-        picturesButton = rootView.findViewById(R.id.poi_frag_pictures_button);
+
+        Button picturesButton = rootView.findViewById(R.id.poi_frag_pictures_button);
         picturesButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PictureListFragment.newInstance(Picture.PictureType.POINT_OF_INTEREST, pointOfInterest.getId())).addToBackStack(null).commit());
+
         RatingBar ratingBar = rootView.findViewById(R.id.poi_frag_rating_bar);
         ratingBar.setRating((float) pointOfInterest.getRating());
+
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_poi_preview_frag);
+
         return rootView;
     }
 
@@ -95,13 +100,12 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        for (Route route : pointOfInterest.getPath().getRoutes()) route.makePolyline(mMap);
-        pointOfInterest.makeMarker(mMap, BitmapDescriptorFactory.HUE_RED);
-        mMap.getUiSettings().setAllGesturesEnabled(false);
-        mMap.setOnMarkerClickListener(this);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(pointOfInterest.getPath().getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
+        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        for (Route route : pointOfInterest.getPath().getRoutes()) route.makePolyline(googleMap);
+        pointOfInterest.makeMarker(googleMap, BitmapDescriptorFactory.HUE_RED);
+        googleMap.getUiSettings().setAllGesturesEnabled(false);
+        googleMap.setOnMarkerClickListener(this);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(pointOfInterest.getPath().getBounds(), 20));
     }
 
     @Override

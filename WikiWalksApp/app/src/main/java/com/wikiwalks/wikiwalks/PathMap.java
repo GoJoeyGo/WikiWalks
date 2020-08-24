@@ -28,9 +28,9 @@ public class PathMap {
     private LinkedHashMap<Integer, PointOfInterest> pointOfInterestList = new LinkedHashMap<>();
 
     public interface PathMapListener {
-        void OnPathMapChange();
+        void onPathMapUpdateSuccess();
 
-        void OnPathMapUpdateFailure();
+        void onPathMapUpdateFailure();
     }
 
     private PathMap() {
@@ -47,7 +47,7 @@ public class PathMap {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> getPaths = MainActivity.getRetrofitRequests(context).getPaths(bounds.northeast.latitude, bounds.northeast.longitude, bounds.southwest.latitude, bounds.southwest.longitude, body);
@@ -87,13 +87,13 @@ public class PathMap {
 
     private void triggerChangeListeners() {
         for (PathMapListener listener : changeListeners) {
-            listener.OnPathMapChange();
+            listener.onPathMapUpdateSuccess();
         }
     }
 
     private void triggerFailedListeners() {
         for (PathMapListener listener : changeListeners) {
-            listener.OnPathMapUpdateFailure();
+            listener.onPathMapUpdateFailure();
         }
     }
 

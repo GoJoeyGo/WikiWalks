@@ -1,5 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
+import android.Manifest;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
@@ -34,6 +35,7 @@ import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
+import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
@@ -43,10 +45,9 @@ import java.util.ArrayList;
 public class RecordingFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Route.RouteModifyCallback, PointOfInterest.PointOfInterestSubmitCallback {
 
     public Context context;
-    GoogleMap mMap;
-    Toolbar toolbar;
-    EditNameDialog editNameDialog;
-    Button markPointButton;
+    private GoogleMap mMap;
+    private EditNameDialog editNameDialog;
+    private Button markPointButton;
     private boolean recording = true;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
@@ -61,6 +62,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     private ArrayList<Double> poiLongitudes = new ArrayList<>();
     private int submittedPointsOfInterest = 0;
     private Location lastLocation;
+    float distanceWalked = 0;
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -79,6 +81,8 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.recording_fragment, container, false);
+
         int pathId = getArguments().getInt("pathId");
         if (pathId > -1)
             path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
@@ -97,12 +101,14 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
             lastLocation.setLongitude(longitudeArray[longitudeArray.length - 1]);
             lastLocation.setAltitude(altitudeArray[altitudeArray.length - 1]);
         }
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-        final View rootView = inflater.inflate(R.layout.recording_fragment, container, false);
-        toolbar = rootView.findViewById(R.id.recording_toolbar);
+
+        Toolbar toolbar = rootView.findViewById(R.id.recording_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle((pathId > -1) ? "New Route - " + path.getName() : "New Path");
+
         stopRecordingButton = rootView.findViewById(R.id.stop_recording_button);
         stopRecordingButton.setOnClickListener(v -> {
             if (recording) {
@@ -138,25 +144,33 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
                     } else showSubmissionDialog(false);
                 } else showSubmissionDialog(true);
             } else {
-                MainActivity.checkLocationPermission(this.getActivity());
-                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-                    if (location.distanceTo(lastLocation) < 15) {
-                        stopRecordingButton.setText("STOP RECORDING");
-                        startLocationUpdates();
+                MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
+                    if (granted) {
+                        stopRecordingButton.setEnabled(true);
+                        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                            if (location.distanceTo(lastLocation) < 15) {
+                                stopRecordingButton.setText("STOP RECORDING");
+                                startLocationUpdates();
+                            } else {
+                                Toast.makeText(context, "Too far away from last point to resume!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     } else {
-                        Toast.makeText(context, "Too far away from last point to resume!", Toast.LENGTH_SHORT).show();
+                        stopRecordingButton.setEnabled(false);
+                        getParentFragmentManager().beginTransaction().replace(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.ACCESS_FINE_LOCATION)).addToBackStack(null).commit();
                     }
                 });
-
             }
         });
+
         markPointButton = rootView.findViewById(R.id.recording_mark_poi_button);
         markPointButton.setOnClickListener(v -> {
             EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "SubmissionPopup");
         });
+
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
         mapFragment.getMapAsync(this);
-        context = getContext();
+
         return rootView;
     }
 
@@ -181,8 +195,14 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        MainActivity.checkLocationPermission(this.getActivity());
-        mMap.setMyLocationEnabled(true);
+        MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
+            if (granted) {
+                mMap.setMyLocationEnabled(true);
+            } else {
+                stopRecordingButton.setEnabled(false);
+                getParentFragmentManager().beginTransaction().replace(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.ACCESS_FINE_LOCATION)).addToBackStack(null).commit();
+            }
+        });
         mMap.getUiSettings().setAllGesturesEnabled(false);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setScrollGesturesEnabledDuringRotateOrZoom(false);
@@ -208,8 +228,9 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(3000);
         locationRequest.setFastestInterval(1000);
-        MainActivity.checkLocationPermission(this.getActivity());
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+        MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
+            if (granted) fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+        });
     }
 
     public void onLocationChanged(Location location) {
@@ -228,6 +249,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
             altitudes.add(location.getAltitude());
             latLngs.add(new LatLng(location.getLatitude(), location.getLongitude()));
             lastLocation = location;
+            distanceWalked += location.distanceTo(lastLocation);
         }
     }
 
@@ -289,5 +311,11 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     @Override
     public void onSubmitPointOfInterestFailure() {
 
+    }
+
+    @Override
+    public void onDestroy() {
+        PreferencesManager.getInstance(getContext()).addDistanceWalked(distanceWalked);
+        super.onDestroy();
     }
 }

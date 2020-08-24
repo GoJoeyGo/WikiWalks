@@ -19,9 +19,9 @@ import com.wikiwalks.wikiwalks.ui.RouteListFragment;
 import java.util.ArrayList;
 
 public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteListRecyclerViewAdapter.ViewHolder> {
-    ArrayList<AppCompatButton> buttons = new ArrayList<>();
-    ArrayList<Route> routeList;
-    RouteListFragment routeListFragment;
+    private ArrayList<AppCompatButton> buttons = new ArrayList<>();
+    private ArrayList<Route> routeList;
+    private RouteListFragment routeListFragment;
 
     public RouteListRecyclerViewAdapter(RouteListFragment routeListFragment, ArrayList<Route> routeList) {
         this.routeListFragment = routeListFragment;

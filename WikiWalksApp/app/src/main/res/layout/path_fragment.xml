@@ -41,7 +41,7 @@
                 app:layout_collapseMode="pin"
                 app:menu="@menu/path_menu"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="?attr/colorOnBackground"></androidx.appcompat.widget.Toolbar>
+                app:titleTextColor="?attr/colorOnBackground" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
