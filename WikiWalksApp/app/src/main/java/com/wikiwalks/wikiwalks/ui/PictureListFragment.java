@@ -125,8 +125,7 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
                 getParentFragmentManager().beginTransaction().add(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.WRITE_EXTERNAL_STORAGE)).addToBackStack(null).commit();
             }
         }));
-
-        updatePicturesList(true);
+        if (savedInstanceState == null) updatePicturesList(true);
 
         return rootView;
     }
@@ -152,5 +151,11 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
         recyclerView.getAdapter().notifyItemRemoved(position);
         recyclerView.getAdapter().notifyItemRangeChanged(position, pictures.size());
         updateRecyclerView();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("not_new", true);
     }
 }

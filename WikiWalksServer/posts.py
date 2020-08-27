@@ -215,7 +215,8 @@ def add_group_walk(path_id):
         request_json = request.get_json(force=True)["attributes"]
         path = Path.query.filter_by(id=path_id).first()
         user = get_submitter(request_json["device_id"])
-        new_gw = GroupWalk(submitter=user.id, created_time=get_time(), path_id=path.id, time=request_json["time"], title=request_json["title"])
+        new_gw = GroupWalk(submitter=user.id, created_time=get_time(), path_id=path.id, time=request_json["time"],
+                           title=request_json["title"])
         db.session.add(new_gw)
         db.session.commit()
         new_gw.submitter = user.nickname
@@ -293,12 +294,13 @@ def add_poi_review(poi_id):
             point_of_interest.average_rating = request_json["rating"]
             point_of_interest.rating_count = 1
         else:
-            point_of_interest.average_rating = ((point_of_interest.average_rating * point_of_interest.rating_count) + request_json["rating"]) / \
-                                  (point_of_interest.rating_count + 1)
+            point_of_interest.average_rating = ((point_of_interest.average_rating * point_of_interest.rating_count)
+                                                + request_json["rating"]) / (point_of_interest.rating_count + 1)
             point_of_interest.rating_count = point_of_interest.rating_count + 1
         user = get_submitter(request_json["device_id"])
         data = poi_review_schema.load(request_json, partial=True)
-        new_poi_review = PointOfInterestReview(**data, point_of_interest_id=poi_id, submitter=user.id, created_time=get_time())
+        new_poi_review = PointOfInterestReview(**data, point_of_interest_id=poi_id, submitter=user.id,
+                                               created_time=get_time())
         db.session.add(new_poi_review)
         db.session.commit()
         new_poi_review.submitter = user.nickname

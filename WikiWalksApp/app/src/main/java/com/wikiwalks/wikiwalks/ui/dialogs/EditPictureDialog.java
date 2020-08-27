@@ -48,7 +48,6 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     private Button submitButton;
     private Picture picture;
     private AlertDialog confirmationDialog;
-    private Bitmap bitmap;
     private Uri photoUri;
 
     private ActivityResultLauncher<Uri> takePicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), uri -> {
@@ -74,7 +73,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         EditPictureDialog fragment = new EditPictureDialog();
         args.putSerializable("picture_type", type);
         args.putInt("parent_id", parentId);
-        if (position > -1) args.putInt("position", position);
+        args.putInt("position", position);
         if (bitmap != null) args.putParcelable("image", bitmap);
         fragment.setArguments(args);
         return fragment;
@@ -119,12 +118,11 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         listener = (EditPictureDialogListener) getParentFragment();
         type = (Picture.PictureType) getArguments().getSerializable("picture_type");
         parentId = getArguments().getInt("parent_id");
-        if (getArguments().containsKey("position")) {
+        if (getArguments().getInt("position") > -1) {
             if (type == Picture.PictureType.PATH)
                 picture = PathMap.getInstance().getPathList().get(parentId).getPicturesList().get(getArguments().getInt("position"));
             else
                 picture = PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().get(getArguments().getInt("position"));
-            bitmap = getArguments().getParcelable("image");
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
@@ -186,7 +184,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         });
         if (picture != null) {
             title.getEditText().setText(picture.getDescription());
-            imageView.setImageBitmap(bitmap);
+            imageView.setImageBitmap(getArguments().getParcelable("image"));
             cameraButton.setVisibility(View.GONE);
             galleryButton.setVisibility(View.GONE);
         } else {
@@ -194,7 +192,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         }
         if (savedInstanceState != null) {
             title.getEditText().setText(savedInstanceState.getString("description"));
-            if (savedInstanceState.containsKey("filename")) {
+            if (savedInstanceState.containsKey("uri")) {
                 photoUri = Uri.parse(savedInstanceState.getString("uri"));
                 loadIntoImageView();
             }
