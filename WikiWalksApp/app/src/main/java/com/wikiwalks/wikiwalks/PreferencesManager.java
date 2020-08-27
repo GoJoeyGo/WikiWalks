@@ -1,17 +1,9 @@
 package com.wikiwalks.wikiwalks;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.text.TextUtils;
-
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.CallSuper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -117,6 +109,14 @@ public class PreferencesManager {
             preferences.edit().putString("bookmarks", TextUtils.join(",", bookmarksList)).apply();
             return true;
         }
+    }
+
+    public void setName(String name) {
+        preferences.edit().putString("name", (name.isEmpty()) ? "Anonymous" : name).apply();
+    }
+
+    public String getName() {
+        return preferences.getString("name", "Anonymous");
     }
 
     public String getDeviceId() {

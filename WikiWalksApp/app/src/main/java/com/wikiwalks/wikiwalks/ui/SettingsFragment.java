@@ -35,8 +35,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class SettingsFragment extends Fragment implements EditNameDialog.EditDialogListener {
 
     EditNameDialog editNameDialog;
@@ -71,7 +69,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
                     if (response.isSuccessful()) {
                         editNameDialog.dismiss();
                         Toast.makeText(getContext(), "Name set successfully!", Toast.LENGTH_SHORT).show();
-                        getContext().getSharedPreferences("preferences", MODE_PRIVATE).edit().putString("name", name).apply();
+                        PreferencesManager.getInstance(getContext()).setName(name);
                     } else {
                         Toast.makeText(getContext(), "Failed to set name...", Toast.LENGTH_SHORT).show();
                     }

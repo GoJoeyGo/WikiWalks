@@ -20,16 +20,14 @@ import com.wikiwalks.wikiwalks.Review;
 
 public class EditReviewDialog extends DialogFragment implements Review.EditReviewCallback {
 
-    EditReviewDialogListener listener;
-    TextInputLayout message;
-    RatingBar rating;
-    Button saveButton;
-    Button deleteButton;
-    Button cancelButton;
-    Review review;
-    AlertDialog confirmationDialog;
+    private EditReviewDialogListener listener;
+    private TextInputLayout message;
+    private RatingBar rating;
+    private Button saveButton;
+    private Review review;
+    private AlertDialog confirmationDialog;
     int parentId;
-    Review.ReviewType type;
+    private Review.ReviewType type;
 
     public interface EditReviewDialogListener {
         void onEditReview();
@@ -112,8 +110,8 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
                 }
             }
         });
-        deleteButton = view.findViewById(R.id.edit_review_popup_delete_button);
-        cancelButton = view.findViewById(R.id.edit_review_popup_cancel_button);
+        Button deleteButton = view.findViewById(R.id.edit_review_popup_delete_button);
+        Button cancelButton = view.findViewById(R.id.edit_review_popup_cancel_button);
         cancelButton.setOnClickListener(v -> {
             dismiss();
         });

@@ -14,7 +14,6 @@ import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.PathFragment;
 
 public class BookmarkedPathRecyclerViewAdapter extends RecyclerView.Adapter<BookmarkedPathRecyclerViewAdapter.ViewHolder> {
-
     private Path[] paths;
     private Fragment parentFragment;
 

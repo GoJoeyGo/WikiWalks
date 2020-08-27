@@ -40,27 +40,24 @@ import java.util.Date;
 
 public class EditPictureDialog extends DialogFragment implements Picture.EditPictureCallback {
 
-    Picture.PictureType type;
-    EditPictureDialogListener listener;
-    TextInputLayout title;
-    int parentId;
-    ImageView imageView;
-    Button cameraButton;
-    Button galleryButton;
-    Button submitButton;
-    Button deleteButton;
-    Button cancelButton;
-    Picture picture;
-    AlertDialog confirmationDialog;
-    Bitmap bitmap;
-    Uri photoUri;
+    private Picture.PictureType type;
+    private EditPictureDialogListener listener;
+    private TextInputLayout title;
+    private int parentId;
+    private ImageView imageView;
+    private Button submitButton;
+    private Picture picture;
+    private AlertDialog confirmationDialog;
+    private Bitmap bitmap;
+    private Uri photoUri;
 
-    ActivityResultLauncher<Uri> takePicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), uri -> {
+    private ActivityResultLauncher<Uri> takePicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), uri -> {
         submitButton.setEnabled(false);
         loadIntoImageView();
         submitButton.setEnabled(true);
     });
-    ActivityResultLauncher<String> selectPicture = registerForActivityResult(new CustomActivityResultContracts.SelectPicture(), uri -> {
+
+    private ActivityResultLauncher<String> selectPicture = registerForActivityResult(new CustomActivityResultContracts.SelectPicture(), uri -> {
         submitButton.setEnabled(false);
         photoUri = uri;
         loadIntoImageView();
@@ -134,7 +131,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         View view = inflater.inflate(R.layout.edit_picture_dialog, null);
         imageView = view.findViewById(R.id.edit_picture_popup_selected_image);
         title = view.findViewById(R.id.edit_picture_popup_description);
-        cameraButton = view.findViewById(R.id.picture_popup_camera_button);
+        Button cameraButton = view.findViewById(R.id.picture_popup_camera_button);
         cameraButton.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentValues contentValues = new ContentValues();
@@ -156,7 +153,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                 });
             }
         });
-        galleryButton = view.findViewById(R.id.picture_popup_gallery_button);
+        Button galleryButton = view.findViewById(R.id.picture_popup_gallery_button);
         galleryButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
             if (granted) selectPicture.launch(null);
         }));
@@ -174,7 +171,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                 }
             }
         });
-        deleteButton = view.findViewById(R.id.edit_picture_popup_delete_button);
+        Button deleteButton = view.findViewById(R.id.edit_picture_popup_delete_button);
         deleteButton.setOnClickListener(v -> {
             confirmationDialog = new AlertDialog.Builder(getContext())
                     .setTitle("Confirm Deletion")
@@ -183,7 +180,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                     .setNegativeButton("No", (dialog, which) -> confirmationDialog.dismiss()).create();
             confirmationDialog.show();
         });
-        cancelButton = view.findViewById(R.id.edit_picture_popup_cancel_button);
+        Button cancelButton = view.findViewById(R.id.edit_picture_popup_cancel_button);
         cancelButton.setOnClickListener(v -> {
             dismiss();
         });

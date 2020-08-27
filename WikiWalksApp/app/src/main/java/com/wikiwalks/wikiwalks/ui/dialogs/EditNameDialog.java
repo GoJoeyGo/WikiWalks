@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 
 public class EditNameDialog extends DialogFragment {
@@ -52,6 +53,7 @@ public class EditNameDialog extends DialogFragment {
             else if (type == EditNameDialogType.POINT_OF_INTEREST)
                 title.getEditText().setText(PathMap.getInstance().getPointOfInterestList().get(getArguments().getInt("parent_id")).getName());
         }
+        if (type == EditNameDialogType.USERNAME) title.getEditText().setText(PreferencesManager.getInstance(getContext()).getName());
         Button editButton = view.findViewById(R.id.edit_popup_save_button);
         editButton.setOnClickListener(v -> {
             listener.onEditName(type, title.getEditText().getText().toString());
