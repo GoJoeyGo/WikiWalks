@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         this.savedInstanceState = savedInstanceState;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, MapsFragment.newInstance()).commitNow();
+        if (savedInstanceState == null) getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, MapsFragment.newInstance()).commitNow();
     }
 
     @Override

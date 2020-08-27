@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -32,7 +32,7 @@ import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
 
 public class PointOfInterestFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestEditCallback {
 
-    private Toolbar toolbar;
+    private MaterialToolbar toolbar;
     private PointOfInterest pointOfInterest;
     private SupportMapFragment mapFragment;
     private EditNameDialog editNameDialog;

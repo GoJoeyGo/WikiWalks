@@ -6,16 +6,17 @@
     android:paddingRight="16dp"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/bookmark_button"
+    <TextView
+        android:id="@+id/statistics_entry"
         style="@style/TextButtonTheme"
+        android:paddingTop="32dp"
+        android:paddingBottom="33dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableEnd="@drawable/chevron"
-        android:gravity="center_vertical" />
+        android:gravity="center_vertical"/>
 
     <View
-        android:id="@+id/bookmark_separator"
+        android:id="@+id/statistics_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider" />

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,7 +35,6 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
     private Button writeReviewButton;
     private int parentId;
     private RecyclerView recyclerView;
-    private Toolbar toolbar;
     private ArrayList<Review> reviews;
     private ConstraintLayout ownReviewLayout;
     private TextView ownReviewMessage;
@@ -75,7 +74,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
         ownReviewMessage = rootView.findViewById(R.id.path_review_own_review_row_text);
         ownReviewRatingBar = rootView.findViewById(R.id.path_review_own_review_row_rating);
         separator = rootView.findViewById(R.id.path_review_separator);
-        toolbar = rootView.findViewById(R.id.path_review_list_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.path_review_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Reviews - " + title);

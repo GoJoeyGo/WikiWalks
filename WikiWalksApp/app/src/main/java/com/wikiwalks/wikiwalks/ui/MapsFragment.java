@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -54,7 +54,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         PathMap.getInstance().addListener(this);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
-        Toolbar toolbar = rootView.findViewById(R.id.main_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.main_toolbar);
         toolbar.setTitle(R.string.app_name);
         toolbar.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {

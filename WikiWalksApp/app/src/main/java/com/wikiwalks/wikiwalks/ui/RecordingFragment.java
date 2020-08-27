@@ -1,7 +1,9 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -13,7 +15,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -101,10 +103,11 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
             lastLocation.setLongitude(longitudeArray[longitudeArray.length - 1]);
             lastLocation.setAltitude(altitudeArray[altitudeArray.length - 1]);
         }
+        context = getContext();
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
-        Toolbar toolbar = rootView.findViewById(R.id.recording_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.recording_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle((pathId > -1) ? "New Route - " + path.getName() : "New Path");
@@ -214,6 +217,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         }
         polyline = mMap.addPolyline(new PolylineOptions().addAll(latLngs));
         polyline.setWidth(20);
+        polyline.setColor(Color.WHITE);
         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20)));
         startLocationUpdates();
     }
@@ -244,21 +248,22 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
     public void addLocation(Location location) {
         if (lastLocation == null || location.distanceTo(lastLocation) > 2) {
+            if (lastLocation != null) distanceWalked += location.distanceTo(lastLocation);
             latitudes.add(location.getLatitude());
             longitudes.add(location.getLongitude());
             altitudes.add(location.getAltitude());
             latLngs.add(new LatLng(location.getLatitude(), location.getLongitude()));
             lastLocation = location;
-            distanceWalked += location.distanceTo(lastLocation);
         }
     }
 
     public void showSubmissionDialog(boolean newPath) {
-        new MaterialAlertDialogBuilder(context).setTitle("Submit?").setPositiveButton("Yes", (dialog, which) -> {
+        AlertDialog confirmationDialog = new AlertDialog.Builder(context).setTitle("Submit?").setPositiveButton("Yes", (dialog, which) -> {
             if (newPath)
                 EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
             else submitRoute("", this);
-        }).setNegativeButton("No", (dialog, which) -> dialog.dismiss()).show();
+        }).setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
+        confirmationDialog.show();
     }
 
     public void submitRoute(String title, Route.RouteModifyCallback callback) {

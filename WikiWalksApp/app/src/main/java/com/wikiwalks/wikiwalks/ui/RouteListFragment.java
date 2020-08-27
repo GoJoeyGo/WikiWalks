@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,7 +53,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         routes = path.getRoutes();
         final View rootView = inflater.inflate(R.layout.route_list_fragment, container, false);
-        Toolbar toolbar = rootView.findViewById(R.id.route_list_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.route_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Routes - " + path.getName());

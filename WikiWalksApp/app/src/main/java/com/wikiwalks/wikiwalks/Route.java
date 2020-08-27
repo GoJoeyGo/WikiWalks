@@ -1,6 +1,8 @@
 package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,6 +21,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -26,16 +29,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Route implements Serializable {
-    @SerializedName("id")
-    int id;
 
+    int id;
     Path path;
-    @SerializedName("editable")
     boolean editable;
 
     private ArrayList<Double> latitudes;
     private ArrayList<Double> longitudes;
     private ArrayList<Double> altitudes;
+    private String distance;
 
     private ArrayList<Polyline> polylines = new ArrayList<>();
 
@@ -51,6 +53,25 @@ public class Route implements Serializable {
         this.latitudes = latitudes;
         this.longitudes = longitudes;
         this.altitudes = altitudes;
+        double distanceInKilometres = 0;
+        Location lastLocation = new Location("import");
+        lastLocation.setLatitude(latitudes.get(0));
+        lastLocation.setLongitude(longitudes.get(0));
+        lastLocation.setAltitude(altitudes.get(0));
+        for (int i = 1; i < latitudes.size(); i++) {
+            Location newLocation = new Location("import");
+            newLocation.setLatitude(latitudes.get(i));
+            newLocation.setLongitude(longitudes.get(i));
+            newLocation.setAltitude(altitudes.get(i));
+            distanceInKilometres += (newLocation.distanceTo(lastLocation) / 1000);
+            lastLocation = newLocation;
+        }
+        String country = Locale.getDefault().getCountry();
+        if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
+            distance = String.format("%.2f mi", distanceInKilometres * 0.621371);
+        } else {
+            distance = String.format("%.2f km", distanceInKilometres);
+        }
     }
 
     public static void submit(Context context, Path path, String title, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, RouteModifyCallback callback) {
@@ -130,6 +151,10 @@ public class Route implements Serializable {
 
     public ArrayList<Double> getAltitudes() {
         return altitudes;
+    }
+
+    public String getDistance() {
+        return distance;
     }
 
     public boolean isEditable() {

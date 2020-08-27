@@ -1,8 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,12 +9,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.gson.JsonElement;
+import com.wikiwalks.wikiwalks.CustomActivityResultContracts;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
@@ -34,14 +35,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 public class SettingsFragment extends Fragment implements EditNameDialog.EditDialogListener {
 
-    private static final int REQUEST_CODE_EXPORT = 0;
-    private static final int REQUEST_CODE_IMPORT = 1;
     EditNameDialog editNameDialog;
+    ActivityResultLauncher<String> exportSettings = registerForActivityResult(new CustomActivityResultContracts.ExportSettings(), uri -> PreferencesManager.getInstance(getContext()).exportPreferences(uri));
+    ActivityResultLauncher<String[]> importSettings = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> PreferencesManager.getInstance(getContext()).importPreferences(uri));
 
     public static SettingsFragment newInstance() {
         Bundle args = new Bundle();
@@ -69,6 +69,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
+                        editNameDialog.dismiss();
                         Toast.makeText(getContext(), "Name set successfully!", Toast.LENGTH_SHORT).show();
                         getContext().getSharedPreferences("preferences", MODE_PRIVATE).edit().putString("name", name).apply();
                     } else {
@@ -88,24 +89,13 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode == RESULT_OK && data != null) {
-            if (requestCode == REQUEST_CODE_EXPORT) {
-                PreferencesManager.getInstance(getContext()).exportPreferences(data.getData());
-            } else {
-                PreferencesManager.getInstance(getContext()).importPreferences(data.getData());
-            }
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.settings_fragment, container, false);
 
-        Toolbar toolbar = rootView.findViewById(R.id.settings_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.settings_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Settings");
@@ -113,14 +103,13 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
         Button setNameButton = rootView.findViewById(R.id.settings_set_name_button);
         setNameButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
 
+        Button statisticsButton = rootView.findViewById(R.id.settings_statistics_button);
+        statisticsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, StatisticsFragment.newInstance()).addToBackStack(null).commit());
+
         Button exportSettingsButton = rootView.findViewById(R.id.settings_export_settings_button);
         exportSettingsButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, (granted -> {
             if (granted) {
-                Intent exportSettingsIntent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-                exportSettingsIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                exportSettingsIntent.setType("application/json");
-                exportSettingsIntent.putExtra(Intent.EXTRA_TITLE, "wikiwalks_backup_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".json");
-                startActivityForResult(exportSettingsIntent, REQUEST_CODE_EXPORT);
+                exportSettings.launch("wikiwalks_backup_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".json");
             } else {
                 getParentFragmentManager().beginTransaction().add(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.WRITE_EXTERNAL_STORAGE)).addToBackStack(null).commit();
             }
@@ -129,10 +118,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
         Button importSettingsButton = rootView.findViewById(R.id.settings_import_settings_button);
         importSettingsButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
             if (granted) {
-                Intent importSettingsIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                importSettingsIntent.setType("application/json");
-                importSettingsIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(importSettingsIntent, REQUEST_CODE_IMPORT);
+                importSettings.launch(new String[]{"application/json"});
             } else {
                 getParentFragmentManager().beginTransaction().add(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.WRITE_EXTERNAL_STORAGE)).addToBackStack(null).commit();
             }

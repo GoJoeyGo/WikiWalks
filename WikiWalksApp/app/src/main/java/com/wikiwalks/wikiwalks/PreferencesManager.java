@@ -1,9 +1,17 @@
 package com.wikiwalks.wikiwalks;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.text.TextUtils;
+
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -22,6 +30,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -117,6 +126,22 @@ public class PreferencesManager {
         return preferences.getString("device_id", null);
     }
 
+    public String[] getStatistics() {
+        String[] strings = new String[6];
+        String country = Locale.getDefault().getCountry();
+        if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
+            strings[0] = String.format("Distance Walked - %.2f mi", statistics.getFloat("distance_walked", 0) * 0.000621371);
+        } else {
+            strings[0] = String.format("Distance Walked - %.2f km", statistics.getFloat("distance_walked", 0) / 1000);
+        }
+        strings[1] = String.format("Times Walked - %d", statistics.getInt("times_walked", 0));
+        strings[2] = String.format("Routes Recorded - %d", statistics.getInt("routes_recorded", 0));
+        strings[3] = String.format("Points of Interest Marked - %d", statistics.getInt("points_marked", 0));
+        strings[4] = String.format("Reviews Written - %d", statistics.getInt("reviews_written", 0));
+        strings[5] = String.format("Pictures Uploaded - %d", statistics.getInt("pictures_uploaded", 0));
+        return strings;
+    }
+
     public void exportPreferences(Uri location) {
         JSONObject preferencesJson = new JSONObject();
         JSONObject statisticsJson = new JSONObject();
@@ -146,7 +171,7 @@ public class PreferencesManager {
                     JsonObject importedStatistics = jsonObject.get("statistics").getAsJsonObject();
                     for (Map.Entry<String, JsonElement> statisticsEntry : importedStatistics.entrySet()) {
                         if (statisticsEntry.getKey().matches("distance_walked")) statistics.edit().putFloat(statisticsEntry.getKey(), statisticsEntry.getValue().getAsFloat()).apply();
-                        else statistics.edit().putFloat(statisticsEntry.getKey(), statisticsEntry.getValue().getAsInt()).apply();
+                        else statistics.edit().putInt(statisticsEntry.getKey(), statisticsEntry.getValue().getAsInt()).apply();
                     }
                 } else {
                     preferences.edit().putString(entry.getKey(), entry.getValue().getAsString()).apply();

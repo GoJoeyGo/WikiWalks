@@ -523,8 +523,8 @@ def edit_poi_picture(poi_id, poi_picture_id):
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         poi_picture = PointOfInterestPicture.query.filter_by(id=poi_picture_id)
-        if poi_picture.first() in user.path_pictures:
-            poi_picture.update(dict(poi_picture_schema.load(request_json, partial=True), url=poi_picture.url))
+        if poi_picture.first() in user.poi_pictures:
+            poi_picture.update(dict(poi_picture_schema.load(request_json, partial=True), url=poi_picture.first().url))
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403

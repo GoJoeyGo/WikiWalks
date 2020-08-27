@@ -12,7 +12,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/path_frag_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -22,7 +22,7 @@
             app:contentInsetStart="16dp"
             app:menu="@menu/path_menu"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="?attr/colorOnBackground"></androidx.appcompat.widget.Toolbar>
+            app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
@@ -36,15 +36,13 @@
         app:layout_constraintWidth_percent="0.5"
         tools:context=".ui.main.PathFragment" />
 
-
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="?attr/colorBackgroundFloating"
         android:clipToPadding="false"
         app:layout_constraintBottom_toTopOf="@id/walk_path_option_selector"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="0.5"
         app:layout_constraintStart_toEndOf="@id/map_path_preview_frag"
         app:layout_constraintTop_toBottomOf="@id/path_frag_toolbar_wrapper">
 
@@ -72,7 +70,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/path_frag_walk_count"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
             <Button
                 android:id="@+id/path_frag_pois_button"
@@ -119,9 +116,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/path_frag_reviews_button" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+    </ScrollView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/walk_path_option_selector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -136,35 +133,29 @@
             android:id="@+id/select_route_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="50dp"
             android:layout_marginEnd="10dp"
             android:fontFamily="monospace"
-            android:text="@string/select_route"
-            app:layout_constraintEnd_toStartOf="@id/new_route_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="@string/select_route" />
 
         <Button
             android:id="@+id/new_route_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="@string/record_new_route"
-            app:layout_constraintEnd_toStartOf="@id/explore_button"
-            app:layout_constraintStart_toEndOf="@id/select_route_button"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="@string/record_new_route" />
 
         <Button
             android:id="@+id/explore_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
             android:fontFamily="monospace"
-            android:text="@string/explore"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/new_route_button"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="@string/explore" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

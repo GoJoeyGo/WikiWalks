@@ -13,7 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -90,7 +90,7 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
             title = PathMap.getInstance().getPointOfInterestList().get(parentId).getName();
         }
 
-        Toolbar toolbar = rootView.findViewById(R.id.path_picture_list_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.path_picture_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Pictures - " + title);

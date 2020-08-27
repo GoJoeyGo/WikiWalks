@@ -30,18 +30,16 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:context=".ui.main.PoIFragment" />
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/poi_frag_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="#00FFFFFF"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:contentInsetEnd="16dp"
                 app:contentInsetStart="16dp"
                 app:layout_collapseMode="pin"
                 app:menu="@menu/point_of_interest_menu"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="?attr/colorOnBackground" />
+                app:titleTextColor="@color/white" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>

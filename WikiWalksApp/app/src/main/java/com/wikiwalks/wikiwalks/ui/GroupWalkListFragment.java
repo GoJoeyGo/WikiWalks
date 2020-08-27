@@ -11,11 +11,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.GroupWalk;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
@@ -49,7 +50,7 @@ public class GroupWalkListFragment extends Fragment {
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
         walks = path.getGroupWalks();
 
-        Toolbar toolbar = rootView.findViewById(R.id.path_group_walk_list_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.path_group_walk_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
         toolbar.setTitle("Group Walks - " + path.getName());
@@ -88,7 +89,7 @@ public class GroupWalkListFragment extends Fragment {
     public void toggleAttendance(int position, View checkbox) {
         GroupWalk walk = path.getGroupWalks().get(position);
         checkbox.setEnabled(false);
-        AlertDialog confirmationDialog = new AlertDialog.Builder(getContext())
+        new MaterialAlertDialogBuilder(getContext())
                 .setTitle("Confirm")
                 .setMessage((walk.isAttending()) ? "Cancel attendance?" : "Attend walk?")
                 .setPositiveButton("Yes", (dialog, which) -> walk.toggleAttendance(getContext(), new GroupWalk.AttendGroupWalkCallback() {
@@ -105,8 +106,7 @@ public class GroupWalkListFragment extends Fragment {
                     }
                 }))
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
-                .setOnDismissListener(dialog -> checkbox.setEnabled(true)).create();
-        confirmationDialog.show();
+                .setOnDismissListener(dialog -> checkbox.setEnabled(true)).create().show();
     }
 
     public void launchEditDialog(int position) {

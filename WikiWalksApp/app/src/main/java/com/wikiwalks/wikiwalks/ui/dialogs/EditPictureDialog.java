@@ -1,9 +1,9 @@
 package com.wikiwalks.wikiwalks.ui.dialogs;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +16,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
@@ -24,23 +26,20 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.squareup.picasso.Picasso;
+import com.wikiwalks.wikiwalks.CustomActivityResultContracts;
+import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.R;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static android.app.Activity.RESULT_OK;
-
 public class EditPictureDialog extends DialogFragment implements Picture.EditPictureCallback {
 
-    static final int REQUEST_IMAGE_CAPTURE = 0;
-    static final int REQUEST_IMAGE_SELECT = 1;
     Picture.PictureType type;
     EditPictureDialogListener listener;
     TextInputLayout title;
@@ -55,6 +54,18 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     AlertDialog confirmationDialog;
     Bitmap bitmap;
     Uri photoUri;
+
+    ActivityResultLauncher<Uri> takePicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), uri -> {
+        submitButton.setEnabled(false);
+        loadIntoImageView();
+        submitButton.setEnabled(true);
+    });
+    ActivityResultLauncher<String> selectPicture = registerForActivityResult(new CustomActivityResultContracts.SelectPicture(), uri -> {
+        submitButton.setEnabled(false);
+        photoUri = uri;
+        loadIntoImageView();
+        submitButton.setEnabled(true);
+    });
 
     public interface EditPictureDialogListener {
         void onEditPicture();
@@ -125,30 +136,30 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         title = view.findViewById(R.id.edit_picture_popup_description);
         cameraButton = view.findViewById(R.id.picture_popup_camera_button);
         cameraButton.setOnClickListener(v -> {
-            Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePicture.resolveActivity(getContext().getPackageManager()) != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg");
-                    contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
-                    contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/" + getContext().getString(R.string.app_name));
-                    photoUri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-                } else {
-                    File photoDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getContext().getString(R.string.app_name));
-                    if (!photoDirectory.exists()) {
-                        photoDirectory.mkdir();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg");
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/" + getContext().getString(R.string.app_name));
+                photoUri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                takePicture.launch(photoUri);
+            } else {
+                MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
+                    if (granted) {
+                        File photoDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getContext().getString(R.string.app_name));
+                        if (!photoDirectory.exists()) {
+                            photoDirectory.mkdir();
+                        }
+                        photoUri = FileProvider.getUriForFile(getContext(), "com.wikiwalks.wikiwalks.fileprovider", new File(photoDirectory, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg"));
+                        takePicture.launch(photoUri);
                     }
-                    photoUri = FileProvider.getUriForFile(getContext(), "com.wikiwalks.wikiwalks.fileprovider", new File(photoDirectory, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg"));
-                }
-                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+                });
             }
         });
         galleryButton = view.findViewById(R.id.picture_popup_gallery_button);
-        galleryButton.setOnClickListener(v -> {
-            Intent selectPicture = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(selectPicture, REQUEST_IMAGE_SELECT);
-        });
+        galleryButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
+            if (granted) selectPicture.launch(null);
+        }));
         submitButton = view.findViewById(R.id.edit_picture_popup_submit_button);
         submitButton.setOnClickListener(v -> {
             if (picture != null) {
@@ -222,22 +233,8 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                     break;
             }
             Picasso.get().load(photoUri).rotate(degree).into(imageView);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        submitButton.setEnabled(false);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_IMAGE_SELECT && data != null) {
-                photoUri = data.getData();
-            }
-            loadIntoImageView();
-        }
-        submitButton.setEnabled(true);
     }
 }

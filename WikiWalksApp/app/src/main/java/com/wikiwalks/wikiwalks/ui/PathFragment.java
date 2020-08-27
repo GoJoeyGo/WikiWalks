@@ -9,7 +9,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 public class PathFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Path.PathChangeCallback, PathMap.PathMapListener {
 
-    private Toolbar toolbar;
+    private MaterialToolbar toolbar;
     private SupportMapFragment mapFragment;
     private Path path;
     private EditNameDialog editNameDialog;

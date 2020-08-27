@@ -30,18 +30,16 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:context=".ui.main.PathFragment" />
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/path_frag_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="#00FFFFFF"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 app:contentInsetEnd="16dp"
                 app:contentInsetStart="16dp"
                 app:layout_collapseMode="pin"
                 app:menu="@menu/path_menu"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="?attr/colorOnBackground" />
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:titleTextColor="@color/white" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -126,7 +124,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/walk_path_option_selector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -134,8 +132,8 @@
         android:background="@drawable/button_background"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/select_route_button"
@@ -143,10 +141,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="@string/select_route"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="@string/select_route" />
 
         <Button
             android:id="@+id/new_route_button"
@@ -154,10 +149,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="@string/record_new_route"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/select_route_button" />
+            android:text="@string/record_new_route"/>
 
         <Button
             android:id="@+id/explore_button"
@@ -165,9 +157,6 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="@string/explore"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/new_route_button" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="@string/explore" />
+    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

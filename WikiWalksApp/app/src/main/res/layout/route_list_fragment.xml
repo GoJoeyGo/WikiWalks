@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,61 +7,76 @@
     android:background="?attr/colorBackgroundFloating">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/route_list_toolbar_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorBackgroundFloating"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="?attr/colorOnBackground">
+        android:layout_height="300dp">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/route_list_toolbar"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/route_list_frag_collapsing_toolbar_layout"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:contentInsetEnd="16dp"
-            app:contentInsetStart="16dp"
-            app:titleTextColor="?attr/colorOnBackground" />
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:expandedTitleMarginEnd="56dp"
+            app:expandedTitleMarginStart="40dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:titleEnabled="false">
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/map_route_list_frag"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/route_list_toolbar_wrapper"
+                    tools:context=".ui.main.PathFragment" />
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/route_list_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                    app:contentInsetEnd="16dp"
+                    app:contentInsetStart="16dp"
+                    app:titleTextColor="?attr/colorOnBackground" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/map_route_list_frag"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/routes_nested_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/route_list_toolbar_wrapper"
-        tools:context=".ui.main.PathFragment" />
+        android:layout_height="match_parent"
+        android:background="?attr/colorBackgroundFloating"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/route_list_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingBottom="0dp"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toTopOf="@id/select_route_background"
+            app:layout_constraintTop_toBottomOf="@id/map_route_list_frag" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/route_list_recyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="0dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@id/select_route_background"
-        app:layout_constraintTop_toBottomOf="@id/map_route_list_frag" />
+    </androidx.core.widget.NestedScrollView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/select_route_background"
+    <LinearLayout
+        android:id="@+id/walk_path_option_selector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:background="@drawable/button_background"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0">
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/select_route_button"
             style="@style/ButtonTheme"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginBottom="10dp"
             android:enabled="false"
             android:fontFamily="monospace"
             android:text="@string/select_route"
@@ -72,7 +87,7 @@
         <Button
             android:id="@+id/edit_route_button"
             style="@style/ButtonTheme"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
             android:text="@string/delete_route"
@@ -81,5 +96,5 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/select_route_button" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

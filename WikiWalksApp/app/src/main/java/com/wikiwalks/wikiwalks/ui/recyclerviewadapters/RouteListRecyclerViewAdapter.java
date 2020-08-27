@@ -28,10 +28,6 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
         this.routeList = routeList;
     }
 
-    public ArrayList<AppCompatButton> getButtons() {
-        return buttons;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -42,7 +38,7 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        holder.button.setText(String.format("Route %d", position + 1));
+        holder.button.setText(String.format("Route %d - %s", position + 1, routeList.get(position).getDistance()));
         holder.button.setOnClickListener(v -> {
             for (Button button : buttons) {
                 button.getBackground().setColorFilter(0x00000000, PorterDuff.Mode.MULTIPLY);

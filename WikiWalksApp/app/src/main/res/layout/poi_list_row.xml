@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/poi_list_frag_button"
@@ -12,10 +13,7 @@
         android:drawableStart="@drawable/colour_indicator"
         android:drawableEnd="@drawable/chevron"
         android:drawablePadding="8dp"
-        android:gravity="center_vertical"
-        android:paddingTop="28dp"
-        android:paddingBottom="28dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:paddingTop="32dp"
+        android:paddingBottom="33dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

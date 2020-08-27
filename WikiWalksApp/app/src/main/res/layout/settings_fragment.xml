@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="?attr/colorOnBackground">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/settings_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -33,9 +33,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settings_toolbar_wrapper">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <Button
                 android:id="@+id/settings_set_name_button"
@@ -44,9 +45,26 @@
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="@string/set_name"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:text="@string/set_name" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <Button
+                android:id="@+id/settings_statistics_button"
+                style="@style/TextButtonTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/chevron"
+                android:gravity="center_vertical"
+                android:text="@string/statistics" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
 
             <Button
                 android:id="@+id/settings_import_settings_button"
@@ -55,9 +73,12 @@
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="@string/import_data"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/settings_set_name_button" />
+                android:text="@string/import_data" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
 
             <Button
                 android:id="@+id/settings_export_settings_button"
@@ -66,11 +87,9 @@
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="@string/export_data"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/settings_import_settings_button" />
+                android:text="@string/export_data" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </ScrollView>
 

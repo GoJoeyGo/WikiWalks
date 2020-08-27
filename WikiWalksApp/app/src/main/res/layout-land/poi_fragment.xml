@@ -11,7 +11,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/poi_frag_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -20,7 +20,8 @@
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="?attr/colorOnBackground" />
+            app:titleTextColor="?attr/colorOnBackground"
+            app:menu="@menu/point_of_interest_menu" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.gms.maps.MapView
