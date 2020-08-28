@@ -50,17 +50,23 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     private AlertDialog confirmationDialog;
     private Uri photoUri;
 
-    private ActivityResultLauncher<Uri> takePicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), uri -> {
-        submitButton.setEnabled(false);
-        loadIntoImageView();
-        submitButton.setEnabled(true);
+    private ActivityResultLauncher<Uri> takePicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), isSuccess -> {
+        if (isSuccess) {
+            submitButton.setEnabled(false);
+            loadIntoImageView();
+            submitButton.setEnabled(true);
+        } else {
+            photoUri = null;
+        }
     });
 
     private ActivityResultLauncher<String> selectPicture = registerForActivityResult(new CustomActivityResultContracts.SelectPicture(), uri -> {
-        submitButton.setEnabled(false);
-        photoUri = uri;
-        loadIntoImageView();
-        submitButton.setEnabled(true);
+        if (uri != null) {
+            submitButton.setEnabled(false);
+            photoUri = uri;
+            loadIntoImageView();
+            submitButton.setEnabled(true);
+        }
     });
 
     public interface EditPictureDialogListener {

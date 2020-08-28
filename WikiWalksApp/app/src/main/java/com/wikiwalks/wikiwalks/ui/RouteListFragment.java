@@ -81,7 +81,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
             polylines.add(newPolyline);
         }
         googleMap.getUiSettings().setAllGesturesEnabled(false);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), 20));
     }
 
     public void setPath(Path path) {

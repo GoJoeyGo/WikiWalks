@@ -15,9 +15,9 @@ public class StatisticsListRecyclerViewAdapter extends RecyclerView.Adapter<Stat
     private String[] statisticsList;
     private Context context;
 
-    public StatisticsListRecyclerViewAdapter(Context context, String[] pointOfInterestList) {
+    public StatisticsListRecyclerViewAdapter(Context context, String[] statisticsList) {
         this.context = context;
-        this.statisticsList = pointOfInterestList;
+        this.statisticsList = statisticsList;
     }
 
     @NonNull

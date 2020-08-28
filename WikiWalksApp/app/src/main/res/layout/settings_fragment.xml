@@ -67,6 +67,20 @@
                 android:background="?android:attr/listDivider" />
 
             <Button
+                android:id="@+id/settings_goals_button"
+                style="@style/TextButtonTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/chevron"
+                android:gravity="center_vertical"
+                android:text="@string/goals" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <Button
                 android:id="@+id/settings_import_settings_button"
                 style="@style/TextButtonTheme"
                 android:layout_width="match_parent"

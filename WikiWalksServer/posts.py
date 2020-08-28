@@ -304,7 +304,8 @@ def add_poi_review(poi_id):
         db.session.add(new_poi_review)
         db.session.commit()
         new_poi_review.submitter = user.nickname
-        return jsonify({"status": "success", "review": poi_review_schema.dump(new_poi_review)}), 201
+        return jsonify({"status": "success", "review": poi_review_schema.dump(new_poi_review),
+                        "average_rating": point_of_interest.average_rating}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
@@ -319,15 +320,15 @@ def edit_poi_review(poi_id, poi_review_id):
             return jsonify({"status": "failed"}), 403
         user = get_submitter(request_json["device_id"])
         poi_review = PointOfInterestReview.query.filter_by(id=poi_review_id)
+        poi = PointOfInterest.query.filter_by(id=poi_review.first().point_of_interest_id).first()
         if poi_review.first() in user.poi_reviews:
-            poi = PointOfInterest.query.filter_by(id=poi_review.first().point_of_interest_id).first()
             poi_review.update(dict(poi_review_schema.load(request_json, partial=True)))
             poi.average_rating = db.session.query(func.avg(PointOfInterestReview.rating)).filter_by(
                 point_of_interest_id=poi.id).scalar()
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
-        return jsonify({"status": "success"}), 201
+        return jsonify({"status": "success", "average_rating": poi.average_rating}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
@@ -339,8 +340,8 @@ def delete_poi_review(poi_id, poi_review_id):
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         poi_review = PointOfInterestReview.query.get(poi_review_id)
+        poi = PointOfInterest.query.filter_by(id=poi_review.point_of_interest_id).first()
         if poi_review in user.poi_reviews:
-            poi = PointOfInterest.query.filter_by(id=poi_review.point_of_interest_id).first()
             db.session.delete(poi_review)
             poi.rating_count = poi.rating_count - 1
             if poi.rating_count != 0:
@@ -351,7 +352,7 @@ def delete_poi_review(poi_id, poi_review_id):
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
-        return jsonify({"status": "success"}), 201
+        return jsonify({"status": "success", "average_rating": poi.average_rating}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
@@ -378,7 +379,8 @@ def add_path_review(path_id):
         db.session.add(new_path_review)
         db.session.commit()
         new_path_review.submitter = user.nickname
-        return jsonify({"status": "success", "review": path_review_schema.dump(new_path_review)}), 201
+        return jsonify({"status": "success", "review": path_review_schema.dump(new_path_review),
+                        "average_rating": path.average_rating}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
@@ -393,15 +395,15 @@ def edit_path_review(path_id, path_review_id):
             return jsonify({"status": "failed"}), 403
         user = get_submitter(request_json["device_id"])
         path_review = PathReview.query.filter_by(id=path_review_id)
+        path = Path.query.filter_by(id=path_review.first().path_id).first()
         if path_review.first() in user.path_reviews:
-            path = Path.query.filter_by(id=path_review.first().path_id).first()
             path_review.update(dict(path_review_schema.load(request_json, partial=True)))
             path.average_rating = db.session.query(func.avg(PathReview.rating)).filter_by(
                 path_id=path.id).scalar()
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
-        return jsonify({"status": "success"}), 201
+        return jsonify({"status": "success", "average_rating": path.average_rating}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500
@@ -413,8 +415,8 @@ def delete_path_review(path_id, path_review_id):
         request_json = request.get_json(force=True)["attributes"]
         user = get_submitter(request_json["device_id"])
         path_review = PathReview.query.get(path_review_id)
+        path = Path.query.filter_by(id=path_review.path_id).first()
         if path_review in user.path_reviews:
-            path = Path.query.filter_by(id=path_review.path_id).first()
             db.session.delete(path_review)
             path.rating_count = path.rating_count - 1
             if path.rating_count != 0:
@@ -424,7 +426,7 @@ def delete_path_review(path_id, path_review_id):
             db.session.commit()
         else:
             return jsonify({"status": "failed"}), 403
-        return jsonify({"status": "success"}), 201
+        return jsonify({"status": "success", "average_rating": path.average_rating}), 201
     except Exception as e:
         print(e)
         return jsonify({"status": "failed"}), 500

@@ -19,7 +19,7 @@ import com.wikiwalks.wikiwalks.ui.RouteListFragment;
 import java.util.ArrayList;
 
 public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteListRecyclerViewAdapter.ViewHolder> {
-    private ArrayList<AppCompatButton> buttons = new ArrayList<>();
+    private ArrayList<Button> buttons = new ArrayList<>();
     private ArrayList<Route> routeList;
     private RouteListFragment routeListFragment;
 
@@ -41,9 +41,9 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
         holder.button.setText(String.format("Route %d - %s", position + 1, routeList.get(position).getDistance()));
         holder.button.setOnClickListener(v -> {
             for (Button button : buttons) {
-                button.getBackground().setColorFilter(0x00000000, PorterDuff.Mode.MULTIPLY);
+                button.getBackground().setColorFilter(null);
             }
-            holder.button.getBackground().setColorFilter(0xFF777777, PorterDuff.Mode.MULTIPLY);
+            holder.button.getBackground().setColorFilter(0x1F6200EE, PorterDuff.Mode.SRC_OVER);
             routeListFragment.selectRoute(position);
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -61,7 +61,7 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        AppCompatButton button;
+        Button button;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -4,18 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingRight="16dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    >
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/route_list_frag_button"
         style="@style/TextButtonTheme"
+        android:background="@drawable/button_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/colour_indicator"
         android:drawablePadding="8dp"
         android:gravity="center_vertical"
-        android:paddingTop="28dp"
-        android:paddingBottom="28dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

@@ -12,95 +12,94 @@
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/edit_picture_popup_title"
+            android:id="@+id/edit_goal_popup_title"
             style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="@string/picture"
+            android:text="@string/goal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/edit_picture_popup_selected_image"
+        <TextView
+            android:id="@+id/edit_goal_popup_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:maxHeight="300dp"
             android:scaleType="fitStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_title" />
+            app:layout_constraintTop_toBottomOf="@id/edit_goal_popup_title" />
 
         <Button
-            android:id="@+id/picture_popup_camera_button"
+            android:id="@+id/edit_goal_select_time_button"
             style="@style/ButtonTheme"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:fontFamily="monospace"
-            android:text="@string/from_camera"
-            app:layout_constraintEnd_toStartOf="@id/picture_popup_gallery_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_selected_image" />
-
-        <Button
-            android:id="@+id/picture_popup_gallery_button"
-            style="@style/ButtonTheme"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:text="@string/from_gallery"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/picture_popup_camera_button"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_selected_image" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/edit_picture_popup_description"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/description"
+            android:fontFamily="monospace"
+            android:text="@string/choose_end_date"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edit_goal_popup_time" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edit_goal_distance"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/distance"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/picture_popup_camera_button">
+            app:layout_constraintTop_toBottomOf="@id/edit_goal_select_time_button"
+            app:layout_constraintEnd_toStartOf="@id/edit_goal_distance_unit">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textAutoCorrect"
-                android:maxLength="200" />
+                android:inputType="numberDecimal"
+                android:maxLength="100" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:id="@+id/edit_goal_distance_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/edit_goal_distance"
+            app:layout_constraintBottom_toBottomOf="@id/edit_goal_distance"
+            app:layout_constraintStart_toEndOf="@id/edit_goal_distance"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="8dp"
+            android:textSize="20sp"/>
+
+
         <Button
-            android:id="@+id/edit_picture_popup_submit_button"
+            android:id="@+id/edit_goal_popup_submit_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:fontFamily="monospace"
             android:text="@string/save"
-            app:layout_constraintEnd_toStartOf="@id/edit_picture_popup_delete_button"
+            app:layout_constraintEnd_toStartOf="@id/edit_goal_popup_delete_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_description"
-            android:enabled="false"/>
+            app:layout_constraintTop_toBottomOf="@id/edit_goal_distance" />
 
         <Button
-            android:id="@+id/edit_picture_popup_delete_button"
+            android:id="@+id/edit_goal_popup_delete_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:fontFamily="monospace"
             android:text="@string/delete"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/edit_picture_popup_submit_button"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_description" />
+            app:layout_constraintStart_toEndOf="@id/edit_goal_popup_submit_button"
+            app:layout_constraintTop_toBottomOf="@id/edit_goal_distance" />
 
         <Button
-            android:id="@+id/edit_picture_popup_cancel_button"
+            android:id="@+id/edit_goal_popup_cancel_button"
             style="@style/ButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -108,7 +107,7 @@
             android:text="@string/cancel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_submit_button" />
+            app:layout_constraintTop_toBottomOf="@id/edit_goal_popup_submit_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -181,6 +181,10 @@ public class Path {
         this.ownReview = ownReview;
     }
 
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
     public ArrayList<Double> getAllLatitudes() {
         ArrayList<Double> allLatitudes = new ArrayList<>();
         for (Route route : routeList) {

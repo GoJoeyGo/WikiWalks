@@ -83,10 +83,10 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
         Button deleteButton = view.findViewById(R.id.edit_group_walk_popup_delete_button);
         deleteButton.setOnClickListener(v -> {
             AlertDialog confirmationDialog = new AlertDialog.Builder(getContext())
-                    .setTitle("Confirm Deletion")
-                    .setMessage("Delete walk?")
-                    .setPositiveButton("Yes", (dialog, which) -> walk.delete(getContext(), this))
-                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
+                    .setTitle(getString(R.string.confirm_deletion))
+                    .setMessage(getString(R.string.delete_walk))
+                    .setPositiveButton(getString(R.string.yes), (dialog, which) -> walk.delete(getContext(), this))
+                    .setNegativeButton(getString(R.string.no), (dialog, which) -> dialog.dismiss()).create();
             confirmationDialog.show();
         });
         if (groupWalkPosition > -1) {
@@ -120,21 +120,23 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
     public void onEditSuccess() {
         ((GroupWalkListFragment) getParentFragment()).updateRecyclerView();
         dismiss();
+        Toast.makeText(getContext(), getString(R.string.save_walk_success), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEditFailure() {
-        Toast.makeText(getContext(), "Failed to save walk!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.save_walk_failure), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDeleteSuccess() {
         ((GroupWalkListFragment) getParentFragment()).updateRecyclerView();
         dismiss();
+        Toast.makeText(getContext(), getString(R.string.deleted_walk_success), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDeleteFailure() {
-        Toast.makeText(getContext(), "Failed to delete walk!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.deleted_walk_failure), Toast.LENGTH_SHORT).show();
     }
 }

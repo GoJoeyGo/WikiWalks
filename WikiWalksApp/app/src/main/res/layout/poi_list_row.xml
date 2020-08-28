@@ -14,6 +14,7 @@
         android:drawableEnd="@drawable/chevron"
         android:drawablePadding="8dp"
         android:paddingTop="32dp"
-        android:paddingBottom="33dp" />
+        android:paddingBottom="33dp"
+        android:gravity="start"/>
 
 </LinearLayout>

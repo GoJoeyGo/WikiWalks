@@ -38,8 +38,12 @@ import retrofit2.Response;
 public class SettingsFragment extends Fragment implements EditNameDialog.EditDialogListener {
 
     EditNameDialog editNameDialog;
-    ActivityResultLauncher<String> exportSettings = registerForActivityResult(new CustomActivityResultContracts.ExportSettings(), uri -> PreferencesManager.getInstance(getContext()).exportPreferences(uri));
-    ActivityResultLauncher<String[]> importSettings = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> PreferencesManager.getInstance(getContext()).importPreferences(uri));
+    ActivityResultLauncher<String> exportSettings = registerForActivityResult(new CustomActivityResultContracts.ExportSettings(), uri -> {
+        if (uri != null) PreferencesManager.getInstance(getContext()).exportPreferences(uri);
+    });
+    ActivityResultLauncher<String[]> importSettings = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+        if (uri != null) PreferencesManager.getInstance(getContext()).importPreferences(uri);
+    });
 
     public static SettingsFragment newInstance() {
         Bundle args = new Bundle();
@@ -103,6 +107,9 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
 
         Button statisticsButton = rootView.findViewById(R.id.settings_statistics_button);
         statisticsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, StatisticsFragment.newInstance()).addToBackStack(null).commit());
+
+        Button goalsButton = rootView.findViewById(R.id.settings_goals_button);
+        goalsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, GoalsFragment.newInstance()).addToBackStack(null).commit());
 
         Button exportSettingsButton = rootView.findViewById(R.id.settings_export_settings_button);
         exportSettingsButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, (granted -> {

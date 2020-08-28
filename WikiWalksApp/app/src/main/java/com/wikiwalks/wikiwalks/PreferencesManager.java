@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +23,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -52,6 +55,17 @@ public class PreferencesManager {
     public void addDistanceWalked(float distance) {
         float oldDistance = statistics.getFloat("distance_walked", 0);
         statistics.edit().putFloat("distance_walked", distance + oldDistance).apply();
+        ArrayList<JSONObject> goals = getGoals();
+        try {
+            for (JSONObject goal : goals) {
+                if (Calendar.getInstance().getTimeInMillis() < goal.getLong("end_time")) {
+                    goal.put("progress", goal.getDouble("progress") + distance);
+                }
+            }
+            setGoals(goals);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void increaseTimesWalked() {
@@ -130,16 +144,70 @@ public class PreferencesManager {
         String[] strings = new String[6];
         String country = Locale.getDefault().getCountry();
         if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
-            strings[0] = String.format("Distance Walked - %.2f mi", statistics.getFloat("distance_walked", 0) * 0.000621371);
+            strings[0] = String.format(context.getString(R.string.distance_walked), statistics.getFloat("distance_walked", 0) * 0.000621371, context.getString(R.string.miles));
         } else {
-            strings[0] = String.format("Distance Walked - %.2f km", statistics.getFloat("distance_walked", 0) / 1000);
+            strings[0] = String.format(context.getString(R.string.distance_walked), statistics.getFloat("distance_walked", 0) / 1000, context.getString(R.string.kilometres));
         }
-        strings[1] = String.format("Times Walked - %d", statistics.getInt("times_walked", 0));
-        strings[2] = String.format("Routes Recorded - %d", statistics.getInt("routes_recorded", 0));
-        strings[3] = String.format("Points of Interest Marked - %d", statistics.getInt("points_marked", 0));
-        strings[4] = String.format("Reviews Written - %d", statistics.getInt("reviews_written", 0));
-        strings[5] = String.format("Pictures Uploaded - %d", statistics.getInt("pictures_uploaded", 0));
+        strings[1] = String.format(context.getString(R.string.times_walked), statistics.getInt("times_walked", 0));
+        strings[2] = String.format(context.getString(R.string.routes_recorded), statistics.getInt("routes_recorded", 0));
+        strings[3] = String.format(context.getString(R.string.points_marked), statistics.getInt("points_marked", 0));
+        strings[4] = String.format(context.getString(R.string.reviews_written), statistics.getInt("reviews_written", 0));
+        strings[5] = String.format(context.getString(R.string.pictures_uploaded), statistics.getInt("pictures_uploaded", 0));
         return strings;
+    }
+
+    public ArrayList<JSONObject> getGoals() {
+        ArrayList<JSONObject> goalsList = new ArrayList<>();
+        try {
+            JSONArray goalsJsonArray = new JSONArray(preferences.getString("goals", "[]"));
+            for (int i = 0; i < goalsJsonArray.length(); i++) {
+                goalsList.add(goalsJsonArray.getJSONObject(i));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return goalsList;
+    }
+
+    public void addGoal(long startTime, long endTime, double distanceGoal) {
+        try {
+            JSONObject newGoal = new JSONObject();
+            newGoal.put("start_time", startTime);
+            newGoal.put("end_time", endTime);
+            newGoal.put("distance_goal", distanceGoal);
+            newGoal.put("progress", 0.0);
+            ArrayList<JSONObject> goals = getGoals();
+            goals.add(0, newGoal);
+            setGoals(goals);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editGoal(int position, long endTime, double distanceGoal) {
+        try {
+            ArrayList<JSONObject> goals = getGoals();
+            JSONObject goal = goals.get(position);
+            goal.put("end_time", endTime);
+            goal.put("distance_goal", distanceGoal);
+            setGoals(goals);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeGoal(int position) {
+        ArrayList<JSONObject> goals = getGoals();
+        goals.remove(position);
+        setGoals(goals);
+    }
+
+    public void setGoals(ArrayList<JSONObject> goals) {
+        JSONArray goalsJsonArray = new JSONArray();
+        for (JSONObject goal : goals) {
+            goalsJsonArray.put(goal);
+        }
+        preferences.edit().putString("goals", goalsJsonArray.toString()).apply();
     }
 
     public void exportPreferences(Uri location) {

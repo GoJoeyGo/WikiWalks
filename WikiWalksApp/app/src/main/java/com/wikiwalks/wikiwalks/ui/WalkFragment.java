@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,7 +58,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
-    private ConstraintLayout outOfRangeBanner;
+    private LinearLayout outOfRangeBanner;
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
     float distanceWalked = 0;

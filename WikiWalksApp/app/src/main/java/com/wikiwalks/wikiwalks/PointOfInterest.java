@@ -155,6 +155,10 @@ public class PointOfInterest {
         return editable;
     }
 
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
     public void edit(Context context, String name, PointOfInterestEditCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
