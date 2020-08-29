@@ -6,6 +6,7 @@ import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
@@ -38,15 +39,11 @@ public class PointOfInterestListRecyclerViewAdapter extends RecyclerView.Adapter
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.button.setText(pointOfInterestList.get(position).getName());
-        holder.button.setOnClickListener(v -> {
-            PointOfInterestFragment newFragment = PointOfInterestFragment.newInstance(pointOfInterestList.get(position).getId());
-            newFragment.setTargetFragment(context, 0);
-            context.getParentFragmentManager().beginTransaction().add(R.id.main_frame, newFragment).addToBackStack("point_of_interest_list").commit();
-        });
+        holder.button.setOnClickListener(v -> context.getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestFragment.newInstance(pointOfInterestList.get(position).getId())).addToBackStack("point_of_interest_list").commit());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            holder.button.getCompoundDrawablesRelative()[0].setTint(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}));
+            holder.indicator.getBackground().setTint(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}));
         } else {
-            holder.button.getCompoundDrawables()[0].mutate().setColorFilter(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}), PorterDuff.Mode.SRC_IN);
+            holder.indicator.getBackground().setColorFilter(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}), PorterDuff.Mode.SRC_OVER);
         }
     }
 
@@ -57,11 +54,13 @@ public class PointOfInterestListRecyclerViewAdapter extends RecyclerView.Adapter
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        AppCompatButton button;
+        Button button;
+        View indicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             button = itemView.findViewById(R.id.poi_list_frag_button);
+            indicator = itemView.findViewById(R.id.poi_list_frag_indicator);
         }
     }
 }

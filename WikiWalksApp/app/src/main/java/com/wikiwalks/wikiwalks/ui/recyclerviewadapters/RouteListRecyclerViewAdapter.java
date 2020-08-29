@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.wikiwalks.wikiwalks.R;
@@ -38,20 +37,29 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        holder.button.setText(String.format("Route %d - %s", position + 1, routeList.get(position).getDistance()));
-        holder.button.setOnClickListener(v -> {
-            for (Button button : buttons) {
-                button.getBackground().setColorFilter(null);
-            }
-            holder.button.getBackground().setColorFilter(0x1F6200EE, PorterDuff.Mode.SRC_OVER);
-            routeListFragment.selectRoute(position);
-        });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            holder.button.getCompoundDrawablesRelative()[0].setTint(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}));
-        } else {
-            holder.button.getCompoundDrawables()[0].mutate().setColorFilter(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}), PorterDuff.Mode.SRC_IN);
-        }
         buttons.add(holder.button);
+        holder.button.setText(String.format(routeListFragment.getContext().getString(R.string.route_format), position + 1, routeList.get(position).getDistance()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            holder.indicator.getBackground().setTint(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}));
+            holder.button.setOnClickListener(v -> {
+                for (Button button : buttons) button.setSelected(false);
+                holder.button.setSelected(true);
+                routeListFragment.selectRoute(position);
+            });
+        } else {
+            holder.indicator.getBackground().setColorFilter(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}), PorterDuff.Mode.SRC_OVER);
+            holder.button.setOnClickListener(v -> {
+                for (Button button : buttons) button.setBackgroundColor(0x00000000);
+                holder.button.setBackgroundColor(0x1F6200EE);
+                routeListFragment.selectRoute(position);
+            });
+        }
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        buttons.remove(holder.button);
+        super.onViewRecycled(holder);
     }
 
     @Override
@@ -62,10 +70,12 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         Button button;
+        View indicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             button = itemView.findViewById(R.id.route_list_frag_button);
+            indicator = itemView.findViewById(R.id.route_list_frag_indicator);
         }
     }
 }

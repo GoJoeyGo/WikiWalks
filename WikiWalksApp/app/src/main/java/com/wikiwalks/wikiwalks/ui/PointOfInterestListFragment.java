@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -66,6 +67,9 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
             noPointsIndicator.setVisibility(View.VISIBLE);
         }
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_poi_list_frag);
+
+        getParentFragmentManager().setFragmentResultListener("update_poi_list", this, (requestKey, result) -> update());
+
         return rootView;
     }
 

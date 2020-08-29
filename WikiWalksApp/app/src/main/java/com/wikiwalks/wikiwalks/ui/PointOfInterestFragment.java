@@ -126,6 +126,7 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
     @Override
     public void onEditPointOfInterestSuccess() {
         toolbar.setTitle(pointOfInterest.getName());
+        getParentFragmentManager().setFragmentResult("update_poi_list", new Bundle());
         editNameDialog.dismiss();
     }
 
@@ -136,9 +137,7 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
 
     @Override
     public void onDeletePointOfInterestSuccess() {
-        if (getTargetFragment() instanceof PointOfInterestListFragment) {
-            ((PointOfInterestListFragment) getTargetFragment()).update();
-        }
+        getParentFragmentManager().setFragmentResult("update_poi_list", new Bundle());
         getParentFragmentManager().popBackStack();
     }
 

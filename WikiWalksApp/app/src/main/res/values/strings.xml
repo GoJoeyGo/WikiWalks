@@ -68,4 +68,5 @@
     <string name="goal_ends">Goal ends: %s</string>
     <string name="goals">Goals</string>
     <string name="delete_goal">Delete goal?</string>
+    <string name="route_format">Route %d - %s</string>
 </resources>

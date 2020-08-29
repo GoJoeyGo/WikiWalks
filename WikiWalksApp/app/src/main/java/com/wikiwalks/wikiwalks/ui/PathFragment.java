@@ -71,11 +71,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         });
 
         Button selectRouteButton = rootView.findViewById(R.id.select_route_button);
-        selectRouteButton.setOnClickListener(view -> {
-            RouteListFragment routeListFragment = RouteListFragment.newInstance(path.getId());
-            routeListFragment.setTargetFragment(this, 0);
-            getParentFragmentManager().beginTransaction().add(R.id.main_frame, routeListFragment).addToBackStack(null).commit();
-        });
+        selectRouteButton.setOnClickListener(view -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RouteListFragment.newInstance(path.getId())).addToBackStack(null).commit());
 
         Button recordRouteButton = rootView.findViewById(R.id.new_route_button);
         recordRouteButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(path.getId())).addToBackStack(null).commit());
