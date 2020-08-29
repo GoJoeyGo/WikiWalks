@@ -42,6 +42,9 @@
     <string name="no_walks_scheduled">No walks scheduled!</string>
     <string name="statistics">Statistics</string>
     <string name="distance_walked">Distance Walked - %.2f %s</string>
+    <string name="longest_walk">Longest Walk- %.2f %s</string>
+    <string name="average_walk_distance">average distance walked - %.2f %s</string>
+    <string name="percent_around_globe_traveled">percent around globe traveled - %.6f %s</string>
     <string name="times_walked">Times Walked - %d</string>
     <string name="routes_recorded">Routes Recorded - %d</string>
     <string name="points_marked">Points of Interest Marked - %d</string>
