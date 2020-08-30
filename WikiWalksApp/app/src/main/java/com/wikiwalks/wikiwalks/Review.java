@@ -30,8 +30,6 @@ public class Review {
     }
 
     public interface EditReviewCallback {
-        void onSubmitReviewSuccess();
-        void onSubmitReviewFailure();
         void onEditReviewSuccess();
         void onEditReviewFailure();
         void onDeleteReviewSuccess();
@@ -51,7 +49,7 @@ public class Review {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             attributes.put("text", message);
             attributes.put("rating", rating);
             request.put("attributes", attributes);
@@ -64,29 +62,35 @@ public class Review {
                         try {
                             JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("review");
                             Review newReview = new Review(type, responseJson.getInt("id"), parentId, responseJson.getString("submitter"), rating, message);
-                            if (type == ReviewType.PATH)
-                                PathMap.getInstance().getPathList().get(parentId).setOwnReview(newReview);
-                            else
-                                PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(newReview);
-                            callback.onSubmitReviewSuccess();
+                            if (type == ReviewType.PATH) {
+                                Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                                parentPath.setOwnReview(newReview);
+                                parentPath.setRating(responseJson.getDouble("average_rating"));
+                            } else {
+                                PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                                parentPointOfInterest.setOwnReview(newReview);
+                                parentPointOfInterest.setRating(responseJson.getDouble("average_rating"));
+                            }
+                            PreferencesManager.getInstance(context).changeReviewsWritten(false);
+                            callback.onEditReviewSuccess();
                         } catch (JSONException e) {
-                            Log.e("SUBMIT_PATH_REVIEW1", Arrays.toString(e.getStackTrace()));
-                            callback.onSubmitReviewFailure();
+                            Log.e("Review", "Getting review from response", e);
+                            callback.onEditReviewSuccess();
                         }
                     } else {
-                        callback.onSubmitReviewFailure();
+                        callback.onEditReviewFailure();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("SUBMIT_PATH_REVIEW2", Arrays.toString(t.getStackTrace()));
-                    callback.onSubmitReviewFailure();
+                    Log.e("Review", "Sending new review request", t);
+                    callback.onEditReviewFailure();
                 }
             });
         } catch (JSONException e) {
-            Log.e("SUBMIT_PATH_REVIEW3", Arrays.toString(e.getStackTrace()));
-            callback.onSubmitReviewFailure();
+            Log.e("Review", "Creating new review request", e);
+            callback.onEditReviewFailure();
         }
     }
 
@@ -107,13 +111,12 @@ public class Review {
     }
 
     public void edit(Context context, String message, int rating, EditReviewCallback callback) {
-        Log.e("test", Integer.toString(rating));
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
             attributes.put("text", message);
             attributes.put("rating", rating);
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> editReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).editPathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).editPoIReview(parentId, id, body);
@@ -123,6 +126,13 @@ public class Review {
                     if (response.isSuccessful()) {
                         Review.this.message = message;
                         Review.this.rating = rating;
+                        if (type == ReviewType.PATH) {
+                            Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                            parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
+                        } else {
+                            PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                            parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
+                        }
                         callback.onEditReviewSuccess();
                     } else {
                         callback.onEditReviewFailure();
@@ -131,14 +141,12 @@ public class Review {
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Toast.makeText(context, "Failed to edit review...", Toast.LENGTH_SHORT).show();
-                    Log.e("EDIT_REVIEW1", Arrays.toString(t.getStackTrace()));
+                    Log.e("Review", "Sending edit review request", t);
                     callback.onEditReviewFailure();
                 }
             });
         } catch (JSONException e) {
-            Toast.makeText(context, "Failed to edit review...", Toast.LENGTH_SHORT).show();
-            Log.e("EDIT_REVIEW2", Arrays.toString(e.getStackTrace()));
+            Log.e("Review", "Creating edit review request", e);
             callback.onDeleteReviewFailure();
         }
     }
@@ -147,7 +155,7 @@ public class Review {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> deleteReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).deletePathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).deletePoIReview(parentId, id, body);
@@ -155,10 +163,14 @@ public class Review {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                        if (type == ReviewType.PATH)
-                            PathMap.getInstance().getPathList().get(parentId).setOwnReview(null);
-                        else
-                            PathMap.getInstance().getPointOfInterestList().get(parentId).setOwnReview(null);
+                        if (type == ReviewType.PATH) {
+                            Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                            parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
+                        } else {
+                            PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                            parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
+                        }
+                        PreferencesManager.getInstance(context).changeReviewsWritten(true);
                         callback.onDeleteReviewSuccess();
                     } else {
                         callback.onDeleteReviewFailure();
@@ -167,14 +179,12 @@ public class Review {
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Toast.makeText(context, "Failed to delete review...", Toast.LENGTH_SHORT).show();
-                    Log.e("DELETE_PATH_REVIEW1", Arrays.toString(t.getStackTrace()));
+                    Log.e("Review", "Sending delete review request", t);
                     callback.onDeleteReviewFailure();
                 }
             });
         } catch (JSONException e) {
-            Toast.makeText(context, "Failed to delete review...", Toast.LENGTH_SHORT).show();
-            Log.e("DELETE_PATH_REVIEW2", Arrays.toString(e.getStackTrace()));
+            Log.e("Review", "Creating delete review request", e);
             callback.onDeleteReviewFailure();
         }
     }

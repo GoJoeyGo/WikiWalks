@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="?attr/colorOnBackground">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/path_picture_list_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -52,26 +52,21 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/submit_group_walk_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_background"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/submit_group_walk_button"
             style="@style/ButtonTheme"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginBottom="10dp"
             android:fontFamily="monospace"
-            android:text="@string/add_photo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="@string/add_photo" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,5 @@
 package com.wikiwalks.wikiwalks.ui.dialogs;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -15,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.wikiwalks.wikiwalks.GroupWalk;
 import com.wikiwalks.wikiwalks.Path;
@@ -27,17 +27,12 @@ import java.util.Calendar;
 
 public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.EditGroupWalkCallback {
 
-    int pathId;
-    int groupWalkPosition;
-    Path path;
-    GroupWalk walk;
-    TextView time;
-    TextInputLayout title;
-    Button selectTimeButton;
-    Button submitButton;
-    Button cancelButton;
-    Button deleteButton;
-    Calendar calendar;
+    private Path path;
+    private GroupWalk walk;
+    private TextView time;
+    private TextInputLayout title;
+    private Button submitButton;
+    private Calendar calendar;
 
     public static EditGroupWalkDialog newInstance(int pathId, int groupWalkPosition) {
         Bundle args = new Bundle();
@@ -51,16 +46,20 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        pathId = getArguments().getInt("path_id");
-        groupWalkPosition = getArguments().getInt("group_walk_position");
-        path = PathMap.getInstance().getPathList().get(pathId);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.edit_group_walk_dialog, null);
+        builder.setTitle(R.string.group_walk);
+
+        int pathId = getArguments().getInt("path_id");
+        int groupWalkPosition = getArguments().getInt("group_walk_position");
+        path = PathMap.getInstance().getPathList().get(pathId);
         calendar = Calendar.getInstance();
-        time = view.findViewById(R.id.edit_group_walk_popup_time);
+
         title = view.findViewById(R.id.edit_group_walk_title);
-        selectTimeButton = view.findViewById(R.id.edit_group_walk_select_time_button);
+
+        time = view.findViewById(R.id.edit_group_walk_popup_time);
+        Button selectTimeButton = view.findViewById(R.id.edit_group_walk_select_time_button);
         selectTimeButton.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (datePicker, year, monthOfYear, dayOfMonth) -> {
                 calendar.set(year, monthOfYear, dayOfMonth);
@@ -74,6 +73,7 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
             datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
             datePickerDialog.show();
         });
+
         submitButton = view.findViewById(R.id.edit_group_walk_popup_submit_button);
         submitButton.setOnClickListener(v -> {
             String walkTitle = (title.getEditText().getText().toString().isEmpty()) ? String.format("Walk at %s", path.getName()) : title.getEditText().getText().toString();
@@ -83,17 +83,17 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
                 walk.edit(getContext(), calendar.getTimeInMillis() / 1000, walkTitle, this);
             }
         });
-        cancelButton = view.findViewById(R.id.edit_group_walk_popup_cancel_button);
+
+        Button cancelButton = view.findViewById(R.id.edit_group_walk_popup_cancel_button);
         cancelButton.setOnClickListener(v -> dismiss());
-        deleteButton = view.findViewById(R.id.edit_group_walk_popup_delete_button);
-        deleteButton.setOnClickListener(v -> {
-            AlertDialog confirmationDialog = new AlertDialog.Builder(getContext())
-                    .setTitle("Confirm Deletion")
-                    .setMessage("Delete walk?")
-                    .setPositiveButton("Yes", (dialog, which) -> walk.delete(getContext(), this))
-                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
-            confirmationDialog.show();
-        });
+
+        Button deleteButton = view.findViewById(R.id.edit_group_walk_popup_delete_button);
+        deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
+                .setTitle(R.string.delete_walk)
+                .setPositiveButton(R.string.yes, (dialog, which) -> walk.delete(getContext(), this))
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .create().show());
+
         if (groupWalkPosition > -1) {
             walk = PathMap.getInstance().getPathList().get(pathId).getGroupWalks().get(groupWalkPosition);
             title.getEditText().setText(walk.getTitle());
@@ -102,6 +102,7 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
             submitButton.setEnabled(true);
             deleteButton.setVisibility(View.VISIBLE);
         }
+
         if (savedInstanceState != null) {
             title.getEditText().setText(savedInstanceState.getString("title"));
             if (savedInstanceState.containsKey("calendar")) {
@@ -110,6 +111,7 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
                 submitButton.setEnabled(true);
             }
         }
+
         builder.setView(view);
         return builder.create();
     }
@@ -118,28 +120,32 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("title", title.getEditText().getText().toString());
-        if (submitButton.isEnabled()) outState.putSerializable("calendar", calendar);
+        if (submitButton.isEnabled()) {
+            outState.putSerializable("calendar", calendar);
+        }
     }
 
     @Override
     public void onEditSuccess() {
         ((GroupWalkListFragment) getParentFragment()).updateRecyclerView();
         dismiss();
+        Toast.makeText(getContext(), R.string.save_group_walk_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEditFailure() {
-        Toast.makeText(getContext(), "Failed to save walk!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.save_group_walk_failure, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDeleteSuccess() {
         ((GroupWalkListFragment) getParentFragment()).updateRecyclerView();
         dismiss();
+        Toast.makeText(getContext(), R.string.delete_group_walk_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDeleteFailure() {
-        Toast.makeText(getContext(), "Failed to delete walk!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.delete_group_walk_failure, Toast.LENGTH_SHORT).show();
     }
 }

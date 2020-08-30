@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.wikiwalks.wikiwalks.ui.MapsFragment;
@@ -33,15 +32,12 @@ public class GetPathIntegrationTests {
     MapsFragment fragment;
     Context appContext;
     LatLngBounds bounds;
-
-    GoogleMap map;
     PathMap pathMap;
 
     @Before
     public void setup() {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         fragment = MapsFragment.newInstance();
-        fragment.setmMap(map);
         pathMap = spy(PathMap.getInstance());
 
     }

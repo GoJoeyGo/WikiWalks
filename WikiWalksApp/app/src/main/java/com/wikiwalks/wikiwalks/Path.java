@@ -121,17 +121,15 @@ public class Path {
                         PathMap.getInstance().addPath(newPath);
                         callback.onGetPathSuccess(newPath);
                     } catch (JSONException e) {
-                        Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
-                        Log.e("UPDATE_PATH1", Arrays.toString(e.getStackTrace()));
-                        callback.onGetPathFailure();
+                        Log.e("Path", "Getting path from update response", e);
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
-                Toast.makeText(context, "Failed to update path...", Toast.LENGTH_SHORT).show();
-                Log.e("UPDATE_PATH2", Arrays.toString(t.getStackTrace()));
+                Log.e("Path", "Sending path update request", t);
+                Toast.makeText(context, R.string.get_path_failure, Toast.LENGTH_SHORT).show();
                 callback.onGetPathFailure();
             }
         });
@@ -183,6 +181,10 @@ public class Path {
 
     public double getRating() {
         return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public ArrayList<Picture> getPicturesList() {
@@ -274,12 +276,12 @@ public class Path {
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("SUBMIT_PATH1", Arrays.toString(t.getStackTrace()));
+                    Log.e("Path", "Sending edit group walk request", t);
                     callback.onEditFailure();
                 }
             });
         } catch (JSONException e) {
-            Log.e("SUBMIT_PATH2", Arrays.toString(e.getStackTrace()));
+            Log.e("Path", "Creating edit path request", e);
             callback.onEditFailure();
         }
     }
@@ -293,14 +295,14 @@ public class Path {
                     try {
                         Path.this.walkCount = new JSONObject(response.body().toString()).getInt("new_count");
                     } catch (JSONException e) {
-                        Log.e("WALK_PATH1", Arrays.toString(e.getStackTrace()));
+                        Log.e("Path", "Getting walk count from walk response", e);
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
-                Log.e("WALK_PATH2", Arrays.toString(t.getStackTrace()));
+                Log.e("Path", "Sending walk path request", t);
             }
         });
     }
@@ -316,7 +318,7 @@ public class Path {
             JSONObject request = new JSONObject();
             JSONObject attributes = new JSONObject();
             try {
-                attributes.put("device_id", MainActivity.getDeviceId(context));
+                attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
                 request.put("attributes", attributes);
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
                 Call<JsonElement> getReviews = MainActivity.getRetrofitRequests(context).getPathReviews(id, nextReviewPage, body);
@@ -349,13 +351,13 @@ public class Path {
                                 isLoadingReviews = false;
                                 callback.onGetReviewSuccess();
                             } catch (JSONException e) {
-                                Log.e("GET_REVIEWS1", Arrays.toString(e.getStackTrace()));
+                                Log.e("Path", "Getting reviews from response", e);
                                 isLoadingReviews = false;
                                 callback.onGetReviewFailure();
                             }
                         } else {
                             if (nextReviewPage > 1) {
-                                Toast.makeText(context, "No more reviews!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, R.string.no_more_reviews, Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingReviews = false;
                                 callback.onGetReviewFailure();
@@ -365,12 +367,12 @@ public class Path {
 
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
-                        Log.e("GET_REVIEWS2", Arrays.toString(t.getStackTrace()));
+                        Log.e("Path", "Sending get reviews request", t);
                         callback.onGetReviewFailure();
                     }
                 });
             } catch (JSONException e) {
-                Log.e("GET_REVIEWS3", Arrays.toString(e.getStackTrace()));
+                Log.e("Path", "Creating get reviews request", e);
                 isLoadingReviews = false;
                 callback.onGetReviewFailure();
             }
@@ -388,7 +390,7 @@ public class Path {
             JSONObject request = new JSONObject();
             JSONObject attributes = new JSONObject();
             try {
-                attributes.put("device_id", MainActivity.getDeviceId(context));
+                attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
                 request.put("attributes", attributes);
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
                 Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPathPictures(id, nextPicturePage, body);
@@ -416,13 +418,13 @@ public class Path {
                                 isLoadingPictures = false;
                                 callback.onGetPicturesSuccess();
                             } catch (JSONException e) {
-                                Log.e("GET_PICTURES1", Arrays.toString(e.getStackTrace()));
+                                Log.e("Path", "Getting photos from response", e);
                                 isLoadingPictures = false;
                                 callback.onGetPicturesFailure();
                             }
                         } else {
                             if (nextPicturePage > 1) {
-                                Toast.makeText(context, "No more pictures!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, R.string.no_more_photos, Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingPictures = false;
                                 callback.onGetPicturesFailure();
@@ -432,12 +434,12 @@ public class Path {
 
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
-                        Log.e("GET_PICTURES2", Arrays.toString(t.getStackTrace()));
+                        Log.e("Path", "Sending get photos request", t);
                         callback.onGetPicturesFailure();
                     }
                 });
             } catch (JSONException e) {
-                Log.e("GET_PICTURES3", Arrays.toString(e.getStackTrace()));
+                Log.e("Path", "Creating get photos request", e);
                 isLoadingPictures = false;
                 callback.onGetPicturesFailure();
             }

@@ -3,14 +3,12 @@ package com.wikiwalks.wikiwalks.ui;
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +19,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.R;
@@ -29,20 +29,15 @@ import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.RouteListRecyclerViewAdap
 
 import java.util.ArrayList;
 
-public class RouteListFragment extends Fragment implements OnMapReadyCallback, Route.RouteModifyCallback {
+public class RouteListFragment extends Fragment implements OnMapReadyCallback {
 
-    Button selectRouteButton;
-    Button deleteButton;
-    SupportMapFragment mapFragment;
-    Path path;
-    ArrayList<Route> routes;
-    ArrayList<Polyline> polylines = new ArrayList<>();
-    RecyclerView recyclerView;
-    int position;
-    AlertDialog confirmationDialog;
-    RouteListRecyclerViewAdapter recyclerViewAdapter;
-    Toolbar toolbar;
-    private GoogleMap routeListMap;
+    private Button selectRouteButton;
+    private Button deleteButton;
+    private SupportMapFragment mapFragment;
+    private Path path;
+    private ArrayList<Route> routes;
+    private ArrayList<Polyline> polylines = new ArrayList<>();
+    private RecyclerView recyclerView;
 
     public static RouteListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -54,20 +49,26 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        final View rootView = inflater.inflate(R.layout.route_list_fragment, container, false);
+
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         routes = path.getRoutes();
-        final View rootView = inflater.inflate(R.layout.route_list_fragment, container, false);
-        toolbar = rootView.findViewById(R.id.route_list_toolbar);
+
+        MaterialToolbar toolbar = rootView.findViewById(R.id.route_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Routes - " + path.getName());
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(String.format(getString(R.string.routes_title), path.getName()));
+
         recyclerView = rootView.findViewById(R.id.route_list_recyclerview);
-        recyclerViewAdapter = new RouteListRecyclerViewAdapter(this, routes);
-        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setAdapter(new RouteListRecyclerViewAdapter(this, routes));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
+
         deleteButton = rootView.findViewById(R.id.edit_route_button);
+
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_route_list_frag);
+
         return rootView;
     }
 
@@ -79,23 +80,21 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        routeListMap = googleMap;
-        routeListMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         for (int i = 0; i < routes.size(); i++) {
-            Polyline newPolyline = routes.get(i).makePolyline(routeListMap);
+            Polyline newPolyline = routes.get(i).makePolyline(googleMap);
             newPolyline.setColor(Color.HSVToColor(new float[]{(i * 50) % 360, 1, 1}));
             polylines.add(newPolyline);
         }
-        routeListMap.getUiSettings().setAllGesturesEnabled(false);
-        routeListMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), getResources().getDisplayMetrics().widthPixels, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics()), 10));
+        googleMap.getUiSettings().setAllGesturesEnabled(false);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), 20));
     }
 
     public void setPath(Path path) {
         this.path = path;
     }
 
-    public void selectRoute(final int position) {
-        this.position = position;
+    public void selectRoute(int position) {
         for (Polyline polyline : polylines) {
             polyline.setVisible(false);
         }
@@ -105,38 +104,37 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback, R
         if (routes.get(position).isEditable()) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(v -> {
-                confirmationDialog = new AlertDialog.Builder(getContext())
-                        .setTitle("Confirm Deletion")
-                        .setMessage("Are you sure you want to delete this route?")
-                        .setPositiveButton("Yes", (dialog, which) -> path.getRoutes().get(position).delete(getContext(), this))
-                        .setNegativeButton("No", (dialog, which) -> confirmationDialog.dismiss()).create();
-                confirmationDialog.show();
+                new MaterialAlertDialogBuilder(getContext())
+                        .setTitle(R.string.delete_route_prompt)
+                        .setPositiveButton(R.string.yes, (dialog, which) -> path.getRoutes().get(position).delete(getContext(), new Route.RouteModifyCallback() {
+                            @Override
+                            public void onRouteEditSuccess(Path path) {
+                                polylines.get(position).remove();
+                                polylines.remove(position);
+                                for (Polyline polyline : polylines) {
+                                    polyline.setVisible(true);
+                                }
+                                recyclerView.getAdapter().notifyItemRemoved(position);
+                                recyclerView.getAdapter().notifyItemRangeChanged(position, routes.size());
+                                deleteButton.setVisibility(View.GONE);
+                                if (routes.size() == 0) {
+                                    getParentFragmentManager().popBackStack("Map", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                }
+                                Toast.makeText(getContext(), R.string.delete_route_success, Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onRouteEditFailure() {
+                                Toast.makeText(getContext(), R.string.delete_route_failure, Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            }
+                        }))
+                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                        .create().show();
             });
         } else {
             deleteButton.setVisibility(View.GONE);
         }
     }
 
-    @Override
-    public void onRouteModifySuccess(Path path) {
-        polylines.get(position).remove();
-        polylines.remove(position);
-        for (Polyline polyline : polylines) {
-            polyline.setVisible(true);
-        }
-        recyclerViewAdapter.getButtons().remove(position);
-        recyclerViewAdapter.notifyItemRemoved(position);
-        recyclerViewAdapter.notifyItemRangeChanged(position, routes.size());
-        deleteButton.setVisibility(View.GONE);
-        Toast.makeText(getContext(), "Successfully deleted route!", Toast.LENGTH_SHORT).show();
-        if (routes.size() == 0) {
-            getParentFragmentManager().popBackStack("Map", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        }
-    }
-
-    @Override
-    public void onRouteModifyFailure() {
-        Toast.makeText(getContext(), "Failed to delete route...", Toast.LENGTH_SHORT).show();
-        confirmationDialog.dismiss();
-    }
 }

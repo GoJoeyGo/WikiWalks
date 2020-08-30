@@ -12,11 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -33,33 +32,36 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
 import com.wikiwalks.wikiwalks.PointOfInterest;
+import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditPictureDialog;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestSubmitCallback, EditPictureDialog.EditPictureDialogListener {
 
-    TextView offTrackVariable;
-    ImageView offTrackDirectionIndicator;
-    Location lastLocation;
-    EditNameDialog editNameDialog;
-    EditPictureDialog editPictureDialog;
-    Button markPointButton;
+    private float distanceWalked = 0;
+    private TextView offTrackVariable;
+    private ImageView offTrackDirectionIndicator;
+    private Location lastLocation;
+    private EditNameDialog editNameDialog;
+    private Button markPointButton;
     private int routeNumber;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Path path;
-    private ConstraintLayout outOfRangeBanner;
+    private LinearLayout outOfRangeBanner;
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
-    private Toolbar toolbar;
 
     public static WalkFragment newInstance(int pathId, int routeNumber) {
         Bundle args = new Bundle();
@@ -72,34 +74,48 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        final View rootView = inflater.inflate(R.layout.walk_fragment, container, false);
+
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
-        new CountDownTimer(60000, 60000) {
+        new CountDownTimer(30000, 30000) {
             @Override
             public void onTick(long millisUntilFinished) {
             }
 
             @Override
             public void onFinish() {
+                PreferencesManager.getInstance(getContext()).increaseTimesWalked();
                 path.walk(getContext());
             }
         }.start();
+
         routeNumber = getArguments().getInt("routeNumber");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-        final View rootView = inflater.inflate(R.layout.walk_fragment, container, false);
-        toolbar = rootView.findViewById(R.id.walk_toolbar);
+
+        MaterialToolbar toolbar = rootView.findViewById(R.id.walk_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(path.getName());
+
         markPointButton = rootView.findViewById(R.id.mark_poi_button);
         markPointButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "EditPopup"));
+
         Button addPhotoButton = rootView.findViewById(R.id.take_picture_button);
         addPhotoButton.setOnClickListener(v -> EditPictureDialog.newInstance(Picture.PictureType.PATH, path.getId(), -1, null).show(getChildFragmentManager(), "PicturePopup"));
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
-        mapFragment.getMapAsync(this);
+
         outOfRangeBanner = rootView.findViewById(R.id.out_of_range_banner);
         offTrackVariable = rootView.findViewById(R.id.off_track_variable);
         offTrackDirectionIndicator = rootView.findViewById(R.id.off_track_direction_indicator);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
+        mapFragment.getMapAsync(this);
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        PreferencesManager.getInstance(getContext()).addDistanceWalked(distanceWalked);
+        super.onDestroy();
     }
 
     @Override
@@ -142,19 +158,24 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         locationRequest.setInterval(1000);
         locationRequest.setFastestInterval(500);
 
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                onLocationChanged(locationResult.getLastLocation());
+        MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
+            if (granted) {
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        super.onLocationResult(locationResult);
+                        onLocationChanged(locationResult.getLastLocation());
+                    }
+                }, Looper.myLooper());
             }
-        }, Looper.myLooper());
+        });
+
     }
 
     private void onLocationChanged(Location location) {
+        if (lastLocation != null) {
+            distanceWalked += location.distanceTo(lastLocation);
+        }
         lastLocation = location;
         markPointButton.setEnabled(true);
         CameraPosition position = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(mMap.getCameraPosition().zoom).bearing(location.getBearing()).build();
@@ -180,10 +201,15 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         }
         if (!inRange) {
             outOfRangeBanner.setVisibility(View.VISIBLE);
-            offTrackVariable.setText(String.format("You are %d metres away.", (int) shortestDistance[0]));
+            String country = Locale.getDefault().getCountry();
+            if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
+                offTrackVariable.setText(String.format(getString(R.string.off_track), (int) (shortestDistance[0] * 3.28084), getString(R.string.feet)));
+            } else {
+                offTrackVariable.setText(String.format(getString(R.string.off_track), (int) shortestDistance[0], getString(R.string.metres)));
+            }
             offTrackDirectionIndicator.setRotation(shortestDistance[1]);
         } else {
-            outOfRangeBanner.setVisibility(View.INVISIBLE);
+            outOfRangeBanner.setVisibility(View.GONE);
         }
     }
 
@@ -204,36 +230,31 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
-        if (name.isEmpty())
+        if (name.isEmpty()) {
             name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());
+        }
         PointOfInterest.submit(getContext(), name, lastLocation.getLatitude(), lastLocation.getLongitude(), path, this);
     }
 
     @Override
     public void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest) {
         editNameDialog.dismiss();
-        Toast.makeText(getContext(), "Successfully submitted point of interest!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.save_point_of_interest_success, Toast.LENGTH_SHORT).show();
         pointOfInterest.makeMarker(mMap, BitmapDescriptorFactory.HUE_RED);
     }
 
     @Override
     public void onSubmitPointOfInterestFailure() {
-        Toast.makeText(getContext(), "Failed to submit point of interest...", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void setPictureDialog(EditPictureDialog editPictureDialog) {
-        this.editPictureDialog = editPictureDialog;
+        Toast.makeText(getContext(), R.string.save_point_of_interest_failure, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEditPicture() {
-        editPictureDialog.dismiss();
-        Toast.makeText(getContext(), "Successfully added picture!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.save_photo_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onDeletePicture() {
+    public void onDeletePicture(int position) {
 
     }
 }

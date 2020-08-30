@@ -60,12 +60,12 @@ public class RecordPathIntegrationTests {
         fragment.addLocation(exampleLocations[2]);
         Route.RouteModifyCallback callback = new Route.RouteModifyCallback() {
             @Override
-            public void onRouteModifySuccess(Path path) {
+            public void onRouteEditSuccess(Path path) {
                 RecordPathIntegrationTests.path = path;
             }
 
             @Override
-            public void onRouteModifyFailure() {
+            public void onRouteEditFailure() {
 
             }
         };

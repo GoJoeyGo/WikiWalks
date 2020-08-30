@@ -12,7 +12,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/recording_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -33,7 +33,7 @@
         app:layout_constraintTop_toBottomOf="@id/recording_toolbar_wrapper"
         tools:context=".ui.main.RecordingFragment" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/recording_button_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,24 +49,18 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginEnd="10dp"
+            android:layout_weight="1"
             android:fontFamily="monospace"
-            android:text="@string/stop_recording"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/recording_mark_poi_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="@string/stop_recording" />
 
         <Button
             android:id="@+id/recording_mark_poi_button"
             android:layout_width="0dp"
             android:layout_height="50dp"
+            android:layout_weight="1"
             android:enabled="false"
             android:fontFamily="monospace"
-            android:text="@string/mark_point"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/stop_recording_button"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="@string/mark_point" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

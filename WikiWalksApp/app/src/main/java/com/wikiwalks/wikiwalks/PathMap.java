@@ -28,13 +28,11 @@ public class PathMap {
     private LinkedHashMap<Integer, PointOfInterest> pointOfInterestList = new LinkedHashMap<>();
 
     public interface PathMapListener {
-        void OnPathMapChange();
-
-        void OnPathMapUpdateFailure();
+        void onPathMapUpdateSuccess();
+        void onPathMapUpdateFailure();
     }
 
-    private PathMap() {
-    }
+    private PathMap() {}
 
     public static PathMap getInstance() {
         if (instance == null) {
@@ -47,7 +45,7 @@ public class PathMap {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> getPaths = MainActivity.getRetrofitRequests(context).getPaths(bounds.northeast.latitude, bounds.northeast.longitude, bounds.southwest.latitude, bounds.southwest.longitude, body);
@@ -66,7 +64,7 @@ public class PathMap {
                             triggerChangeListeners();
                         } catch (JSONException e) {
                             triggerFailedListeners();
-                            Log.e("GET_PATHS1", Arrays.toString(e.getStackTrace()));
+                            Log.e("PathMap", "Getting paths from response", e);
                         }
                     } else {
                         triggerFailedListeners();
@@ -76,24 +74,24 @@ public class PathMap {
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     triggerFailedListeners();
-                    Log.e("GET_PATHS2", Arrays.toString(t.getStackTrace()));
+                    Log.e("PathMap", "Sending path update request", t);
                 }
             });
         } catch (JSONException e) {
             triggerFailedListeners();
-            Log.e("GET_PATHS3", Arrays.toString(e.getStackTrace()));
+            Log.e("PathMap", "Creating path update request", e);
         }
     }
 
     private void triggerChangeListeners() {
         for (PathMapListener listener : changeListeners) {
-            listener.OnPathMapChange();
+            listener.onPathMapUpdateSuccess();
         }
     }
 
     private void triggerFailedListeners() {
         for (PathMapListener listener : changeListeners) {
-            listener.OnPathMapUpdateFailure();
+            listener.onPathMapUpdateFailure();
         }
     }
 

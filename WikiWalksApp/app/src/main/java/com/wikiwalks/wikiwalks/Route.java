@@ -1,6 +1,7 @@
 package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,7 +11,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.JsonElement;
-import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -26,22 +27,21 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Route implements Serializable {
-    @SerializedName("id")
-    int id;
 
+    int id;
     Path path;
-    @SerializedName("editable")
     boolean editable;
 
     private ArrayList<Double> latitudes;
     private ArrayList<Double> longitudes;
     private ArrayList<Double> altitudes;
+    private double distance;
 
     private ArrayList<Polyline> polylines = new ArrayList<>();
 
     public interface RouteModifyCallback {
-        void onRouteModifySuccess(Path path);
-        void onRouteModifyFailure();
+        void onRouteEditSuccess(Path path);
+        void onRouteEditFailure();
     }
 
     public Route(int id, Path path, boolean editable, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes) {
@@ -51,18 +51,33 @@ public class Route implements Serializable {
         this.latitudes = latitudes;
         this.longitudes = longitudes;
         this.altitudes = altitudes;
+        Location lastLocation = new Location("import");
+        lastLocation.setLatitude(latitudes.get(0));
+        lastLocation.setLongitude(longitudes.get(0));
+        lastLocation.setAltitude(altitudes.get(0));
+        for (int i = 1; i < latitudes.size(); i++) {
+            Location newLocation = new Location("import");
+            newLocation.setLatitude(latitudes.get(i));
+            newLocation.setLongitude(longitudes.get(i));
+            newLocation.setAltitude(altitudes.get(i));
+            distance += (newLocation.distanceTo(lastLocation) / 1000);
+            lastLocation = newLocation;
+        }
     }
 
     public static void submit(Context context, Path path, String title, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, RouteModifyCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             attributes.put("latitudes", new JSONArray(latitudes));
             attributes.put("longitudes", new JSONArray(longitudes));
             attributes.put("altitudes", new JSONArray(altitudes));
-            if (path != null) attributes.put("path", path.id);
-            else attributes.put("name", title);
+            if (path != null) {
+                attributes.put("path", path.id);
+            } else {
+                attributes.put("name", title);
+            }
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> newRoute = MainActivity.getRetrofitRequests(context).newRoute(body);
@@ -74,28 +89,25 @@ public class Route implements Serializable {
                             JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("path");
                             Path newPath = new Path(responseJson);
                             PathMap.getInstance().addPath(newPath);
-                            callback.onRouteModifySuccess(newPath);
+                            callback.onRouteEditSuccess(newPath);
                         } catch (JSONException e) {
-                            Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
-                            Log.e("SUBMIT_PATH1", Arrays.toString(e.getStackTrace()));
-                            callback.onRouteModifyFailure();
+                            Log.e("Route", "Getting path from submit response", e);
                         }
+                        PreferencesManager.getInstance(context).changeRoutesRecorded(false);
                     } else {
-                        callback.onRouteModifyFailure();
+                        callback.onRouteEditFailure();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
-                    Log.e("SUBMIT_PATH2", Arrays.toString(t.getStackTrace()));
-                    callback.onRouteModifyFailure();
+                    Log.e("Route", "Sending new route request", t);
+                    callback.onRouteEditFailure();
                 }
             });
         } catch (JSONException e) {
-            Toast.makeText(context, "Failed to upload path...", Toast.LENGTH_SHORT).show();
-            Log.e("SUBMIT_PATH3", Arrays.toString(e.getStackTrace()));
-            callback.onRouteModifyFailure();
+            Log.e("Route", "Creating new route request", e);
+            callback.onRouteEditFailure();
         }
     }
 
@@ -106,10 +118,15 @@ public class Route implements Serializable {
         }
         Polyline polyline = map.addPolyline(new PolylineOptions().addAll(coordinates));
         int walkCount = path.getWalkCount();
-        if (walkCount < 10) polyline.setColor(0xffffe49c);
-        else if (walkCount < 100) polyline.setColor(0xffff9100);
-        else if (walkCount < 1000) polyline.setColor(0xffff1e00);
-        else polyline.setColor(0xff000000);
+        if (walkCount < 10) {
+            polyline.setColor(0xffffe49c);
+        } else if (walkCount < 100) {
+            polyline.setColor(0xffff9100);
+        } else if (walkCount < 1000) {
+            polyline.setColor(0xffff1e00);
+        } else {
+            polyline.setColor(0xff000000);
+        }
         polyline.setWidth(20);
         polylines.add(polyline);
         return polyline;
@@ -131,6 +148,10 @@ public class Route implements Serializable {
         return altitudes;
     }
 
+    public double getDistance() {
+        return distance;
+    }
+
     public boolean isEditable() {
         return editable;
     }
@@ -139,7 +160,7 @@ public class Route implements Serializable {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", MainActivity.getDeviceId(context));
+            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> deleteRoute = MainActivity.getRetrofitRequests(context).deleteRoute(id, body);
@@ -157,21 +178,22 @@ public class Route implements Serializable {
                         for (Polyline polyline : polylines) {
                             polyline.remove();
                         }
-                        callback.onRouteModifySuccess(null);
+                        PreferencesManager.getInstance(context).changeRoutesRecorded(true);
+                        callback.onRouteEditSuccess(null);
                     } else {
-                        callback.onRouteModifyFailure();
+                        callback.onRouteEditFailure();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("DELETE_PATH1", Arrays.toString(t.getStackTrace()));
-                    callback.onRouteModifyFailure();
+                    Log.e("Route", "Sending delete route request", t);
+                    callback.onRouteEditFailure();
                 }
             });
         } catch (JSONException e) {
-            Log.e("DELETE_PATH2", Arrays.toString(e.getStackTrace()));
-            callback.onRouteModifyFailure();
+            Log.e("Route", "Creating delete route request", e);
+            callback.onRouteEditFailure();
         }
     }
 }
