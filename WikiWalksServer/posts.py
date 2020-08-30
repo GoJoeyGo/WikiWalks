@@ -61,7 +61,7 @@ def add_route():
         path_schema = PathSchema()
         request_json = request.get_json(force=True)["attributes"]
         if len(request_json["latitudes"]) == len(request_json["longitudes"]) == len(request_json["altitudes"]) \
-                and len(request_json["latitudes"]) > 0:
+                and len(request_json["latitudes"]) > 10:
             user = get_submitter(request_json["device_id"])
             time = get_time()
             boundaries = [min(request_json["latitudes"]), min(request_json["longitudes"]),

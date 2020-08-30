@@ -160,7 +160,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
                     if (granted) {
                         stopRecordingButton.setEnabled(true);
                         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-                            if (location.distanceTo(lastLocation) < 15) {
+                            if (location.distanceTo(lastLocation) < 25) {
                                 stopRecordingButton.setText(R.string.stop_recording);
                                 startLocationUpdates();
                             } else {
@@ -243,7 +243,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         recording = true;
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(3000);
+        locationRequest.setInterval(2000);
         locationRequest.setFastestInterval(1000);
         MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
             if (granted) {
@@ -262,7 +262,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     }
 
     public void addLocation(Location location) {
-        if (lastLocation == null || location.distanceTo(lastLocation) > 2) {
+        if (lastLocation == null || (location.distanceTo(lastLocation) > 2) && location.distanceTo(lastLocation) < 25)  {
             if (lastLocation != null) {
                 distanceWalked += location.distanceTo(lastLocation);
             }
@@ -271,6 +271,9 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
             altitudes.add(location.getAltitude());
             latLngs.add(new LatLng(location.getLatitude(), location.getLongitude()));
             lastLocation = location;
+            if (latLngs.size() > 10) {
+                stopRecordingButton.setEnabled(true);
+            }
         }
     }
 
