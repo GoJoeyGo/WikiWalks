@@ -34,7 +34,7 @@ public class StatisticsFragment extends Fragment {
         MaterialToolbar toolbar = rootView.findViewById(R.id.statistics_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle(R.string.statistics_title);
+        toolbar.setTitle(R.string.statistics);
 
         RecyclerView recyclerView = rootView.findViewById(R.id.statistics_recycler_view);
         recyclerView.setAdapter(new StatisticsListRecyclerViewAdapter(getContext(), PreferencesManager.getInstance(getContext()).getStatistics()));

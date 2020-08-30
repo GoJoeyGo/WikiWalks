@@ -24,7 +24,7 @@
 
     <string name="new_path">New Path</string>
     <string name="create_new_path">Create New Path</string>
-    <string name="new_path_prompt">Make new path?</string>
+    <string name="new_path_prompt">Make New Path?</string>
     <string name="new_path_info">Your route does not connect to the path and cannot be submitted. Make it a new path instead?</string>
     <string name="get_path_failure">Failed to get path…</string>
     <string name="get_paths_failure">Failed to get paths…</string>
@@ -40,7 +40,7 @@
     <string name="record_new_route">Record New Route</string>
     <string name="explore">Explore</string>
     <string name="delete_route">Delete Route</string>
-    <string name="delete_route_prompt">Delete route?</string>
+    <string name="delete_route_prompt">Delete Route?</string>
     <string name="save_route_success">Saved route successfully!</string>
     <string name="save_route_failure">Failed to save route…</string>
     <string name="delete_route_success">Deleted route successfully!</string>
@@ -51,7 +51,7 @@
     <string name="point_of_interest_description">Point of interest on %s</string>
     <string name="mark_point">Mark Point</string>
     <string name="no_points_of_interest">No points of interest!</string>
-    <string name="delete_point_of_interest_prompt">Delete point of interest?</string>
+    <string name="delete_point_of_interest_prompt">Delete Point of Interest?</string>
     <string name="save_point_of_interest_success">Saved point of interest successfully!</string>
     <string name="save_point_of_interest_failure">Failed to save point of interest…</string>
     <string name="delete_point_of_interest_success">Deleted point of interest successfully!</string>
@@ -108,7 +108,6 @@
     <string name="toggle_group_walk_attendance_success">Updated group walk attendance successfully!</string>
     <string name="toggle_group_walk_attendance_failure">Failed to update group walk attendance…</string>
 
-    <string name="statistics_title">Statistics</string>
     <string name="statistics">Statistics</string>
     <string name="distance_walked">Distance Walked - %.2f %s</string>
     <string name="earth_circumference_walked">🌎\'s Circumference Walked - %.6f%%</string>
@@ -136,7 +135,7 @@
     <string name="no_bookmarks">No bookmarks!</string>
 
     <string name="settings_title">Settings</string>
-    <string name="set_name">Set Name</string>
+    <string name="set_name">Set Display Name</string>
     <string name="import_data">Import Data</string>
     <string name="export_data">Export Data</string>
     <string name="save_name_success">Saved name successfully!</string>

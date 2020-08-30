@@ -1,6 +1,5 @@
 package com.wikiwalks.wikiwalks.ui;
 
-import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;

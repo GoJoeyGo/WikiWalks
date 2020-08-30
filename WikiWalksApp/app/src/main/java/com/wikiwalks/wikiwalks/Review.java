@@ -2,14 +2,11 @@ package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Arrays;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;

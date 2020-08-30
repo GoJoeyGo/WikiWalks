@@ -3,7 +3,6 @@ package com.wikiwalks.wikiwalks;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -18,8 +17,6 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;

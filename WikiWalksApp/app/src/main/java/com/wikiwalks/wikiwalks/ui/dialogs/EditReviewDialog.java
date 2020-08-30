@@ -65,7 +65,6 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
     @Override
     public void onDeleteReviewFailure() {
         Toast.makeText(getContext(), getString(R.string.delete_review_failure), Toast.LENGTH_SHORT).show();
-        ;
     }
 
     @NonNull
