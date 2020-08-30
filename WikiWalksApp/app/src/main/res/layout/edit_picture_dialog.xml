@@ -50,7 +50,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/description"
+            android:hint="@string/caption"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"

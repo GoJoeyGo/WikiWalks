@@ -116,7 +116,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.edit_picture_dialog, null);
-        builder.setTitle(R.string.picture);
+        builder.setTitle(R.string.photo);
 
         listener = (EditPictureDialogListener) getParentFragment();
         type = (Picture.PictureType) getArguments().getSerializable("picture_type");

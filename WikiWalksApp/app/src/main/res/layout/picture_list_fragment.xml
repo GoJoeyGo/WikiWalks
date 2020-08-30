@@ -29,7 +29,7 @@
         style="@style/TextTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_pictures"
+        android:text="@string/no_photos"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/submit_group_walk_background"
         app:layout_constraintEnd_toEndOf="parent"

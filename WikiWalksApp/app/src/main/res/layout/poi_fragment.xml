@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/chevron"
                 android:gravity="center_vertical"
-                android:text="@string/pictures"
+                android:text="@string/photos"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/poi_frag_reviews_button" />
 

@@ -77,7 +77,7 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
         toolbar.setTitle(pointOfInterest.getName());
 
         TextView description = rootView.findViewById(R.id.poi_frag_description);
-        description.setText(String.format(getString(R.string.point_of_interest_format), pointOfInterest.getPath().getName()));
+        description.setText(String.format(getString(R.string.point_of_interest_description), pointOfInterest.getPath().getName()));
 
         Button reviewsButton = rootView.findViewById(R.id.poi_frag_reviews_button);
         reviewsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, ReviewListFragment.newInstance(Review.ReviewType.POINT_OF_INTEREST, pointOfInterest.getId())).addToBackStack(null).commit());

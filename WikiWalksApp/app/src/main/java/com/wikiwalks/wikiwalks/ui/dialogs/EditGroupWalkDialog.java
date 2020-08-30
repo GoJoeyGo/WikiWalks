@@ -89,7 +89,7 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
 
         Button deleteButton = view.findViewById(R.id.edit_group_walk_popup_delete_button);
         deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
-                .setTitle(R.string.delete_walk)
+                .setTitle(R.string.cancel_group_walk_prompt)
                 .setPositiveButton(R.string.yes, (dialog, which) -> walk.delete(getContext(), this))
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .create().show());
