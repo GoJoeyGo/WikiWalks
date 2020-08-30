@@ -52,11 +52,13 @@ def get_path(path_id):
 
 @gets.route("/paths/", methods=["GET", "POST"])
 def get_paths():
-    paths = Path.query.filter()
     north_boundary = request.args.get('n', default=90, type=float)
     south_boundary = request.args.get('s', default=-90, type=float)
     east_boundary = request.args.get('e', default=180, type=float)
     west_boundary = request.args.get('w', default=-180, type=float)
+    if abs(east_boundary - west_boundary) > 3 or abs(north_boundary - south_boundary) > 3:
+        return jsonify({"status": "failed - distance too large"}), 500
+    paths = Path.query.filter()
     in_range_paths = []
     for path in paths:
         if ((north_boundary >= path.boundaries[2] >= south_boundary or

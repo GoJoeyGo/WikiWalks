@@ -17,6 +17,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -86,16 +87,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         setMapLocation();
         MainActivity.checkPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
-            if (granted) {
-                mMap.setMyLocationEnabled(true);
-            }
+                if (granted) {
+                    mMap.setMyLocationEnabled(true);
                 }
+            }
         );
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
         PathMap pathMap = PathMap.getInstance();
         pathMap.addListener(this);
-        mMap.setOnCameraIdleListener(() -> pathMap.updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getActivity()));
+        mMap.setOnCameraIdleListener(() -> {
+            LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+            if (Math.abs(bounds.northeast.latitude - bounds.southwest.latitude) < 3) {
+                pathMap.updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getContext());
+            }
+        });
     }
 
     @Override
