@@ -84,7 +84,6 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
 
             @Override
             public void onFinish() {
-                PreferencesManager.getInstance(getContext()).increaseTimesWalked();
                 path.walk(getContext());
             }
         }.start();

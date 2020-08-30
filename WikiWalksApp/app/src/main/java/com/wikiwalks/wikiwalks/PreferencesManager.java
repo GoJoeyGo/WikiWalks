@@ -55,9 +55,8 @@ public class PreferencesManager {
     public void addDistanceWalked(float distance) {
         float oldDistance = statistics.getFloat("distance_walked", 0);
         statistics.edit().putFloat("distance_walked", distance + oldDistance).apply();
-        longestWalk(distance);
-        averageDistanceWalked(distance);
-        percentAroundGlobeTraveled();
+        increaseTimesWalked();
+        updateLongestWalk(distance);
         ArrayList<JSONObject> goals = getGoals();
         try {
             for (JSONObject goal : goals) {
@@ -70,25 +69,18 @@ public class PreferencesManager {
             Log.e("PreferencesManager", "Adding distance walked", e);
         }
     }
-    public void percentAroundGlobeTraveled() {
-        float distanceFl = statistics.getFloat("distance_walked", 0);
-        statistics.edit().putFloat("distance_walked",(distanceFl/4007500)*100).apply();
-    }
-    public void longestWalk(float distance) {
-        float oldDistance = statistics.getFloat("distance_walked", 0);
-        if(distance>oldDistance){
-            statistics.edit().putFloat("longest_walk", distance).apply();
-        }
-    }
-    public void averageDistanceWalked(float distance) {
-        float oldAverageDistance = statistics.getFloat("average_walk_distance", 0);
-        int timesWalked = statistics.getInt("times_walked", 0);
-        float newAverageDistance = oldAverageDistance + (distance - oldAverageDistance) / (timesWalked + 2);//2 is used as the times walked is updated after the distance is added to toatal distance
-        statistics.edit().putFloat("average_walk_distance", newAverageDistance).apply();
-    }
+
     public void increaseTimesWalked() {
         int timesWalked = statistics.getInt("times_walked", 0);
         statistics.edit().putInt("times_walked", timesWalked + 1).apply();
+    }
+
+
+    public void updateLongestWalk(float distance) {
+        float oldDistance = statistics.getFloat("longest_walk", 0);
+        if (distance > oldDistance) {
+            statistics.edit().putFloat("longest_walk", distance).apply();
+        }
     }
 
     public void changeRoutesRecorded(boolean deleted) {
@@ -173,22 +165,24 @@ public class PreferencesManager {
     public String[] getStatistics() {
         String[] strings = new String[9];
         String country = Locale.getDefault().getCountry();
+        float distanceWalked = statistics.getFloat("distance_walked", 0);
+        int timesWalked = statistics.getInt("times_walked", 0);
         if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
-            strings[0] = String.format(context.getString(R.string.distance_walked), statistics.getFloat("distance_walked", 0) * 0.000621371, context.getString(R.string.miles));
-            strings[6] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0)* 0.000621371, context.getString(R.string.miles));
-            strings[8] = String.format(context.getString(R.string.average_walk_distance),statistics.getFloat("average_walk_distance",0)* 0.000621371,context.getString(R.string.miles));
+            strings[0] = String.format(context.getString(R.string.distance_walked), distanceWalked * 0.000621371, context.getString(R.string.miles));
+            strings[2] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0) * 0.000621371, context.getString(R.string.miles));
+            strings[3] = String.format(context.getString(R.string.average_walk_distance), (distanceWalked / timesWalked) * 0.000621371,context.getString(R.string.miles));
         } else {
-            strings[0] = String.format(context.getString(R.string.distance_walked), statistics.getFloat("distance_walked", 0) / 1000, context.getString(R.string.kilometres));
-            strings[6] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0)/ 1000, context.getString(R.string.kilometres));
-            strings[8] = String.format(context.getString(R.string.average_walk_distance), statistics.getFloat("average_walk_distance",0)/ 1000, context.getString(R.string.kilometres));
+            strings[0] = String.format(context.getString(R.string.distance_walked), distanceWalked * 0.001, context.getString(R.string.kilometres));
+            strings[2] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0) * 0.001, context.getString(R.string.kilometres));
+            strings[3] = String.format(context.getString(R.string.average_walk_distance), (distanceWalked / timesWalked) * 0.001, context.getString(R.string.kilometres));
 
         }
-        strings[1] = String.format(context.getString(R.string.times_walked), statistics.getInt("times_walked", 0));
-        strings[2] = String.format(context.getString(R.string.routes_recorded), statistics.getInt("routes_recorded", 0));
-        strings[3] = String.format(context.getString(R.string.points_marked), statistics.getInt("points_marked", 0));
-        strings[4] = String.format(context.getString(R.string.reviews_written), statistics.getInt("reviews_written", 0));
-        strings[5] = String.format(context.getString(R.string.pictures_uploaded), statistics.getInt("pictures_uploaded", 0));
-        strings[7] = String.format(context.getString(R.string.percent_around_globe_traveled), statistics.getFloat("percent_around_globe_traveled", 0),"%");
+        strings[1] = String.format(context.getString(R.string.earth_circumference_walked), statistics.getFloat("distance_walked", 0) / 400750);
+        strings[4] = String.format(context.getString(R.string.times_walked), timesWalked);
+        strings[5] = String.format(context.getString(R.string.routes_recorded), statistics.getInt("routes_recorded", 0));
+        strings[6] = String.format(context.getString(R.string.points_marked), statistics.getInt("points_marked", 0));
+        strings[7] = String.format(context.getString(R.string.reviews_written), statistics.getInt("reviews_written", 0));
+        strings[8] = String.format(context.getString(R.string.pictures_uploaded), statistics.getInt("pictures_uploaded", 0));
         return strings;
     }
 

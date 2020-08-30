@@ -61,17 +61,20 @@
     <string name="goals">Goals</string>
     <string name="delete_goal">Delete goal?</string>
     <string name="resume_recording">Resume Recording</string>
+    <string name="no_walks_scheduled">No walks scheduled!</string>
 
     <string name="submit_prompt">Submit?</string>
 
-    <string name="distance_format">"%.2f %s"</string>
+    <string name="distance_format">%.2f %s</string>
 
     <string name="off_track">You are %d %s away</string>
 
     <string name="statistics_title">Statistics</string>
-    <string name="no_walks_scheduled">No walks scheduled!</string>
     <string name="statistics">Statistics</string>
     <string name="distance_walked">Distance Walked - %.2f %s</string>
+    <string name="earth_circumference_walked">🌎\'s Circumference Walked - %.6f%%</string>
+    <string name="longest_walk">Longest Walk - %.2f %s</string>
+    <string name="average_walk_distance">Average Walk - %.2f %s</string>
     <string name="times_walked">Times Walked - %d</string>
     <string name="routes_recorded">Routes Recorded - %d</string>
     <string name="points_marked">Points of Interest Marked - %d</string>
