@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import com.google.android.material.appbar.MaterialToolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
@@ -76,8 +76,8 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
         separator = rootView.findViewById(R.id.path_review_separator);
         MaterialToolbar toolbar = rootView.findViewById(R.id.path_review_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Reviews - " + title);
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(String.format(getString(R.string.reviews_title), title));
         noReviewsIndicator = rootView.findViewById(R.id.no_reviews_indicator);
         recyclerView = rootView.findViewById(R.id.path_review_list_recyclerview);
         recyclerView.setAdapter(new ReviewListRecyclerViewAdapter(this, reviews));
@@ -98,9 +98,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
         swipeRefreshLayout = rootView.findViewById(R.id.review_list_swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(() -> updateReviewsList(true));
         writeReviewButton = rootView.findViewById(R.id.path_write_review_button);
-        writeReviewButton.setOnClickListener(v -> {
-            EditReviewDialog.newInstance(type, parentId).show(getChildFragmentManager(), "EditPopup");
-        });
+        writeReviewButton.setOnClickListener(v -> EditReviewDialog.newInstance(type, parentId).show(getChildFragmentManager(), "EditPopup"));
         updateReviewsList(true);
         return rootView;
     }
@@ -121,7 +119,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
             noReviewsIndicator.setVisibility(View.VISIBLE);
             ownReviewLayout.setVisibility(View.GONE);
             separator.setVisibility(View.GONE);
-            writeReviewButton.setText("WRITE REVIEW");
+            writeReviewButton.setText(R.string.write_review);
         } else {
             recyclerView.setVisibility(View.VISIBLE);
             noReviewsIndicator.setVisibility(View.GONE);
@@ -132,15 +130,15 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
                     ownReviewMessage.setText(ownReview.getMessage());
                 } else {
                     ownReviewMessage.setTypeface(ownReviewMessage.getTypeface(), Typeface.ITALIC);
-                    ownReviewMessage.setText("no review written");
+                    ownReviewMessage.setText(R.string.review_no_text);
                 }
                 ownReviewLayout.setVisibility(View.VISIBLE);
                 separator.setVisibility(View.VISIBLE);
-                writeReviewButton.setText("EDIT REVIEW");
+                writeReviewButton.setText(R.string.edit_review);
             } else {
                 ownReviewLayout.setVisibility(View.GONE);
                 separator.setVisibility(View.GONE);
-                writeReviewButton.setText("WRITE REVIEW");
+                writeReviewButton.setText(R.string.write_review);
             }
             recyclerView.getAdapter().notifyDataSetChanged();
         }
@@ -155,7 +153,7 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
 
     @Override
     public void onGetReviewFailure() {
-        Toast.makeText(getContext(), "Failed to get reviews", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.get_reviews_failure, Toast.LENGTH_SHORT).show();
     }
 
     @Override

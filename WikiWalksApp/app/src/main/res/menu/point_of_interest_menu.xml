@@ -7,12 +7,12 @@
         android:icon="@drawable/ic_baseline_delete_24"
         android:title="Delete"
         android:visible="false"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
 
     <item
         android:id="@+id/point_of_interest_menu_edit"
         android:icon="@drawable/ic_baseline_edit_24"
         android:title="Edit Name"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 </menu>

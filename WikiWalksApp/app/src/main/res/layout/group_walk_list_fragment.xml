@@ -68,6 +68,6 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="@string/schedule_group_walk"/>
+            android:text="@string/schedule_group_walk" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

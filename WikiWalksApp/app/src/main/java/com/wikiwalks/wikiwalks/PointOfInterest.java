@@ -25,7 +25,7 @@ import retrofit2.Response;
 
 public class PointOfInterest {
 
-    LatLng coordinates;
+    private LatLng coordinates;
     private int id;
     private String name;
     private ArrayList<Picture> picturesList = new ArrayList<>();
@@ -84,9 +84,7 @@ public class PointOfInterest {
                             path.addPointOfInterest(newPointOfInterest);
                             callback.onSubmitPointOfInterestSuccess(newPointOfInterest);
                         } catch (JSONException e) {
-                            Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
-                            Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
-                            callback.onSubmitPointOfInterestFailure();
+                            Log.e("PointOfInterest", "Getting point from submit response", e);
                         }
                         PreferencesManager.getInstance(context).changePointsOfInterestMarked(false);
                     } else {
@@ -96,14 +94,12 @@ public class PointOfInterest {
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
-                    Log.e("SUBMIT_POI", Arrays.toString(t.getStackTrace()));
+                    Log.e("PointOfInterest", "Sending new point request", t);
                     callback.onSubmitPointOfInterestFailure();
                 }
             });
         } catch (JSONException e) {
-            Toast.makeText(context, "Failed to upload point of interest...", Toast.LENGTH_SHORT).show();
-            Log.e("SUBMIT_POI", Arrays.toString(e.getStackTrace()));
+            Log.e("PointOfInterest", "Creating new point request", e);
             callback.onSubmitPointOfInterestFailure();
         }
     }
@@ -118,6 +114,10 @@ public class PointOfInterest {
 
     public double getRating() {
         return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public LatLng getCoordinates() {
@@ -155,10 +155,6 @@ public class PointOfInterest {
         return editable;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
     public void edit(Context context, String name, PointOfInterestEditCallback callback) {
         JSONObject request = new JSONObject();
         JSONObject attributes = new JSONObject();
@@ -173,16 +169,19 @@ public class PointOfInterest {
                     if (response.isSuccessful()) {
                         PointOfInterest.this.name = name;
                         callback.onEditPointOfInterestSuccess();
-                    } else callback.onEditPointOfInterestFailure();
+                    } else {
+                        callback.onEditPointOfInterestFailure();
+                    }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.e("PointOfInterest", "Sending edit point request", t);
                     callback.onEditPointOfInterestFailure();
                 }
             });
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("PointOfInterest", "Creating edit point request", e);
             callback.onEditPointOfInterestFailure();
         }
     }
@@ -203,18 +202,21 @@ public class PointOfInterest {
                         for (Marker marker : markers) marker.remove();
                         markers.clear();
                         PathMap.getInstance().getPointOfInterestList().remove(id);
+                        PreferencesManager.getInstance(context).changePointsOfInterestMarked(true);
                         callback.onDeletePointOfInterestSuccess();
-                    } else callback.onDeletePointOfInterestFailure();
-                    PreferencesManager.getInstance(context).changePointsOfInterestMarked(true);
+                    } else {
+                        callback.onDeletePointOfInterestFailure();
+                    }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.e("PointOfInterest", "Sending delete point request", t);
                     callback.onEditPointOfInterestFailure();
                 }
             });
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("PointOfInterest", "Creating delete point request", e);
             callback.onDeletePointOfInterestFailure();
         }
     }
@@ -263,13 +265,13 @@ public class PointOfInterest {
                                 isLoadingReviews = false;
                                 callback.onGetReviewSuccess();
                             } catch (JSONException e) {
-                                Log.e("GET_REVIEWS1", Arrays.toString(e.getStackTrace()));
+                                Log.e("PointOfInterest", "Getting reviews from response", e);
                                 isLoadingReviews = false;
                                 callback.onGetReviewFailure();
                             }
                         } else {
                             if (nextReviewPage > 1) {
-                                Toast.makeText(context, "No more reviews!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, R.string.no_more_reviews, Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingReviews = false;
                                 callback.onGetReviewFailure();
@@ -279,12 +281,12 @@ public class PointOfInterest {
 
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
-                        Log.e("GET_REVIEWS2", Arrays.toString(t.getStackTrace()));
+                        Log.e("PointOfInterest", "Sending get reviews request", t);
                         callback.onGetReviewFailure();
                     }
                 });
             } catch (JSONException e) {
-                Log.e("GET_REVIEWS3", Arrays.toString(e.getStackTrace()));
+                Log.e("PointOfInterest", "Creating get reviews request", e);
                 isLoadingReviews = false;
                 callback.onGetReviewFailure();
             }
@@ -330,13 +332,13 @@ public class PointOfInterest {
                                 isLoadingPictures = false;
                                 callback.onGetPicturesSuccess();
                             } catch (JSONException e) {
-                                Log.e("GET_PICTURES1", Arrays.toString(e.getStackTrace()));
+                                Log.e("PointOfInterest", "Getting photos from response", e);
                                 isLoadingPictures = false;
                                 callback.onGetPicturesFailure();
                             }
                         } else {
                             if (nextPicturePage > 1) {
-                                Toast.makeText(context, "No more pictures!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, R.string.no_more_photos, Toast.LENGTH_SHORT).show();
                             } else {
                                 isLoadingPictures = false;
                                 callback.onGetPicturesFailure();
@@ -346,16 +348,15 @@ public class PointOfInterest {
 
                     @Override
                     public void onFailure(Call<JsonElement> call, Throwable t) {
-                        Log.e("GET_PICTURES2", Arrays.toString(t.getStackTrace()));
+                        Log.e("PointOfInterest", "Sending get photos request", t);
                         callback.onGetPicturesFailure();
                     }
                 });
             } catch (JSONException e) {
-                Log.e("GET_PICTURES3", Arrays.toString(e.getStackTrace()));
+                Log.e("PointOfInterest", "Creating get photos request", e);
                 isLoadingPictures = false;
                 callback.onGetPicturesFailure();
             }
         }
     }
-
 }

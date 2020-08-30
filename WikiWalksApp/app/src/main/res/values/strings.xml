@@ -8,6 +8,7 @@
     <string name="record_new_route">Record New Route</string>
     <string name="explore">Explore</string>
     <string name="delete_route">Delete Route</string>
+    <string name="bookmarks">Bookmarks</string>
     <string name="no_bookmarks">No bookmarks!</string>
     <string name="set_name">Set Name</string>
     <string name="name">Name</string>
@@ -28,6 +29,7 @@
     <string name="no_reviews">No reviews!</string>
     <string name="you">You</string>
     <string name="write_review">Write Review</string>
+    <string name="edit_review">Edit Review</string>
     <string name="import_data">Import Data</string>
     <string name="export_data">Export Data</string>
     <string name="direction_arrow">Direction Arrow</string>
@@ -39,22 +41,10 @@
     <string name="select_time">Select Time</string>
     <string name="title">Title</string>
     <string name="group_walk">Group Walk</string>
-    <string name="no_walks_scheduled">No walks scheduled!</string>
-    <string name="statistics">Statistics</string>
-    <string name="distance_walked">Distance Walked - %.2f %s</string>
-    <string name="times_walked">Times Walked - %d</string>
-    <string name="routes_recorded">Routes Recorded - %d</string>
-    <string name="points_marked">Points of Interest Marked - %d</string>
-    <string name="reviews_written">Reviews Written - %d</string>
-    <string name="pictures_uploaded">Pictures Uploaded - %d</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="confirm_deletion">Confirm Deletion</string>
     <string name="delete_walk">Cancel group walk?</string>
-    <string name="save_walk_success">Saved group walk successfully!</string>
-    <string name="save_walk_failure">Failed to save group walk…</string>
-    <string name="deleted_walk_success">Cancelled group walk successfully!</string>
-    <string name="deleted_walk_failure">Failed to cancel group walk…</string>
     <string name="set_goal">Set Goal</string>
     <string name="no_goals">No goals!</string>
     <string name="goal">Goal</string>
@@ -63,10 +53,95 @@
     <string name="progress">%.2f / %.2f %s</string>
     <string name="miles">mi</string>
     <string name="kilometres">km</string>
+    <string name="metres">metres</string>
+    <string name="feet">feet</string>
     <string name="distance">Distance</string>
     <string name="invalid_distance">Invalid distance entered!</string>
     <string name="goal_ends">Goal ends: %s</string>
     <string name="goals">Goals</string>
     <string name="delete_goal">Delete goal?</string>
+    <string name="resume_recording">Resume Recording</string>
+
+    <string name="submit_prompt">Submit?</string>
+
+    <string name="distance_format">"%.2f %s"</string>
+
+    <string name="off_track">You are %d %s away</string>
+
+    <string name="statistics_title">Statistics</string>
+    <string name="no_walks_scheduled">No walks scheduled!</string>
+    <string name="statistics">Statistics</string>
+    <string name="distance_walked">Distance Walked - %.2f %s</string>
+    <string name="times_walked">Times Walked - %d</string>
+    <string name="routes_recorded">Routes Recorded - %d</string>
+    <string name="points_marked">Points of Interest Marked - %d</string>
+    <string name="reviews_written">Reviews Written - %d</string>
+    <string name="pictures_uploaded">Pictures Uploaded - %d</string>
+
+
+    <string name="settings_title">Settings</string>
+    <string name="save_name_success">Saved name successfully!</string>
+    <string name="save_name_failure">Failed to delete name…</string>
+
+    <string name="new_path">New Path</string>
+    <string name="new_path_prompt">Make new path?</string>
+    <string name="new_path_info">Your route does not connect to the path and cannot be submitted. Make it a new path instead?</string>
+    <string name="get_path_failure">Failed to get path…</string>
+    <string name="get_paths_failure">Failed to get paths…</string>
+    <string name="save_path_success">Saved path successfully!</string>
+    <string name="save_path_failure">Failed to save path…</string>
+    <string name="walk_count_once">Path has been walked once.</string>
+    <string name="walk_count_multiple">Path has been walked %d times.</string>
+
+    <string name="new_route">New Route - %s</string>
+    <string name="routes_title">Routes - %s</string>
     <string name="route_format">Route %d - %s</string>
+    <string name="delete_route_prompt">Delete route?</string>
+    <string name="save_route_success">Saved route successfully!</string>
+    <string name="save_route_failure">Failed to save route…</string>
+    <string name="delete_route_success">Deleted route successfully!</string>
+    <string name="delete_route_failure">Failed to delete route…</string>
+
+    <string name="points_of_interest_title">Points of Interest - %s</string>
+    <string name="point_of_interest_format">Point of interest on %s</string>
+    <string name="delete_point_of_interest_prompt">Delete point of interest?</string>
+    <string name="save_point_of_interest_success">Saved point of interest successfully!</string>
+    <string name="save_point_of_interest_failure">Failed to save point of interest…</string>
+    <string name="delete_point_of_interest_success">Deleted point of interest successfully!</string>
+    <string name="delete_point_of_interest_failure">Failed to delete point of interest…</string>
+
+    <string name="photos_title">Photos - %s</string>
+    <string name="delete_photo_prompt">Delete photo?</string>
+    <string name="get_photos_failure">Failed to get photos…</string>
+    <string name="no_more_photos">No more photos!</string>
+    <string name="save_photo_success">Saved photo successfully!</string>
+    <string name="save_photo_failure">Failed to save photo…</string>
+    <string name="delete_photo_success">Deleted photo successfully!</string>
+    <string name="delete_photo_failure">Failed to delete photo…</string>
+    <string name="photo_no_caption">no caption written</string>
+
+    <string name="reviews_title">Reviews - %s</string>
+    <string name="review_no_text">no review written</string>
+    <string name="delete_review_prompt">Delete review?</string>
+    <string name="get_reviews_failure">Failed to get reviews…</string>
+    <string name="no_more_reviews">No more reviews!</string>
+    <string name="save_review_success">Saved review successfully!</string>
+    <string name="save_review_failure">Failed to save review…</string>
+    <string name="delete_review_success">Deleted review successfully!</string>
+    <string name="delete_review_failure">Failed to delete review…</string>
+
+    <string name="group_walks_title">Group Walks - %s</string>
+    <string name="group_walk_host">Host: %s</string>
+    <string name="group_walk_attendees">Attendees: %s</string>
+    <string name="attend_group_walk_prompt">Attend group walk?</string>
+    <string name="cancel_group_walk_attendance_prompt">Cancel attendance?</string>
+    <string name="save_group_walk_success">Saved group walk successfully!</string>
+    <string name="save_group_walk_failure">Failed to save group walk…</string>
+    <string name="delete_group_walk_success">Cancelled group walk successfully!</string>
+    <string name="delete_group_walk_failure">Failed to cancel group walk…</string>
+    <string name="toggle_group_walk_attendance_success">Updated group walk attendance successfully!</string>
+    <string name="toggle_group_walk_attendance_failure">Failed to update group walk attendance…</string>
+
+    <string name="requires_location">WikiWalks needs location permissions to run.</string>
+    <string name="requires_storage">WikiWalks needs storage permissions to submit photos and import/export settings.</string>
 </resources>

@@ -19,9 +19,9 @@
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:contentInsetEnd="16dp"
             app:contentInsetStart="16dp"
+            app:menu="@menu/point_of_interest_menu"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextColor="?attr/colorOnBackground"
-            app:menu="@menu/point_of_interest_menu" />
+            app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.gms.maps.MapView

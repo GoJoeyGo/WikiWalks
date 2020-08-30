@@ -133,9 +133,9 @@
             android:id="@+id/select_route_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="50dp"
             android:layout_marginEnd="10dp"
+            android:layout_weight="1"
             android:fontFamily="monospace"
             android:text="@string/select_route" />
 
@@ -143,8 +143,8 @@
             android:id="@+id/new_route_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="50dp"
+            android:layout_weight="1"
             android:fontFamily="monospace"
             android:text="@string/record_new_route" />
 
@@ -152,9 +152,9 @@
             android:id="@+id/explore_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
+            android:layout_weight="1"
             android:fontFamily="monospace"
             android:text="@string/explore" />
     </LinearLayout>

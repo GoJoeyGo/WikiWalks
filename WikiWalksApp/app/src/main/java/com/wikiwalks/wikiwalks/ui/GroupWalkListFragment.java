@@ -1,6 +1,5 @@
 package com.wikiwalks.wikiwalks.ui;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +10,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.GroupWalk;
 import com.wikiwalks.wikiwalks.Path;
@@ -52,8 +51,8 @@ public class GroupWalkListFragment extends Fragment {
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.path_group_walk_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Group Walks - " + path.getName());
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(String.format(getString(R.string.group_walks_title), path.getName()));
 
         Button scheduleButton = rootView.findViewById(R.id.submit_group_walk_button);
         scheduleButton.setOnClickListener(v -> launchEditDialog(-1));
@@ -90,23 +89,24 @@ public class GroupWalkListFragment extends Fragment {
         GroupWalk walk = path.getGroupWalks().get(position);
         checkbox.setEnabled(false);
         new MaterialAlertDialogBuilder(getContext())
-                .setTitle("Confirm")
-                .setMessage((walk.isAttending()) ? "Cancel attendance?" : "Attend walk?")
-                .setPositiveButton("Yes", (dialog, which) -> walk.toggleAttendance(getContext(), new GroupWalk.AttendGroupWalkCallback() {
+                .setTitle((walk.isAttending()) ? R.string.cancel_group_walk_attendance_prompt : R.string.attend_group_walk_prompt)
+                .setPositiveButton(R.string.yes, (dialog, which) -> walk.toggleAttendance(getContext(), new GroupWalk.AttendGroupWalkCallback() {
                     @Override
                     public void toggleAttendanceSuccess() {
                         recyclerView.getAdapter().notifyItemChanged(position);
                         dialog.dismiss();
+                        Toast.makeText(getContext(), R.string.toggle_group_walk_attendance_success, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void toggleAttendanceFailure() {
-                        Toast.makeText(getContext(), "Failed to change attendance...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.toggle_group_walk_attendance_failure, Toast.LENGTH_SHORT).show();
                         checkbox.setEnabled(true);
                     }
                 }))
-                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
-                .setOnDismissListener(dialog -> checkbox.setEnabled(true)).create().show();
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .setOnDismissListener(dialog -> checkbox.setEnabled(true))
+                .create().show();
     }
 
     public void launchEditDialog(int position) {

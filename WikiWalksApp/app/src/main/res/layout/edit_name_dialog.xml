@@ -7,16 +7,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/edit_popup_title"
-            style="@style/TextAppearance.AppCompat.Medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:text="@string/set_name" />
+        android:orientation="vertical"
+        android:padding="10dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edit_name"
@@ -25,7 +17,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/name"
             android:paddingTop="10dp"
-            android:paddingBottom="10dp" >
+            android:paddingBottom="10dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"

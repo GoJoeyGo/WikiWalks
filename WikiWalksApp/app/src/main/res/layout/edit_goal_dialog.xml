@@ -12,16 +12,6 @@
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/edit_goal_popup_title"
-            style="@style/TextAppearance.AppCompat.Medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:text="@string/goal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/edit_goal_popup_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,7 +19,7 @@
             android:scaleType="fitStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_goal_popup_title" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/edit_goal_select_time_button"
@@ -49,9 +39,9 @@
             android:hint="@string/distance"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
+            app:layout_constraintEnd_toStartOf="@id/edit_goal_distance_unit"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_goal_select_time_button"
-            app:layout_constraintEnd_toStartOf="@id/edit_goal_distance_unit">
+            app:layout_constraintTop_toBottomOf="@id/edit_goal_select_time_button">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -65,12 +55,12 @@
             android:id="@+id/edit_goal_distance_unit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/edit_goal_distance"
-            app:layout_constraintBottom_toBottomOf="@id/edit_goal_distance"
-            app:layout_constraintStart_toEndOf="@id/edit_goal_distance"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="8dp"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@id/edit_goal_distance"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/edit_goal_distance"
+            app:layout_constraintTop_toTopOf="@id/edit_goal_distance" />
 
 
         <Button

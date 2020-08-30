@@ -3,14 +3,12 @@ package com.wikiwalks.wikiwalks.ui;
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +19,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.R;
@@ -38,7 +38,6 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<Route> routes;
     private ArrayList<Polyline> polylines = new ArrayList<>();
     private RecyclerView recyclerView;
-    private AlertDialog confirmationDialog;
 
     public static RouteListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -50,19 +49,26 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        final View rootView = inflater.inflate(R.layout.route_list_fragment, container, false);
+
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         routes = path.getRoutes();
-        final View rootView = inflater.inflate(R.layout.route_list_fragment, container, false);
+
         MaterialToolbar toolbar = rootView.findViewById(R.id.route_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Routes - " + path.getName());
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(String.format(getString(R.string.routes_title), path.getName()));
+
         recyclerView = rootView.findViewById(R.id.route_list_recyclerview);
         recyclerView.setAdapter(new RouteListRecyclerViewAdapter(this, routes));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+
         selectRouteButton = rootView.findViewById(R.id.select_route_button);
+
         deleteButton = rootView.findViewById(R.id.edit_route_button);
+
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_route_list_frag);
+
         return rootView;
     }
 
@@ -98,12 +104,11 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
         if (routes.get(position).isEditable()) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(v -> {
-                confirmationDialog = new AlertDialog.Builder(getContext())
-                        .setTitle("Confirm Deletion")
-                        .setMessage("Are you sure you want to delete this route?")
-                        .setPositiveButton("Yes", (dialog, which) -> path.getRoutes().get(position).delete(getContext(), new Route.RouteModifyCallback() {
+                new MaterialAlertDialogBuilder(getContext())
+                        .setTitle(R.string.delete_route_prompt)
+                        .setPositiveButton(R.string.yes, (dialog, which) -> path.getRoutes().get(position).delete(getContext(), new Route.RouteModifyCallback() {
                             @Override
-                            public void onRouteModifySuccess(Path path) {
+                            public void onRouteEditSuccess(Path path) {
                                 polylines.get(position).remove();
                                 polylines.remove(position);
                                 for (Polyline polyline : polylines) {
@@ -112,20 +117,20 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
                                 recyclerView.getAdapter().notifyItemRemoved(position);
                                 recyclerView.getAdapter().notifyItemRangeChanged(position, routes.size());
                                 deleteButton.setVisibility(View.GONE);
-                                Toast.makeText(getContext(), "Successfully deleted route!", Toast.LENGTH_SHORT).show();
                                 if (routes.size() == 0) {
                                     getParentFragmentManager().popBackStack("Map", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                                 }
+                                Toast.makeText(getContext(), R.string.delete_route_success, Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
-                            public void onRouteModifyFailure() {
-                                Toast.makeText(getContext(), "Failed to delete route...", Toast.LENGTH_SHORT).show();
-                                confirmationDialog.dismiss();
+                            public void onRouteEditFailure() {
+                                Toast.makeText(getContext(), R.string.delete_route_failure, Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
                             }
                         }))
-                        .setNegativeButton("No", (dialog, which) -> confirmationDialog.dismiss()).create();
-                confirmationDialog.show();
+                        .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                        .create().show();
             });
         } else {
             deleteButton.setVisibility(View.GONE);

@@ -31,7 +31,9 @@ public class StatisticsListRecyclerViewAdapter extends RecyclerView.Adapter<Stat
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.entry.setText(statisticsList[position]);
-        if (position == statisticsList.length - 1) holder.separator.setVisibility(View.GONE);
+        if (position == statisticsList.length - 1) {
+            holder.separator.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -41,8 +43,8 @@ public class StatisticsListRecyclerViewAdapter extends RecyclerView.Adapter<Stat
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView entry;
-        View separator;
+        private TextView entry;
+        private View separator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

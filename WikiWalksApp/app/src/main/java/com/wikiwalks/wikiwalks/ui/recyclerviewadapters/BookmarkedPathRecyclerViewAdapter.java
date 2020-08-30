@@ -3,6 +3,7 @@ package com.wikiwalks.wikiwalks.ui.recyclerviewadapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
@@ -38,7 +39,9 @@ public class BookmarkedPathRecyclerViewAdapter extends RecyclerView.Adapter<Book
         } else {
             holder.button.setVisibility(View.VISIBLE);
             holder.separator.setVisibility(View.VISIBLE);
-            if (position == paths.length - 1) holder.separator.setVisibility(View.GONE);
+            if (position == paths.length - 1) {
+                holder.separator.setVisibility(View.GONE);
+            }
             holder.button.setText(paths[position].getName());
             holder.button.setOnClickListener(v -> parentFragment.getParentFragmentManager().beginTransaction().add(R.id.main_frame, PathFragment.newInstance(paths[position].getId())).addToBackStack(null).commit());
         }
@@ -51,8 +54,8 @@ public class BookmarkedPathRecyclerViewAdapter extends RecyclerView.Adapter<Book
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        AppCompatButton button;
-        View separator;
+        private Button button;
+        private View separator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

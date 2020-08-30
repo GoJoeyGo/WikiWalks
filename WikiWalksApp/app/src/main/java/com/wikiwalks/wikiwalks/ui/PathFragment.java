@@ -9,7 +9,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,6 +16,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
@@ -54,9 +54,11 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
 
         toolbar = rootView.findViewById(R.id.path_frag_toolbar);
         toolbar.setTitle(path.getName());
-        if (PreferencesManager.getInstance(getContext()).isBookmarked(path.getId())) toolbar.getMenu().getItem(0).setIcon(R.drawable.ic_baseline_bookmark_24);
+        if (PreferencesManager.getInstance(getContext()).isBookmarked(path.getId())) {
+            toolbar.getMenu().getItem(0).setIcon(R.drawable.ic_baseline_bookmark_24);
+        }
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.path_menu_edit:
@@ -95,7 +97,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
         ratingBar.setRating((float) path.getRating());
 
         TextView walkCount = rootView.findViewById(R.id.path_frag_walk_count);
-        String walkCountString = (path.getWalkCount() == 1) ? "Path has been walked once." : String.format("Path has been walked %s times.", path.getWalkCount());
+        String walkCountString = path.getWalkCount() == 1 ? getString(R.string.walk_count_once) : String.format(getString(R.string.walk_count_multiple), path.getWalkCount());
         walkCount.setText(walkCountString);
 
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_path_preview_frag);
@@ -145,11 +147,12 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
     public void onEditSuccess() {
         editNameDialog.dismiss();
         toolbar.setTitle(path.getName());
+        Toast.makeText(getContext(), R.string.save_path_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEditFailure() {
-        Toast.makeText(getContext(), "Failed to update path...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.save_path_failure, Toast.LENGTH_SHORT).show();
     }
 
     @Override

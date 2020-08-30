@@ -1,7 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
@@ -15,7 +14,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -32,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
@@ -47,6 +46,7 @@ import java.util.ArrayList;
 public class RecordingFragment extends Fragment implements OnMapReadyCallback, EditNameDialog.EditDialogListener, Route.RouteModifyCallback, PointOfInterest.PointOfInterestSubmitCallback {
 
     public Context context;
+    private float distanceWalked = 0;
     private GoogleMap mMap;
     private EditNameDialog editNameDialog;
     private Button markPointButton;
@@ -64,7 +64,6 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     private ArrayList<Double> poiLongitudes = new ArrayList<>();
     private int submittedPointsOfInterest = 0;
     private Location lastLocation;
-    float distanceWalked = 0;
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -86,8 +85,10 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         View rootView = inflater.inflate(R.layout.recording_fragment, container, false);
 
         int pathId = getArguments().getInt("pathId");
-        if (pathId > -1)
+        if (pathId > -1) {
             path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        }
+
         if (savedInstanceState != null && savedInstanceState.containsKey("latitudes")) {
             double[] latitudeArray = savedInstanceState.getDoubleArray("latitudes");
             double[] longitudeArray = savedInstanceState.getDoubleArray("longitudes");
@@ -109,15 +110,15 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.recording_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle((pathId > -1) ? "New Route - " + path.getName() : "New Path");
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle((pathId > -1) ? String.format(getString(R.string.new_route), path.getName()) : getString(R.string.new_path));
 
         stopRecordingButton = rootView.findViewById(R.id.stop_recording_button);
         stopRecordingButton.setOnClickListener(v -> {
             if (recording) {
                 fusedLocationProviderClient.removeLocationUpdates(locationCallback);
                 recording = false;
-                stopRecordingButton.setText("RESUME RECORDING");
+                stopRecordingButton.setText(R.string.resume_recording);
                 if (path != null) {
                     boolean inRange = false;
                     ArrayList<Double> pathLatitudes = path.getAllLatitudes();
@@ -130,29 +131,37 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
                             Location newLocation = new Location(LocationManager.GPS_PROVIDER);
                             newLocation.setLatitude(latitudes.get(j));
                             newLocation.setLongitude(longitudes.get(j));
-                            if (pathLocation.distanceTo(newLocation) < 10) {
+                            if (pathLocation.distanceTo(newLocation) < 30) {
                                 inRange = true;
                                 break;
                             }
                         }
-                        if (inRange) break;
+                        if (inRange) {
+                            break;
+                        }
                     }
                     if (!inRange) {
-                        new MaterialAlertDialogBuilder(context).setTitle("Make new path?").setMessage("Your route does not connect to the path and cannot be submitted. Make it a new path instead?").setPositiveButton("Yes", (dialog, which) -> {
-                            path = null;
-                            showSubmissionDialog(true);
-                        }).setNegativeButton("No", (dialog, which) -> {
-
-                        }).show();
-                    } else showSubmissionDialog(false);
-                } else showSubmissionDialog(true);
+                        new MaterialAlertDialogBuilder(context)
+                                .setTitle(R.string.new_path_prompt)
+                                .setMessage(R.string.new_path_info)
+                                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                                    path = null;
+                                    showSubmissionDialog(true);
+                                }).setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                                .create().show();
+                    } else {
+                        showSubmissionDialog(false);
+                    }
+                } else {
+                    showSubmissionDialog(true);
+                }
             } else {
                 MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
                     if (granted) {
                         stopRecordingButton.setEnabled(true);
                         fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
                             if (location.distanceTo(lastLocation) < 15) {
-                                stopRecordingButton.setText("STOP RECORDING");
+                                stopRecordingButton.setText(R.string.stop_recording);
                                 startLocationUpdates();
                             } else {
                                 Toast.makeText(context, "Too far away from last point to resume!", Toast.LENGTH_SHORT).show();
@@ -167,9 +176,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         });
 
         markPointButton = rootView.findViewById(R.id.recording_mark_poi_button);
-        markPointButton.setOnClickListener(v -> {
-            EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "SubmissionPopup");
-        });
+        markPointButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "SubmissionPopup"));
 
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
         mapFragment.getMapAsync(this);
@@ -191,6 +198,12 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         outState.putDoubleArray("longitudes", longitudeArray);
         outState.putDoubleArray("altitudes", altitudeArray);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDestroy() {
+        PreferencesManager.getInstance(getContext()).addDistanceWalked(distanceWalked);
+        super.onDestroy();
     }
 
     @Override
@@ -233,7 +246,9 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
         locationRequest.setInterval(3000);
         locationRequest.setFastestInterval(1000);
         MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
-            if (granted) fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+            if (granted) {
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+            }
         });
     }
 
@@ -248,7 +263,9 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
     public void addLocation(Location location) {
         if (lastLocation == null || location.distanceTo(lastLocation) > 2) {
-            if (lastLocation != null) distanceWalked += location.distanceTo(lastLocation);
+            if (lastLocation != null) {
+                distanceWalked += location.distanceTo(lastLocation);
+            }
             latitudes.add(location.getLatitude());
             longitudes.add(location.getLongitude());
             altitudes.add(location.getAltitude());
@@ -258,12 +275,15 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     }
 
     public void showSubmissionDialog(boolean newPath) {
-        AlertDialog confirmationDialog = new AlertDialog.Builder(context).setTitle("Submit?").setPositiveButton("Yes", (dialog, which) -> {
-            if (newPath)
-                EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
-            else submitRoute("", this);
-        }).setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
-        confirmationDialog.show();
+        new MaterialAlertDialogBuilder(context).setTitle(R.string.submit_prompt)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    if (newPath) {
+                        EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
+                    } else {
+                        submitRoute("", this);
+                    }})
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
+                .create().show();
     }
 
     public void submitRoute(String title, Route.RouteModifyCallback callback) {
@@ -274,18 +294,23 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     }
 
     @Override
-    public void onRouteModifySuccess(Path path) {
-        if (editNameDialog != null) editNameDialog.dismiss();
+    public void onRouteEditSuccess(Path path) {
+        if (editNameDialog != null) {
+            editNameDialog.dismiss();
+        }
         if (poiNames.size() > 0) {
             for (int i = 0; i < poiNames.size(); i++) {
                 PointOfInterest.submit(this.context, poiNames.get(i), poiLatitudes.get(i), poiLongitudes.get(i), path, this);
             }
-        } else getParentFragmentManager().popBackStack();
+        } else {
+            getParentFragmentManager().popBackStack();
+        }
+        Toast.makeText(getContext(), R.string.save_route_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onRouteModifyFailure() {
-        Toast.makeText(getContext(), "Failed to submit route...", Toast.LENGTH_SHORT).show();
+    public void onRouteEditFailure() {
+        Toast.makeText(getContext(), R.string.save_route_failure, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -295,10 +320,12 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
 
     @Override
     public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
-        if (type == EditNameDialog.EditNameDialogType.PATH) submitRoute(name, this);
-        else {
-            if (name.isEmpty())
+        if (type == EditNameDialog.EditNameDialogType.PATH) {
+            submitRoute(name, this);
+        } else {
+            if (name.isEmpty()) {
                 name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());
+            }
             poiNames.add(name);
             poiLatitudes.add(lastLocation.getLatitude());
             poiLongitudes.add(lastLocation.getLongitude());
@@ -310,17 +337,14 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, E
     @Override
     public void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest) {
         submittedPointsOfInterest++;
-        if (submittedPointsOfInterest == poiNames.size()) getParentFragmentManager().popBackStack();
+        if (submittedPointsOfInterest == poiNames.size()) {
+            getParentFragmentManager().popBackStack();
+        }
+        Toast.makeText(context, R.string.save_point_of_interest_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSubmitPointOfInterestFailure() {
-
-    }
-
-    @Override
-    public void onDestroy() {
-        PreferencesManager.getInstance(getContext()).addDistanceWalked(distanceWalked);
-        super.onDestroy();
+        Toast.makeText(context, R.string.save_point_of_interest_failure, Toast.LENGTH_SHORT).show();
     }
 }

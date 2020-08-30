@@ -21,17 +21,17 @@ import java.util.Date;
 
 public class GroupWalkListRecyclerViewAdapter extends RecyclerView.Adapter<GroupWalkListRecyclerViewAdapter.ViewHolder> {
     private ArrayList<GroupWalk> groupWalkList;
-    private GroupWalkListFragment context;
+    private GroupWalkListFragment parentFragment;
 
-    public GroupWalkListRecyclerViewAdapter(GroupWalkListFragment context, ArrayList<GroupWalk> groupWalkList) {
-        this.context = context;
+    public GroupWalkListRecyclerViewAdapter(GroupWalkListFragment parentFragment, ArrayList<GroupWalk> groupWalkList) {
+        this.parentFragment = parentFragment;
         this.groupWalkList = groupWalkList;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context.getContext());
+        LayoutInflater inflater = LayoutInflater.from(parentFragment.getContext());
         View view = inflater.inflate(R.layout.group_walk_list_row, parent, false);
         return new ViewHolder(view);
     }
@@ -41,24 +41,27 @@ public class GroupWalkListRecyclerViewAdapter extends RecyclerView.Adapter<Group
         GroupWalk walk = groupWalkList.get(position);
         holder.title.setText(walk.getTitle());
         holder.time.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(walk.getTime() * 1000)));
-        holder.host.setText(String.format("Host: %s", walk.getHostName()));
+        holder.host.setText(String.format(parentFragment.getString(R.string.group_walk_host), walk.getHostName()));
         if (walk.getAttendees().size() == 0) {
             holder.attendees.setText(R.string.no_attendees);
             holder.attendees.setTypeface(holder.attendees.getTypeface(), Typeface.ITALIC);
         } else {
-            holder.attendees.setText(String.format("Attendees: %s", TextUtils.join(", ", walk.getAttendees())));
+            holder.attendees.setText(String.format(parentFragment.getString(R.string.group_walk_attendees), TextUtils.join(", ", walk.getAttendees())));
             holder.attendees.setTypeface(holder.attendees.getTypeface(), Typeface.NORMAL);
         }
         if (walk.isEditable()) {
             holder.editButton.setVisibility(View.VISIBLE);
             holder.attendingButton.setVisibility(View.GONE);
-            holder.editButton.setOnClickListener(v -> context.launchEditDialog(position));
-        } else holder.editButton.setVisibility(View.GONE);
-        if (walk.isAttending())
+            holder.editButton.setOnClickListener(v -> parentFragment.launchEditDialog(position));
+        } else {
+            holder.editButton.setVisibility(View.GONE);
+        }
+        if (walk.isAttending()) {
             holder.attendingButton.setImageResource(R.drawable.ic_baseline_check_box_24);
-        else
+        } else {
             holder.attendingButton.setImageResource(R.drawable.ic_baseline_check_box_outline_blank_24);
-        holder.attendingButton.setOnClickListener(v -> context.toggleAttendance(position, v));
+        }
+        holder.attendingButton.setOnClickListener(v -> parentFragment.toggleAttendance(position, v));
     }
 
     @Override
@@ -73,12 +76,12 @@ public class GroupWalkListRecyclerViewAdapter extends RecyclerView.Adapter<Group
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView title;
-        TextView time;
-        TextView host;
-        TextView attendees;
-        ImageButton attendingButton;
-        ImageButton editButton;
+        private TextView title;
+        private TextView time;
+        private TextView host;
+        private TextView attendees;
+        private ImageButton attendingButton;
+        private ImageButton editButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

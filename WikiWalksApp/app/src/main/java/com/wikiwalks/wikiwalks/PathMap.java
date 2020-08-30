@@ -29,12 +29,10 @@ public class PathMap {
 
     public interface PathMapListener {
         void onPathMapUpdateSuccess();
-
         void onPathMapUpdateFailure();
     }
 
-    private PathMap() {
-    }
+    private PathMap() {}
 
     public static PathMap getInstance() {
         if (instance == null) {
@@ -66,7 +64,7 @@ public class PathMap {
                             triggerChangeListeners();
                         } catch (JSONException e) {
                             triggerFailedListeners();
-                            Log.e("GET_PATHS1", Arrays.toString(e.getStackTrace()));
+                            Log.e("PathMap", "Getting paths from response", e);
                         }
                     } else {
                         triggerFailedListeners();
@@ -76,12 +74,12 @@ public class PathMap {
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     triggerFailedListeners();
-                    Log.e("GET_PATHS2", Arrays.toString(t.getStackTrace()));
+                    Log.e("PathMap", "Sending path update request", t);
                 }
             });
         } catch (JSONException e) {
             triggerFailedListeners();
-            Log.e("GET_PATHS3", Arrays.toString(e.getStackTrace()));
+            Log.e("PathMap", "Creating path update request", e);
         }
     }
 

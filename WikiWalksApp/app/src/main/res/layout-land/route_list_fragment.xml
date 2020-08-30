@@ -41,14 +41,14 @@
         android:id="@+id/route_list_recyclerview"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/select_route_background"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/map_route_list_frag"
-        app:layout_constraintTop_toBottomOf="@id/route_list_toolbar_wrapper"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingBottom="0dp"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toTopOf="@id/select_route_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/map_route_list_frag"
+        app:layout_constraintTop_toBottomOf="@id/route_list_toolbar_wrapper" />
 
 
     <LinearLayout
@@ -65,8 +65,8 @@
             android:id="@+id/select_route_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="50dp"
+            android:layout_weight="1"
             android:enabled="false"
             android:fontFamily="monospace"
             android:text="@string/select_route" />
@@ -75,9 +75,9 @@
             android:id="@+id/edit_route_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
+            android:layout_weight="1"
             android:fontFamily="monospace"
             android:text="@string/delete_route"
             android:visibility="gone" />

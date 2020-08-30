@@ -18,17 +18,17 @@ import java.util.ArrayList;
 
 public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewListRecyclerViewAdapter.ViewHolder> {
     private ArrayList<Review> reviewList;
-    private ReviewListFragment context;
+    private ReviewListFragment parentFragment;
 
-    public ReviewListRecyclerViewAdapter(ReviewListFragment context, ArrayList<Review> reviewList) {
-        this.context = context;
+    public ReviewListRecyclerViewAdapter(ReviewListFragment parentFragment, ArrayList<Review> reviewList) {
+        this.parentFragment = parentFragment;
         this.reviewList = reviewList;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context.getContext());
+        LayoutInflater inflater = LayoutInflater.from(parentFragment.getContext());
         View view = inflater.inflate(R.layout.review_list_row, parent, false);
         return new ViewHolder(view);
     }
@@ -40,7 +40,7 @@ public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewLi
         if (!reviewList.get(position).getMessage().isEmpty()) {
             holder.message.setText(reviewList.get(position).getMessage());
         } else {
-            holder.message.setText("no review written");
+            holder.message.setText(parentFragment.getText(R.string.review_no_text));
             holder.message.setTypeface(holder.message.getTypeface(), Typeface.ITALIC);
         }
     }
@@ -57,9 +57,9 @@ public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewLi
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView name;
-        RatingBar ratingBar;
-        TextView message;
+        private TextView name;
+        private RatingBar ratingBar;
+        private TextView message;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

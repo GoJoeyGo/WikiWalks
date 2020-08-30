@@ -34,11 +34,11 @@
                 android:id="@+id/path_frag_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:contentInsetEnd="16dp"
                 app:contentInsetStart="16dp"
                 app:layout_collapseMode="pin"
                 app:menu="@menu/path_menu"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:titleTextColor="@color/white" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -130,10 +130,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:background="@drawable/button_background"
+        android:orientation="vertical"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/select_route_button"
@@ -149,7 +149,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:fontFamily="monospace"
-            android:text="@string/record_new_route"/>
+            android:text="@string/record_new_route" />
 
         <Button
             android:id="@+id/explore_button"

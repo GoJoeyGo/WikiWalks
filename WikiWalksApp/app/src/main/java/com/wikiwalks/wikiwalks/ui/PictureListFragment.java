@@ -1,7 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -13,14 +12,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import com.google.android.material.appbar.MaterialToolbar;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.Picture;
@@ -92,8 +90,8 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.path_picture_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Pictures - " + title);
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(String.format(getString(R.string.photos_title), title));
 
         noPicturesIndicator = rootView.findViewById(R.id.no_pictures_indicator);
 
@@ -125,9 +123,17 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
                 getParentFragmentManager().beginTransaction().add(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.WRITE_EXTERNAL_STORAGE)).addToBackStack(null).commit();
             }
         }));
-        if (savedInstanceState == null) updatePicturesList(true);
+        if (savedInstanceState == null) {
+            updatePicturesList(true);
+        }
 
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("not_new", true);
     }
 
     @Override
@@ -137,7 +143,7 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
 
     @Override
     public void onGetPicturesFailure() {
-        Toast.makeText(getContext(), "Failed to get pictures...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.get_photos_failure, Toast.LENGTH_SHORT).show();
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -151,11 +157,5 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
         recyclerView.getAdapter().notifyItemRemoved(position);
         recyclerView.getAdapter().notifyItemRangeChanged(position, pictures.size());
         updateRecyclerView();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("not_new", true);
     }
 }

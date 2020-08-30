@@ -8,11 +8,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PreferencesManager;
@@ -41,12 +41,12 @@ public class BookmarksFragment extends Fragment {
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.bookmarks_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Bookmarks");
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(R.string.bookmarks);
 
         recyclerView = rootView.findViewById(R.id.bookmarks_list_recyclerview);
         String bookmarks = PreferencesManager.getInstance(getContext()).getBookmarks();
-        if (bookmarks.equals("")) {
+        if (bookmarks.isEmpty()) {
             TextView noBookmarks = rootView.findViewById(R.id.no_bookmarks_indicator);
             noBookmarks.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);

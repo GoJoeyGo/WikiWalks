@@ -20,23 +20,23 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:titleEnabled="false">
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/map_route_list_frag"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/route_list_toolbar_wrapper"
-                    tools:context=".ui.main.PathFragment" />
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/map_route_list_frag"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/route_list_toolbar_wrapper"
+                tools:context=".ui.main.PathFragment" />
 
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/route_list_toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                    app:contentInsetEnd="16dp"
-                    app:contentInsetStart="16dp"
-                    app:titleTextColor="?attr/colorOnBackground" />
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/route_list_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                app:contentInsetEnd="16dp"
+                app:contentInsetStart="16dp"
+                app:titleTextColor="?attr/colorOnBackground" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -67,10 +67,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:background="@drawable/button_background"
+        android:orientation="vertical"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/select_route_button"

@@ -11,16 +11,6 @@
         android:layout_height="wrap_content"
         android:padding="10dp">
 
-        <TextView
-            android:id="@+id/edit_picture_popup_title"
-            style="@style/TextAppearance.AppCompat.Medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:text="@string/picture"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/edit_picture_popup_selected_image"
             android:layout_width="wrap_content"
@@ -30,7 +20,7 @@
             android:scaleType="fitStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_title" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/picture_popup_camera_button"
@@ -80,12 +70,12 @@
             style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:fontFamily="monospace"
             android:text="@string/save"
             app:layout_constraintEnd_toStartOf="@id/edit_picture_popup_delete_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_description"
-            android:enabled="false"/>
+            app:layout_constraintTop_toBottomOf="@id/edit_picture_popup_description" />
 
         <Button
             android:id="@+id/edit_picture_popup_delete_button"

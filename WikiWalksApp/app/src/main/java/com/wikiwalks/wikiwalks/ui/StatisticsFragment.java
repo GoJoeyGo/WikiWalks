@@ -17,10 +17,9 @@ import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.StatisticsListRecyclerViewAdapter;
 
 public class StatisticsFragment extends Fragment {
+
     public static StatisticsFragment newInstance() {
-
         Bundle args = new Bundle();
-
         StatisticsFragment fragment = new StatisticsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -34,8 +33,8 @@ public class StatisticsFragment extends Fragment {
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.statistics_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Statistics");
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(R.string.statistics_title);
 
         RecyclerView recyclerView = rootView.findViewById(R.id.statistics_recycler_view);
         recyclerView.setAdapter(new StatisticsListRecyclerViewAdapter(getContext(), PreferencesManager.getInstance(getContext()).getStatistics()));

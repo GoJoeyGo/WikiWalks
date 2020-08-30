@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -39,17 +39,17 @@ public class PreferencesManager {
     SharedPreferences preferences;
     SharedPreferences statistics;
 
+    private PreferencesManager(Context context) {
+        preferences = context.getSharedPreferences("preferences", MODE_PRIVATE);
+        statistics = context.getSharedPreferences("statistics", MODE_PRIVATE);
+        this.context = context.getApplicationContext();
+    }
+
     public static PreferencesManager getInstance(Context context) {
         if (instance == null) {
             instance = new PreferencesManager(context);
         }
         return instance;
-    }
-
-    private PreferencesManager(Context context) {
-        preferences = context.getSharedPreferences("preferences", MODE_PRIVATE);
-        statistics = context.getSharedPreferences("statistics", MODE_PRIVATE);
-        this.context = context.getApplicationContext();
     }
 
     public void addDistanceWalked(float distance) {
@@ -64,7 +64,7 @@ public class PreferencesManager {
             }
             setGoals(goals);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("PreferencesManager", "Adding distance walked", e);
         }
     }
 
@@ -75,29 +75,41 @@ public class PreferencesManager {
 
     public void changeRoutesRecorded(boolean deleted) {
         int routesRecorded = statistics.getInt("routes_recorded", 0);
-        if (deleted) routesRecorded--;
-        else routesRecorded++;
+        if (deleted) {
+            routesRecorded--;
+        } else {
+            routesRecorded++;
+        }
         statistics.edit().putInt("routes_recorded", routesRecorded).apply();
     }
 
     public void changePointsOfInterestMarked(boolean deleted) {
         int pointsMarked = statistics.getInt("points_marked", 0);
-        if (deleted) pointsMarked--;
-        else pointsMarked++;
+        if (deleted) {
+            pointsMarked--;
+        } else {
+            pointsMarked++;
+        }
         statistics.edit().putInt("points_marked", pointsMarked).apply();
     }
 
     public void changeReviewsWritten(boolean deleted) {
         int reviewsWritten = statistics.getInt("reviews_written", 0);
-        if (deleted) reviewsWritten--;
-        else reviewsWritten++;
+        if (deleted) {
+            reviewsWritten--;
+        } else {
+            reviewsWritten++;
+        }
         statistics.edit().putInt("reviews_written", reviewsWritten).apply();
     }
 
     public void changePicturesUploaded(boolean deleted) {
         int picturesUploaded = statistics.getInt("pictures_uploaded", 0);
-        if (deleted) picturesUploaded--;
-        else picturesUploaded++;
+        if (deleted) {
+            picturesUploaded--;
+        } else {
+            picturesUploaded++;
+        }
         statistics.edit().putInt("pictures_uploaded", picturesUploaded).apply();
     }
 
@@ -125,12 +137,12 @@ public class PreferencesManager {
         }
     }
 
-    public void setName(String name) {
-        preferences.edit().putString("name", (name.isEmpty()) ? "Anonymous" : name).apply();
-    }
-
     public String getName() {
         return preferences.getString("name", "Anonymous");
+    }
+
+    public void setName(String name) {
+        preferences.edit().putString("name", (name.isEmpty()) ? "Anonymous" : name).apply();
     }
 
     public String getDeviceId() {
@@ -164,9 +176,17 @@ public class PreferencesManager {
                 goalsList.add(goalsJsonArray.getJSONObject(i));
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("PreferencesManager", "Getting goals", e);
         }
         return goalsList;
+    }
+
+    public void setGoals(ArrayList<JSONObject> goals) {
+        JSONArray goalsJsonArray = new JSONArray();
+        for (JSONObject goal : goals) {
+            goalsJsonArray.put(goal);
+        }
+        preferences.edit().putString("goals", goalsJsonArray.toString()).apply();
     }
 
     public void addGoal(long startTime, long endTime, double distanceGoal) {
@@ -180,7 +200,7 @@ public class PreferencesManager {
             goals.add(0, newGoal);
             setGoals(goals);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("PreferencesManager", "Adding goal", e);
         }
     }
 
@@ -192,7 +212,7 @@ public class PreferencesManager {
             goal.put("distance_goal", distanceGoal);
             setGoals(goals);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("PreferencesManager", "Editing goal", e);
         }
     }
 
@@ -200,14 +220,6 @@ public class PreferencesManager {
         ArrayList<JSONObject> goals = getGoals();
         goals.remove(position);
         setGoals(goals);
-    }
-
-    public void setGoals(ArrayList<JSONObject> goals) {
-        JSONArray goalsJsonArray = new JSONArray();
-        for (JSONObject goal : goals) {
-            goalsJsonArray.put(goal);
-        }
-        preferences.edit().putString("goals", goalsJsonArray.toString()).apply();
     }
 
     public void exportPreferences(Uri location) {
@@ -226,7 +238,7 @@ public class PreferencesManager {
             writer.write(preferencesJson.toString());
             writer.close();
         } catch (JSONException | IOException e) {
-            e.printStackTrace();
+            Log.e("PreferencesManager", "Exporting preferences", e);
         }
     }
 
@@ -238,15 +250,18 @@ public class PreferencesManager {
                 if (entry.getKey().matches("statistics")) {
                     JsonObject importedStatistics = jsonObject.get("statistics").getAsJsonObject();
                     for (Map.Entry<String, JsonElement> statisticsEntry : importedStatistics.entrySet()) {
-                        if (statisticsEntry.getKey().matches("distance_walked")) statistics.edit().putFloat(statisticsEntry.getKey(), statisticsEntry.getValue().getAsFloat()).apply();
-                        else statistics.edit().putInt(statisticsEntry.getKey(), statisticsEntry.getValue().getAsInt()).apply();
+                        if (statisticsEntry.getKey().matches("distance_walked")) {
+                            statistics.edit().putFloat(statisticsEntry.getKey(), statisticsEntry.getValue().getAsFloat()).apply();
+                        } else {
+                            statistics.edit().putInt(statisticsEntry.getKey(), statisticsEntry.getValue().getAsInt()).apply();
+                        }
                     }
                 } else {
                     preferences.edit().putString(entry.getKey(), entry.getValue().getAsString()).apply();
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Log.e("PreferencesManager", "Importing preferences", e);
         }
     }
 }

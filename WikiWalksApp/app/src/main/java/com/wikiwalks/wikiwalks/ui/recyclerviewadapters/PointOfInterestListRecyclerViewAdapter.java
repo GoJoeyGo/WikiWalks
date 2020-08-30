@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.wikiwalks.wikiwalks.PointOfInterest;
@@ -21,17 +20,17 @@ import java.util.ArrayList;
 
 public class PointOfInterestListRecyclerViewAdapter extends RecyclerView.Adapter<PointOfInterestListRecyclerViewAdapter.ViewHolder> {
     private ArrayList<PointOfInterest> pointOfInterestList;
-    private PointOfInterestListFragment context;
+    private PointOfInterestListFragment parentFragment;
 
-    public PointOfInterestListRecyclerViewAdapter(PointOfInterestListFragment context, ArrayList<PointOfInterest> pointOfInterestList) {
-        this.context = context;
+    public PointOfInterestListRecyclerViewAdapter(PointOfInterestListFragment parentFragment, ArrayList<PointOfInterest> pointOfInterestList) {
+        this.parentFragment = parentFragment;
         this.pointOfInterestList = pointOfInterestList;
     }
 
     @NonNull
     @Override
     public PointOfInterestListRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context.getContext());
+        LayoutInflater inflater = LayoutInflater.from(parentFragment.getContext());
         View view = inflater.inflate(R.layout.poi_list_row, parent, false);
         return new PointOfInterestListRecyclerViewAdapter.ViewHolder(view);
     }
@@ -39,7 +38,7 @@ public class PointOfInterestListRecyclerViewAdapter extends RecyclerView.Adapter
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.button.setText(pointOfInterestList.get(position).getName());
-        holder.button.setOnClickListener(v -> context.getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestFragment.newInstance(pointOfInterestList.get(position).getId())).addToBackStack("point_of_interest_list").commit());
+        holder.button.setOnClickListener(v -> parentFragment.getParentFragmentManager().beginTransaction().add(R.id.main_frame, PointOfInterestFragment.newInstance(pointOfInterestList.get(position).getId())).addToBackStack("point_of_interest_list").commit());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.indicator.getBackground().setTint(Color.HSVToColor(new float[]{(position * 50) % 360, 1, 1}));
         } else {
@@ -54,8 +53,8 @@ public class PointOfInterestListRecyclerViewAdapter extends RecyclerView.Adapter
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        Button button;
-        View indicator;
+        private Button button;
+        private View indicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

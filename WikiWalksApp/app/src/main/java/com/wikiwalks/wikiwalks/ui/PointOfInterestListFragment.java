@@ -8,9 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.google.android.material.appbar.MaterialToolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +16,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
@@ -54,13 +53,12 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.poi_list_frag_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Points of Interest - " + path.getName());
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(String.format(getString(R.string.points_of_interest_title), path.getName()));
 
         noPointsIndicator = rootView.findViewById(R.id.no_points_indicator);
         recyclerView = rootView.findViewById(R.id.poi_list_recyclerview);
-        PointOfInterestListRecyclerViewAdapter recyclerViewAdapter = new PointOfInterestListRecyclerViewAdapter(this, pointOfInterestList);
-        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setAdapter(new PointOfInterestListRecyclerViewAdapter(this, pointOfInterestList));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         if (pointOfInterestList.size() == 0) {
             recyclerView.setVisibility(View.GONE);
@@ -95,7 +93,8 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
     public void onMapReady(GoogleMap googleMap) {
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         for (Route route : path.getRoutes()) route.makePolyline(googleMap);
-        for (int i = 0; i < pointOfInterestList.size(); i++) pointOfInterestList.get(i).makeMarker(googleMap, ((i * 50) % 360));
+        for (int i = 0; i < pointOfInterestList.size(); i++)
+            pointOfInterestList.get(i).makeMarker(googleMap, ((i * 50) % 360));
         googleMap.getUiSettings().setAllGesturesEnabled(false);
         googleMap.setOnMarkerClickListener(marker -> true);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), 20));

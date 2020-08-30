@@ -19,10 +19,7 @@ import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditGoalDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.GoalsListRecyclerViewAdapter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -47,8 +44,8 @@ public class GoalsFragment extends Fragment {
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.goals_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
-        toolbar.setNavigationOnClickListener((View v) -> getParentFragmentManager().popBackStack());
-        toolbar.setTitle("Goals");
+        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        toolbar.setTitle(R.string.goals);
 
         Button setGoalButton = rootView.findViewById(R.id.set_goal_button);
         setGoalButton.setOnClickListener(v -> launchEditDialog(-1));
@@ -59,6 +56,7 @@ public class GoalsFragment extends Fragment {
         recyclerView = rootView.findViewById(R.id.goals_list_recyclerview);
         recyclerView.setAdapter(new GoalsListRecyclerViewAdapter(this, goalsList));
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         return rootView;
     }
 

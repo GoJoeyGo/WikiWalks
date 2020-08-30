@@ -1,8 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.material.appbar.MaterialToolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -23,6 +19,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
@@ -78,13 +75,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
+    public void onDestroy() {
+        PathMap.getInstance().removeListener(this);
+        super.onDestroy();
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         setMapLocation();
         MainActivity.checkPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
-                if (granted) mMap.setMyLocationEnabled(true);
+            if (granted) {
+                mMap.setMyLocationEnabled(true);
             }
+                }
         );
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
@@ -99,18 +104,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         return true;
     }
 
-    @Override
-    public void onDestroy() {
-        PathMap.getInstance().removeListener(this);
-        super.onDestroy();
-    }
-
     public void setMapLocation() {
         MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
             if (granted) {
                 fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-                    if (location != null) mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
-                    else setMapLocation();
+                    if (location != null) {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                    } else {
+                        setMapLocation();
+                    }
                 });
             } else {
                 getParentFragmentManager().beginTransaction().add(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.ACCESS_FINE_LOCATION)).addToBackStack(null).commit();
@@ -146,7 +148,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onPathMapUpdateFailure() {
         if (!hasFailed) {
             hasFailed = true;
-            Toast.makeText(getContext(), "Failed to get paths...", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.get_paths_failure, Toast.LENGTH_SHORT).show();
         }
     }
 }

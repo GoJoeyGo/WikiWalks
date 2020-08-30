@@ -36,8 +36,6 @@ public class Picture {
     }
 
     public interface EditPictureCallback {
-        void onSubmitPictureSuccess();
-        void onSubmitPictureFailure();
         void onEditPictureSuccess();
         void onEditPictureFailure();
         void onDeletePictureSuccess();
@@ -73,28 +71,31 @@ public class Picture {
                         try {
                             JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("picture");
                             Picture newPicture = new Picture(type, responseJson.getInt("id"), parentId, responseJson.getString("url"), responseJson.getInt("width"), responseJson.getInt("height"), responseJson.getString("description"), responseJson.getString("submitter"), true);
-                            if (type == PictureType.PATH)
+                            if (type == PictureType.PATH) {
                                 PathMap.getInstance().getPathList().get(parentId).getPicturesList().add(0, newPicture);
-                            else
+                            } else {
                                 PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().add(0, newPicture);
+                            }
                             PreferencesManager.getInstance(context).changePicturesUploaded(false);
-                            callback.onSubmitPictureSuccess();
+                            callback.onEditPictureSuccess();
                         } catch (JSONException e) {
-                            e.printStackTrace();
-                            callback.onSubmitPictureFailure();
+                            Log.e("Picture", "Getting photo from response", e);
+                            callback.onEditPictureSuccess();
                         }
+                    } else {
+                        callback.onEditPictureFailure();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    t.printStackTrace();
-                    callback.onSubmitPictureFailure();
+                    Log.e("Picture", "Sending new photo request", t);
+                    callback.onEditPictureFailure();
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
-            callback.onSubmitPictureFailure();
+            Log.e("Picture", "Creating new photo request", e);
+            callback.onEditPictureFailure();
         }
     }
 
@@ -146,12 +147,12 @@ public class Picture {
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("EDIT_PATH_PICTURE1", Arrays.toString(t.getStackTrace()));
+                    Log.e("Picture", "Sending edit photo request", t);
                     callback.onEditPictureFailure();
                 }
             });
         } catch (JSONException e) {
-            Log.e("EDIT_PATH_PICTURE2", Arrays.toString(e.getStackTrace()));
+            Log.e("Picture", "Creating edit photo request", e);
             callback.onEditPictureFailure();
         }
     }
@@ -168,10 +169,11 @@ public class Picture {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                        if (type == PictureType.PATH)
+                        if (type == PictureType.PATH) {
                             PathMap.getInstance().getPathList().get(parentId).getPicturesList().remove(Picture.this);
-                        else
+                        } else {
                             PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().remove(Picture.this);
+                        }
                         PreferencesManager.getInstance(context).changePicturesUploaded(true);
                         callback.onDeletePictureSuccess();
                     } else {
@@ -181,12 +183,12 @@ public class Picture {
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("DELETE_PATH_PICTURE1", Arrays.toString(t.getStackTrace()));
+                    Log.e("Picture", "Sending delete photo request", t);
                     callback.onDeletePictureFailure();
                 }
             });
         } catch (JSONException e) {
-            Log.e("DELETE_PATH_PICTURE2", Arrays.toString(e.getStackTrace()));
+            Log.e("Picture", "Creating delete photo request", e);
             callback.onDeletePictureFailure();
         }
     }
