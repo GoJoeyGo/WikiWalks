@@ -57,7 +57,7 @@ public class Route implements Serializable {
             newLocation.setLatitude(latitudes.get(i));
             newLocation.setLongitude(longitudes.get(i));
             newLocation.setAltitude(altitudes.get(i));
-            distance += (newLocation.distanceTo(lastLocation) / 1000);
+            distance += (newLocation.distanceTo(lastLocation));
             lastLocation = newLocation;
         }
     }
@@ -171,6 +171,7 @@ public class Route implements Serializable {
                                 marker.remove();
                             }
                             PathMap.getInstance().deletePath(path);
+
                         }
                         for (Polyline polyline : polylines) {
                             polyline.remove();
