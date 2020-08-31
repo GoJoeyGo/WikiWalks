@@ -11,7 +11,6 @@
     <string name="no">No</string>
     <string name="title">Title</string>
 
-    <string name="distance_format">%.2f %s</string>
     <string name="miles">mi</string>
     <string name="kilometres">km</string>
     <string name="metres">metres</string>
@@ -36,6 +35,7 @@
     <string name="new_route">New Route - %s</string>
     <string name="routes_title">Routes - %s</string>
     <string name="route_format">Route %d - %s</string>
+    <string name="distance_format">Route %d - %.2f %s</string>
     <string name="select_route">Select Route</string>
     <string name="record_new_route">Record New Route</string>
     <string name="explore">Explore</string>

@@ -42,9 +42,9 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
 
         String country = Locale.getDefault().getCountry();
         if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
-            holder.button.setText(String.format(parentFragment.getString(R.string.distance_format), routeList.get(position).getDistance() * 0.000621371, parentFragment.getString(R.string.miles)));
+            holder.button.setText(String.format(parentFragment.getString(R.string.distance_format), position + 1, routeList.get(position).getDistance() * 0.000621371, parentFragment.getString(R.string.miles)));
         } else {
-            holder.button.setText(String.format(parentFragment.getString(R.string.distance_format), routeList.get(position).getDistance() * 0.001, parentFragment.getString(R.string.kilometres)));
+            holder.button.setText(String.format(parentFragment.getString(R.string.distance_format), position + 1, routeList.get(position).getDistance() * 0.001, parentFragment.getString(R.string.kilometres)));
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

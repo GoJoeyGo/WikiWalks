@@ -166,8 +166,8 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
             for (Route route : path.getRoutes()) {
                 polylines.add(route.makePolyline(mMap));
             }
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), 20));
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), 20));
     }
 
     @Override
