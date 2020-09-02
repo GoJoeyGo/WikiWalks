@@ -42,7 +42,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
             PreferencesManager.getInstance(getContext()).exportPreferences(uri);
         }
     });
-    ActivityResultLauncher<String[]> importSettings = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+    ActivityResultLauncher<String[]> importSettings = registerForActivityResult(new CustomActivityResultContracts.ImportSettings(), uri -> {
         if (uri != null) {
             PreferencesManager.getInstance(getContext()).importPreferences(uri);
         }

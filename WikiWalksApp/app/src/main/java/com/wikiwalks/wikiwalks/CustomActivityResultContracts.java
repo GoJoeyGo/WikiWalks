@@ -18,6 +18,15 @@ public abstract class CustomActivityResultContracts {
         }
     }
 
+    public static class ImportSettings extends ActivityResultContracts.OpenDocument {
+        @Override
+        public Intent createIntent(@NonNull Context context, @NonNull String[] input) {
+            super.createIntent(context, input);
+            return new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                    .setType("application/octet-stream");
+        }
+    }
+
     public static class SelectPicture extends ActivityResultContracts.GetContent {
         @Override
         public Intent createIntent(@NonNull Context context, @NonNull String input) {
