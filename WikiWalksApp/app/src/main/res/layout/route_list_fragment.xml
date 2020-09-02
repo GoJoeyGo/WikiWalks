@@ -33,10 +33,10 @@
                 android:id="@+id/route_list_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:contentInsetEnd="16dp"
                 app:contentInsetStart="16dp"
-                app:titleTextColor="?attr/colorOnBackground" />
+                app:titleTextColor="@color/white" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

@@ -62,6 +62,13 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     private LinearLayout outOfRangeBanner;
     private ArrayList<Double> pathLatitudes;
     private ArrayList<Double> pathLongitudes;
+    private LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            super.onLocationResult(locationResult);
+            onLocationChanged(locationResult.getLastLocation());
+        }
+    };
 
     public static WalkFragment newInstance(int pathId, int routeNumber) {
         Bundle args = new Bundle();
@@ -159,13 +166,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
 
         MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
             if (granted) {
-                fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        super.onLocationResult(locationResult);
-                        onLocationChanged(locationResult.getLastLocation());
-                    }
-                }, Looper.myLooper());
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
             }
         });
 
@@ -255,5 +256,11 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public void onDeletePicture(int position) {
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        super.onDestroyView();
     }
 }
