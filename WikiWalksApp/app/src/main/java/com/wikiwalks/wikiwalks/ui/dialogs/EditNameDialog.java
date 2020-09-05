@@ -41,7 +41,7 @@ public class EditNameDialog extends DialogFragment {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.edit_name_dialog, null);
-        builder.setTitle(R.string.set_name);
+        builder.setTitle(R.string.name);
 
         listener = (EditDialogListener) getParentFragment();
         listener.setEditNameDialog(this);

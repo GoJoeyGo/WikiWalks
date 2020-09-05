@@ -107,6 +107,7 @@ def get_paths():
 
 @gets.route("/paths/<path_id>/reviews", methods=["GET", "POST"])
 def path_review_list(path_id):
+    path = Path.query.filter_by(id=path_id).first()
     page = request.args.get('page', default=1, type=int)
     reviews = PathReview.query.filter_by(path_id=path_id).order_by(PathReview.created_time.desc())
     own_review = None
@@ -126,9 +127,10 @@ def path_review_list(path_id):
     path_review_list_schema = PathReviewSchema(many=True)
     output = path_review_list_schema.dump(reviews)
     if own_review is None:
-        return jsonify({"reviews": output})
+        return jsonify({"reviews": output, "average_rating": path.average_rating})
     else:
-        return jsonify({"reviews": output, "own_review": path_review_list_schema.dump([own_review])})
+        return jsonify({"reviews": output, "own_review": path_review_list_schema.dump([own_review]),
+                        "average_rating": path.average_rating})
 
 
 @gets.route("/paths/<path_id>/pictures", methods=["GET", "POST"])
@@ -211,6 +213,7 @@ def get_pois():
 
 @gets.route("/pois/<poi_id>/reviews", methods=["GET", "POST"])
 def poi_review_list(poi_id):
+    point_of_interest = Path.query.filter_by(id=poi_id).first()
     page = request.args.get('page', default=1, type=int)
     reviews = PointOfInterestReview.query.filter_by(point_of_interest_id=poi_id) \
         .order_by(PointOfInterestReview.created_time.desc())
@@ -231,9 +234,10 @@ def poi_review_list(poi_id):
     poi_review_list_schema = PointOfInterestReviewSchema(many=True)
     output = poi_review_list_schema.dump(reviews)
     if own_review is None:
-        return jsonify({"reviews": output})
+        return jsonify({"reviews": output, "average_rating": point_of_interest.average_rating})
     else:
-        return jsonify({"reviews": output, "own_review": poi_review_list_schema.dump([own_review])})
+        return jsonify({"reviews": output, "own_review": poi_review_list_schema.dump([own_review]),
+                        "average_rating": point_of_interest.average_rating})
 
 
 @gets.route("/pois/<poi_id>/pictures", methods=["GET", "POST"])
