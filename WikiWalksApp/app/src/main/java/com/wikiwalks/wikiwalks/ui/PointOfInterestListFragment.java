@@ -16,6 +16,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
@@ -33,6 +34,8 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
     private RecyclerView recyclerView;
     private SupportMapFragment mapFragment;
     private TextView noPointsIndicator;
+    private ArrayList<Marker> markers = new ArrayList<>();
+    private GoogleMap map;
 
     public static PointOfInterestListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -87,14 +90,18 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
             recyclerView.getAdapter().notifyDataSetChanged();
             recyclerView.getAdapter().notifyItemRangeChanged(0, pointOfInterestList.size());
         }
+        for (Marker marker : markers) marker.remove();
+        for (int i = 0; i < pointOfInterestList.size(); i++)
+            markers.add(pointOfInterestList.get(i).makeMarker(map, ((i * 50) % 360)));
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         for (Route route : path.getRoutes()) route.makePolyline(googleMap);
         for (int i = 0; i < pointOfInterestList.size(); i++)
-            pointOfInterestList.get(i).makeMarker(googleMap, ((i * 50) % 360));
+            markers.add(pointOfInterestList.get(i).makeMarker(googleMap, ((i * 50) % 360)));
         googleMap.getUiSettings().setAllGesturesEnabled(false);
         googleMap.setOnMarkerClickListener(marker -> true);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(path.getBounds(), 20));

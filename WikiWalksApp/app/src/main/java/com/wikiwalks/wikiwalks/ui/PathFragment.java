@@ -9,7 +9,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -95,6 +97,8 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, EditNa
 
         RatingBar ratingBar = rootView.findViewById(R.id.path_frag_rating_bar);
         ratingBar.setRating((float) path.getRating());
+
+        getParentFragmentManager().setFragmentResultListener("update_rating", this, (requestKey, result) -> ratingBar.setRating((float) path.getRating()));
 
         TextView walkCount = rootView.findViewById(R.id.path_frag_walk_count);
         String walkCountString = path.getWalkCount() == 1 ? getString(R.string.walk_count_once) : String.format(getString(R.string.walk_count_multiple), path.getWalkCount());

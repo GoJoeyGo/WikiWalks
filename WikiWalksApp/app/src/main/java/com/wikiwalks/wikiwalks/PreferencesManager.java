@@ -177,7 +177,7 @@ public class PreferencesManager {
             strings[3] = String.format(context.getString(R.string.average_walk_distance), (distanceWalked / timesWalked) * 0.001, context.getString(R.string.kilometres));
 
         }
-        strings[1] = String.format(context.getString(R.string.earth_circumference_walked), statistics.getFloat("distance_walked", 0) / 400750);
+        strings[1] = String.format(context.getString(R.string.earth_circumference_walked), statistics.getFloat("distance_walked", 0) / 400750000);
         strings[4] = String.format(context.getString(R.string.times_walked), timesWalked);
         strings[5] = String.format(context.getString(R.string.routes_recorded), statistics.getInt("routes_recorded", 0));
         strings[6] = String.format(context.getString(R.string.points_marked), statistics.getInt("points_marked", 0));
@@ -269,7 +269,7 @@ public class PreferencesManager {
                 if (entry.getKey().matches("statistics")) {
                     JsonObject importedStatistics = jsonObject.get("statistics").getAsJsonObject();
                     for (Map.Entry<String, JsonElement> statisticsEntry : importedStatistics.entrySet()) {
-                        if (statisticsEntry.getKey().matches("distance_walked")) {
+                        if (statisticsEntry.getKey().matches("(distance_walked|longest_walk)")) {
                             statistics.edit().putFloat(statisticsEntry.getKey(), statisticsEntry.getValue().getAsFloat()).apply();
                         } else {
                             statistics.edit().putInt(statisticsEntry.getKey(), statisticsEntry.getValue().getAsInt()).apply();

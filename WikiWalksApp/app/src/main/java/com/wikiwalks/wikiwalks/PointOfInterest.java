@@ -260,6 +260,7 @@ public class PointOfInterest {
                                     JSONObject review = responseJson.getJSONArray("own_review").getJSONObject(0);
                                     ownReview = new Review(Review.ReviewType.POINT_OF_INTEREST, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"));
                                 }
+                                rating = responseJson.getDouble("average_rating");
                                 nextReviewPage++;
                                 isLoadingReviews = false;
                                 callback.onGetReviewSuccess();

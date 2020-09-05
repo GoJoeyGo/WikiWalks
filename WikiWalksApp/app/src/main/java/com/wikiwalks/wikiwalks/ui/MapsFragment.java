@@ -1,6 +1,7 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,12 +87,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         setMapLocation();
-        MainActivity.checkPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
-                if (granted) {
-                    mMap.setMyLocationEnabled(true);
-                }
-            }
-        );
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
         PathMap pathMap = PathMap.getInstance();
@@ -113,6 +108,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void setMapLocation() {
         MainActivity.checkPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION, granted -> {
             if (granted) {
+                mMap.setMyLocationEnabled(true);
                 fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
                     if (location != null) {
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));

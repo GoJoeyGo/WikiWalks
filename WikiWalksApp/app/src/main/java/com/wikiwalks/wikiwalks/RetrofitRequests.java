@@ -24,7 +24,8 @@ public interface RetrofitRequests {
                                @Body RequestBody body);
 
     @POST("/paths/{id}")
-    Call<JsonElement> updatePath(@Path("id") int id);
+    Call<JsonElement> updatePath(@Path("id") int id,
+                                 @Body RequestBody body);
 
     @POST("/paths/{id}/edit")
     Call<JsonElement> editPath(@Path("id") int id,

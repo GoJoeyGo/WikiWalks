@@ -10,6 +10,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,7 +111,12 @@ public class Path {
     }
 
     public static void getPath(Context context, int id, GetPathCallback callback) {
-        Call<JsonElement> updatePath = MainActivity.getRetrofitRequests(context).updatePath(id);
+        JsonObject attributes = new JsonObject();
+        JsonObject request = new JsonObject();
+        attributes.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        request.add("attributes", attributes);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> updatePath = MainActivity.getRetrofitRequests(context).updatePath(id, body);
         updatePath.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -132,30 +138,6 @@ public class Path {
                 callback.onGetPathFailure();
             }
         });
-    }
-    public static double findDistance(Path path){
-        final int R = 6371; // this will be a tad off but it will only be really noticable if people do walks that are really long
-        ArrayList<Double> latitudes =  path.getAllLatitudes();
-        ArrayList<Double> longitudes =  path.getAllLongitudes();
-        ArrayList<Double> Altitudes =  path.getAllAltitudes();
-        double toatalDistance = 0.0;
-        for(int x = 1; x<latitudes.size();x++){
-            double lon1 = Math.toRadians(longitudes.get(x-1));
-            double lon2 = Math.toRadians(longitudes.get(x));
-            double lat1 = Math.toRadians(latitudes.get(x-1));
-            double lat2 = Math.toRadians(latitudes.get(x));
-            double height =  Altitudes.get(x-1) -  Altitudes.get(x);
-            double latDistance = lat2 - lat1;
-            double lonDistance = lon2 - lon1;
-            double a =
-                    Math.sin(latDistance/2)*Math.sin(latDistance/2) +
-                    Math.cos(lat1)*Math.cos(lat2)*
-                    Math.sin(lonDistance/2)*Math.sin(lonDistance/2);
-            double c = 2* Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            double distance = Math.sqrt(Math.pow( R * c * 1000, 2) + Math.pow(height, 2));
-            toatalDistance+=distance;
-        }
-        return toatalDistance;
     }
 
     public void addPointOfInterest(PointOfInterest pointOfInterest) {
@@ -346,6 +328,7 @@ public class Path {
                                     JSONObject review = responseJson.getJSONArray("own_review").getJSONObject(0);
                                     ownReview = new Review(Review.ReviewType.PATH, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"));
                                 }
+                                rating = responseJson.getDouble("average_rating");
                                 nextReviewPage++;
                                 isLoadingReviews = false;
                                 callback.onGetReviewSuccess();

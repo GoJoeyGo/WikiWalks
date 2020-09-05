@@ -188,6 +188,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
             imageView.setImageBitmap(getArguments().getParcelable("image"));
             cameraButton.setVisibility(View.GONE);
             galleryButton.setVisibility(View.GONE);
+            submitButton.setEnabled(true);
         } else {
             deleteButton.setVisibility(View.GONE);
         }

@@ -42,7 +42,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
             PreferencesManager.getInstance(getContext()).exportPreferences(uri);
         }
     });
-    ActivityResultLauncher<String[]> importSettings = registerForActivityResult(new CustomActivityResultContracts.ImportSettings(), uri -> {
+    ActivityResultLauncher<String[]> importSettings = registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
         if (uri != null) {
             PreferencesManager.getInstance(getContext()).importPreferences(uri);
         }
@@ -126,7 +126,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
         Button importSettingsButton = rootView.findViewById(R.id.settings_import_settings_button);
         importSettingsButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
             if (granted) {
-                importSettings.launch(new String[]{"application/json"});
+                importSettings.launch(new String[]{"application/json", "application/octet-stream"});
             } else {
                 getParentFragmentManager().beginTransaction().add(R.id.main_frame, PermissionsFragment.newInstance(Manifest.permission.WRITE_EXTERNAL_STORAGE)).addToBackStack(null).commit();
             }

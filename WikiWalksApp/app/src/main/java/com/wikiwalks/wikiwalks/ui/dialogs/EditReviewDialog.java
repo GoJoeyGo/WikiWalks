@@ -109,8 +109,8 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
                     .setTitle(R.string.delete_review_prompt)
-                    .setPositiveButton(getString(R.string.yes), (dialog, which) -> review.delete(getContext(), this))
-                    .setNegativeButton(getString(R.string.no), (dialog, which) -> confirmationDialog.dismiss())
+                    .setPositiveButton(R.string.yes, (dialog, which) -> review.delete(getContext(), this))
+                    .setNegativeButton(R.string.no, (dialog, which) -> confirmationDialog.dismiss())
                     .create().show());
             message.getEditText().setText(review.getMessage());
             rating.setRating(review.getRating());

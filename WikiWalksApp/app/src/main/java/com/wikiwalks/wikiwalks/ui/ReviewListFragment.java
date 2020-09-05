@@ -143,6 +143,8 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
             recyclerView.getAdapter().notifyDataSetChanged();
         }
         swipeRefreshLayout.setRefreshing(false);
+        getParentFragmentManager().setFragmentResult("update_rating", new Bundle());
+        getParentFragmentManager().setFragmentResult("update_point_rating", new Bundle());
     }
 
     @Override

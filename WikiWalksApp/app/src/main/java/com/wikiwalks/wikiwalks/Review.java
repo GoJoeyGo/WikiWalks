@@ -62,11 +62,11 @@ public class Review {
                             if (type == ReviewType.PATH) {
                                 Path parentPath = PathMap.getInstance().getPathList().get(parentId);
                                 parentPath.setOwnReview(newReview);
-                                parentPath.setRating(responseJson.getDouble("average_rating"));
+                                parentPath.setRating(new JSONObject(response.body().getAsJsonObject().toString()).getDouble("average_rating"));
                             } else {
                                 PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
                                 parentPointOfInterest.setOwnReview(newReview);
-                                parentPointOfInterest.setRating(responseJson.getDouble("average_rating"));
+                                parentPointOfInterest.setRating(new JSONObject(response.body().getAsJsonObject().toString()).getDouble("average_rating"));
                             }
                             PreferencesManager.getInstance(context).changeReviewsWritten(false);
                             callback.onEditReviewSuccess();
@@ -163,9 +163,11 @@ public class Review {
                         if (type == ReviewType.PATH) {
                             Path parentPath = PathMap.getInstance().getPathList().get(parentId);
                             parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
+                            parentPath.setOwnReview(null);
                         } else {
                             PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
                             parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
+                            parentPointOfInterest.setOwnReview(null);
                         }
                         PreferencesManager.getInstance(context).changeReviewsWritten(true);
                         callback.onDeleteReviewSuccess();
