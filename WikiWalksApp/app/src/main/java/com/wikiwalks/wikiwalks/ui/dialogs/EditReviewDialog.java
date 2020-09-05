@@ -73,7 +73,7 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.edit_review_dialog, null);
-        builder.setTitle(R.string.photo);
+        builder.setTitle(R.string.review);
 
         listener = (EditReviewDialogListener) getParentFragment();
         parentId = getArguments().getInt("parentId");
