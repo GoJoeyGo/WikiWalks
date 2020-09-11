@@ -112,7 +112,8 @@
     <string name="distance_walked">Distance Walked - %.2f %s</string>
     <string name="earth_circumference_walked">🌎\'s Circumference Walked - %.6f%%</string>
     <string name="longest_walk">Longest Walk - %.2f %s</string>
-    <string name="average_walk_distance">Average Walk - %.2f %s</string>
+    <string name="average_walk">Average Walk - %.2f %s</string>
+    <string name="average_walk_n_a">Average Walk - N/A</string>
     <string name="times_walked">Times Walked - %d</string>
     <string name="routes_recorded">Routes Recorded - %d</string>
     <string name="points_marked">Points of Interest Marked - %d</string>
@@ -140,6 +141,10 @@
     <string name="export_data">Export Data</string>
     <string name="save_name_success">Saved name successfully!</string>
     <string name="save_name_failure">Failed to delete name…</string>
+    <string name="import_data_success">Imported data successfully!</string>
+    <string name="import_data_failure">Failed to import data…</string>
+    <string name="export_data_success">Exported data successfully!</string>
+    <string name="export_data_failure">Failed to export data…</string>
 
     <string name="open_settings">Open Settings</string>
     <string name="requires_location">WikiWalks needs location permissions to run.</string>

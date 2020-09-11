@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -164,12 +165,14 @@ public class PreferencesManager {
         if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
             strings[0] = String.format(context.getString(R.string.distance_walked), distanceWalked * 0.000621371, context.getString(R.string.miles));
             strings[2] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0) * 0.000621371, context.getString(R.string.miles));
-            strings[3] = String.format(context.getString(R.string.average_walk_distance), (distanceWalked / timesWalked) * 0.000621371,context.getString(R.string.miles));
+            strings[3] = String.format(context.getString(R.string.average_walk), (distanceWalked / timesWalked) * 0.000621371,context.getString(R.string.miles));
         } else {
             strings[0] = String.format(context.getString(R.string.distance_walked), distanceWalked * 0.001, context.getString(R.string.kilometres));
             strings[2] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0) * 0.001, context.getString(R.string.kilometres));
-            strings[3] = String.format(context.getString(R.string.average_walk_distance), (distanceWalked / timesWalked) * 0.001, context.getString(R.string.kilometres));
-
+            strings[3] = String.format(context.getString(R.string.average_walk), (distanceWalked / timesWalked) * 0.001, context.getString(R.string.kilometres));
+        }
+        if (timesWalked == 0) {
+            strings[3] = context.getString(R.string.average_walk_n_a);
         }
         strings[1] = String.format(context.getString(R.string.earth_circumference_walked), statistics.getFloat("distance_walked", 0) / 400750000);
         strings[4] = String.format(context.getString(R.string.times_walked), timesWalked);
@@ -238,8 +241,10 @@ public class PreferencesManager {
             Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             writer.write(preferencesJson.toString());
             writer.close();
+            Toast.makeText(context, R.string.export_data_success, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Log.e("PreferencesManager", "Exporting preferences", e);
+            Toast.makeText(context, R.string.export_data_failure, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -261,8 +266,10 @@ public class PreferencesManager {
                     preferences.edit().putString(entry.getKey(), entry.getValue().getAsString()).apply();
                 }
             }
+            Toast.makeText(context, R.string.import_data_success, Toast.LENGTH_SHORT).show();
         } catch (FileNotFoundException e) {
             Log.e("PreferencesManager", "Importing preferences", e);
+            Toast.makeText(context, R.string.import_data_failure, Toast.LENGTH_SHORT).show();
         }
     }
 }
