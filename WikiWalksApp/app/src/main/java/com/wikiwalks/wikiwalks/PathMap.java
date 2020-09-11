@@ -4,11 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,43 +39,33 @@ public class PathMap {
     }
 
     public void updatePaths(LatLngBounds bounds, Context context) {
-        JSONObject request = new JSONObject();
-        try {
-            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> getPaths = MainActivity.getRetrofitRequests(context).getPaths(bounds.northeast.latitude, bounds.northeast.longitude, bounds.southwest.latitude, bounds.southwest.longitude, body);
-            getPaths.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        try {
-                            JSONArray responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONArray("paths");
-                            for (int i = 0; i < responseJson.length(); i++) {
-                                JSONObject pathJson = responseJson.getJSONObject(i);
-                                if (!pathList.containsKey(pathJson.getInt("id"))) {
-                                    pathList.put(pathJson.getInt("id"), new Path(pathJson));
-                                }
-                            }
-                            triggerChangeListeners();
-                        } catch (JSONException e) {
-                            triggerFailedListeners();
-                            Log.e("PathMap", "Getting paths from response", e);
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> getPaths = MainActivity.getRetrofitRequests(context).getPaths(bounds.northeast.latitude, bounds.northeast.longitude, bounds.southwest.latitude, bounds.southwest.longitude, body);
+        getPaths.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    JsonArray responseJson = response.body().getAsJsonObject().get("paths").getAsJsonArray();
+                    for (int i = 0; i < responseJson.size(); i++) {
+                        JsonObject pathJson = responseJson.get(i).getAsJsonObject();
+                        if (!pathList.containsKey(pathJson.get("id").getAsInt())) {
+                            pathList.put(pathJson.get("id").getAsInt(), new Path(pathJson));
                         }
-                    } else {
-                        triggerFailedListeners();
                     }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    triggerChangeListeners();
+                } else {
                     triggerFailedListeners();
-                    Log.e("PathMap", "Sending path update request", t);
                 }
-            });
-        } catch (JSONException e) {
-            triggerFailedListeners();
-            Log.e("PathMap", "Creating path update request", e);
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                triggerFailedListeners();
+                Log.e("PathMap", "Sending path update request", t);
+            }
+        });
     }
 
     private void triggerChangeListeners() {

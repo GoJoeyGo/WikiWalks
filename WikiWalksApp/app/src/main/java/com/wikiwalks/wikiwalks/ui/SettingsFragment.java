@@ -17,14 +17,12 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.wikiwalks.wikiwalks.CustomActivityResultContracts;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -62,34 +60,29 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
 
     @Override
     public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
-        JSONObject request = new JSONObject();
-        try {
-            request.put("device_id", PreferencesManager.getInstance(getContext()).getDeviceId());
-            request.put("name", name);
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> setName = MainActivity.getRetrofitRequests(getContext()).setName(body);
-            setName.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        editNameDialog.dismiss();
-                        PreferencesManager.getInstance(getContext()).setName(name);
-                        Toast.makeText(getContext(), R.string.save_name_success, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), R.string.save_name_failure, Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("SettingsFragment", "Sending name update request", t);
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(getContext()).getDeviceId());
+        request.addProperty("name", name);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> setName = MainActivity.getRetrofitRequests(getContext()).setName(body);
+        setName.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    editNameDialog.dismiss();
+                    PreferencesManager.getInstance(getContext()).setName(name);
+                    Toast.makeText(getContext(), R.string.save_name_success, Toast.LENGTH_SHORT).show();
+                } else {
                     Toast.makeText(getContext(), R.string.save_name_failure, Toast.LENGTH_SHORT).show();
                 }
-            });
-        } catch (JSONException e) {
-            Log.e("SettingsFragment", "Creating name update request", e);
-            Toast.makeText(getContext(), R.string.save_name_failure, Toast.LENGTH_SHORT).show();
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("SettingsFragment", "Sending name update request", t);
+                Toast.makeText(getContext(), R.string.save_name_failure, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Nullable

@@ -16,12 +16,10 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.JsonObject;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.GoalsFragment;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -111,16 +109,12 @@ public class EditGoalDialog extends DialogFragment {
                 .create().show());
 
         if (position > -1) {
-            try {
-                JSONObject goal = PreferencesManager.getInstance(getContext()).getGoals().get(position);
-                calendar.setTimeInMillis(goal.getLong("end_time"));
-                time.setText(String.format(getString(R.string.goal_ends), DateFormat.getDateInstance(DateFormat.SHORT).format(calendar.getTime())));
-                distance.getEditText().setText(String.valueOf(goal.getDouble("distance_goal") / (imperial ? 1609.34 : 1000)));
-                deleteButton.setVisibility(View.VISIBLE);
-                submitButton.setEnabled(true);
-            } catch (JSONException e) {
-                Log.e("EditGoalDialog", "Getting goal attributes", e);
-            }
+            JsonObject goal = PreferencesManager.getInstance(getContext()).getGoals().get(position);
+            calendar.setTimeInMillis(goal.get("end_time").getAsLong());
+            time.setText(String.format(getString(R.string.goal_ends), DateFormat.getDateInstance(DateFormat.SHORT).format(calendar.getTime())));
+            distance.getEditText().setText(String.valueOf(goal.get("distance_goal").getAsDouble() / (imperial ? 1609.34 : 1000)));
+            deleteButton.setVisibility(View.VISIBLE);
+            submitButton.setEnabled(true);
         }
 
         if (savedInstanceState != null) {

@@ -14,18 +14,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.gson.JsonObject;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.EditGoalDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.GoalsListRecyclerViewAdapter;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 public class GoalsFragment extends Fragment {
 
-    private ArrayList<JSONObject> goalsList = new ArrayList<>();
+    private ArrayList<JsonObject> goalsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TextView noGoalsIndicator;
 
@@ -79,7 +78,7 @@ public class GoalsFragment extends Fragment {
 
     private void populateList() {
         goalsList.clear();
-        ArrayList<JSONObject> goals = PreferencesManager.getInstance(getContext()).getGoals();
+        ArrayList<JsonObject> goals = PreferencesManager.getInstance(getContext()).getGoals();
         goalsList.addAll(goals);
     }
 }

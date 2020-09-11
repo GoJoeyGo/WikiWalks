@@ -171,6 +171,7 @@ def add_poi():
                                   average_rating=0.0)
         db.session.add(new_poi)
         db.session.commit()
+        new_poi.editable = True
         return jsonify({"status": "success", "poi": poi_schema.dump(new_poi)}), 201
     except Exception as e:
         print(e)
@@ -220,6 +221,7 @@ def add_group_walk(path_id):
         db.session.add(new_gw)
         db.session.commit()
         new_gw.submitter = user.nickname
+        new_gw.editable = True
         return jsonify({"status": "success", "group_walk": gw_schema.dump(new_gw)}), 201
     except Exception as e:
         print(e)
@@ -304,6 +306,7 @@ def add_poi_review(poi_id):
         db.session.add(new_poi_review)
         db.session.commit()
         new_poi_review.submitter = user.nickname
+        new_poi_review.editable = True
         return jsonify({"status": "success", "review": poi_review_schema.dump(new_poi_review),
                         "average_rating": point_of_interest.average_rating}), 201
     except Exception as e:
@@ -379,6 +382,7 @@ def add_path_review(path_id):
         db.session.add(new_path_review)
         db.session.commit()
         new_path_review.submitter = user.nickname
+        new_path_review.editable = True
         return jsonify({"status": "success", "review": path_review_schema.dump(new_path_review),
                         "average_rating": path.average_rating}), 201
     except Exception as e:
@@ -449,6 +453,7 @@ def add_path_picture(path_id):
             processed_image[0].save("./images/" + processed_image[1], 'WEBP', quality=80)
             db.session.add(new_path_picture)
             db.session.commit()
+            new_path_picture.editable = True
             return jsonify({"status": "success", "picture": path_picture_schema.dump(new_path_picture)}), 201
         else:
             return jsonify({"status": "invalid file type"}), 403
@@ -512,6 +517,7 @@ def add_poi_picture(poi_id):
             processed_image[0].save("./images/" + processed_image[1], 'WEBP', quality=80)
             db.session.add(new_poi_picture)
             db.session.commit()
+            new_poi_picture.editable = True
             return jsonify({"status": "success", "picture": poi_picture_schema.dump(new_poi_picture)}), 201
         else:
             return jsonify({"status": "invalid file type"}), 403

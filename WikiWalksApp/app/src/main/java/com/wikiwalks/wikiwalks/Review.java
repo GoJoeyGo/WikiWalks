@@ -4,9 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.JsonElement;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
 
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -33,60 +31,50 @@ public class Review {
         void onDeleteReviewFailure();
     }
 
-    public Review(ReviewType type, int id, int parentId, String name, int rating, String message) {
-        this.type = type;
-        this.id = id;
+    public Review(JsonObject attributes, int parentId, ReviewType type) {
+        id = attributes.get("id").getAsInt();
+        name = attributes.get("submitter").getAsString();
+        message = attributes.get("text").getAsString();
+        rating = attributes.get("rating").getAsInt();
         this.parentId = parentId;
-        this.name = name;
-        this.rating = rating;
-        this.message = message;
+        this.type = type;
     }
 
     public static void submit(Context context, ReviewType type, int parentId, String message, int rating, EditReviewCallback callback) {
-        JSONObject request = new JSONObject();
-        try {
-            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("text", message);
-            request.put("rating", rating);
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> newReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).newPathReview(parentId, body) : MainActivity.getRetrofitRequests(context).newPoIReview(parentId, body);
-            newReview.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        try {
-                            JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("review");
-                            Review newReview = new Review(type, responseJson.getInt("id"), parentId, responseJson.getString("submitter"), rating, message);
-                            if (type == ReviewType.PATH) {
-                                Path parentPath = PathMap.getInstance().getPathList().get(parentId);
-                                parentPath.setOwnReview(newReview);
-                                parentPath.setRating(new JSONObject(response.body().getAsJsonObject().toString()).getDouble("average_rating"));
-                            } else {
-                                PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
-                                parentPointOfInterest.setOwnReview(newReview);
-                                parentPointOfInterest.setRating(new JSONObject(response.body().getAsJsonObject().toString()).getDouble("average_rating"));
-                            }
-                            PreferencesManager.getInstance(context).changeReviewsWritten(false);
-                            callback.onEditReviewSuccess();
-                        } catch (JSONException e) {
-                            Log.e("Review", "Getting review from response", e);
-                            callback.onEditReviewSuccess();
-                        }
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        request.addProperty("text", message);
+        request.addProperty("rating", rating);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> newReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).newPathReview(parentId, body) : MainActivity.getRetrofitRequests(context).newPoIReview(parentId, body);
+        newReview.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    JsonObject responseJson = response.body().getAsJsonObject().get("review").getAsJsonObject();
+                    Review newReview = new Review(responseJson, parentId, type);
+                    if (type == ReviewType.PATH) {
+                        Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                        parentPath.setOwnReview(newReview);
+                        parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                     } else {
-                        callback.onEditReviewFailure();
+                        PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                        parentPointOfInterest.setOwnReview(newReview);
+                        parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                     }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("Review", "Sending new review request", t);
+                    PreferencesManager.getInstance(context).changeReviewsWritten(false);
+                    callback.onEditReviewSuccess();
+                } else {
                     callback.onEditReviewFailure();
                 }
-            });
-        } catch (JSONException e) {
-            Log.e("Review", "Creating new review request", e);
-            callback.onEditReviewFailure();
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("Review", "Sending new review request", t);
+                callback.onEditReviewFailure();
+            }
+        });
     }
 
     public int getId() {
@@ -106,80 +94,70 @@ public class Review {
     }
 
     public void edit(Context context, String message, int rating, EditReviewCallback callback) {
-        JSONObject request = new JSONObject();
-        try {
-            request.put("text", message);
-            request.put("rating", rating);
-            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> editReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).editPathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).editPoIReview(parentId, id, body);
-            editReview.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        Review.this.message = message;
-                        Review.this.rating = rating;
-                        if (type == ReviewType.PATH) {
-                            Path parentPath = PathMap.getInstance().getPathList().get(parentId);
-                            parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
-                        } else {
-                            PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
-                            parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
-                        }
-                        callback.onEditReviewSuccess();
+        JsonObject request = new JsonObject();
+        request.addProperty("text", message);
+        request.addProperty("rating", rating);
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> editReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).editPathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).editPoIReview(parentId, id, body);
+        editReview.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    Review.this.message = message;
+                    Review.this.rating = rating;
+                    if (type == ReviewType.PATH) {
+                        Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                        parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                     } else {
-                        callback.onEditReviewFailure();
+                        PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                        parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                     }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("Review", "Sending edit review request", t);
+                    callback.onEditReviewSuccess();
+                } else {
                     callback.onEditReviewFailure();
                 }
-            });
-        } catch (JSONException e) {
-            Log.e("Review", "Creating edit review request", e);
-            callback.onDeleteReviewFailure();
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("Review", "Sending edit review request", t);
+                callback.onEditReviewFailure();
+            }
+        });
     }
 
-    public void delete(final Context context, EditReviewCallback callback) {
-        JSONObject request = new JSONObject();
-        try {
-            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> deleteReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).deletePathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).deletePoIReview(parentId, id, body);
-            deleteReview.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        if (type == ReviewType.PATH) {
-                            Path parentPath = PathMap.getInstance().getPathList().get(parentId);
-                            parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
-                            parentPath.setOwnReview(null);
-                        } else {
-                            PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
-                            parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
-                            parentPointOfInterest.setOwnReview(null);
-                        }
-                        PreferencesManager.getInstance(context).changeReviewsWritten(true);
-                        callback.onDeleteReviewSuccess();
+    public void delete(Context context, EditReviewCallback callback) {
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> deleteReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).deletePathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).deletePoIReview(parentId, id, body);
+        deleteReview.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    if (type == ReviewType.PATH) {
+                        Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                        parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
+                        parentPath.setOwnReview(null);
                     } else {
-                        callback.onDeleteReviewFailure();
+                        PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                        parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
+                        parentPointOfInterest.setOwnReview(null);
                     }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("Review", "Sending delete review request", t);
+                    PreferencesManager.getInstance(context).changeReviewsWritten(true);
+                    callback.onDeleteReviewSuccess();
+                } else {
                     callback.onDeleteReviewFailure();
                 }
-            });
-        } catch (JSONException e) {
-            Log.e("Review", "Creating delete review request", e);
-            callback.onDeleteReviewFailure();
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("Review", "Sending delete review request", t);
+                callback.onDeleteReviewFailure();
+            }
+        });
     }
 
     public enum ReviewType {PATH, POINT_OF_INTEREST}

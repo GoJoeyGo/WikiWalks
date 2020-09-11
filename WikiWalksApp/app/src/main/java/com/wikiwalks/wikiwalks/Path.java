@@ -9,12 +9,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -67,46 +64,29 @@ public class Path {
         id = -1;
     }
 
-    public Path(JSONObject pathJson) throws JSONException {
-        id = pathJson.getInt("id");
-        name = pathJson.getString("name");
-        walkCount = pathJson.getInt("walk_count");
-        rating = pathJson.getDouble("average_rating");
-        markerPoint = new LatLng(pathJson.getJSONArray("marker_point").getDouble(0), pathJson.getJSONArray("marker_point").getDouble(1));
-        JSONArray boundaries = pathJson.getJSONArray("boundaries");
-        bounds = new LatLngBounds(new LatLng(boundaries.getDouble(0), boundaries.getDouble(1)), new LatLng(boundaries.getDouble(2), boundaries.getDouble(3)));
-        JSONArray points_of_interest = pathJson.getJSONArray("points_of_interest");
-        for (int i = 0; i < points_of_interest.length(); i++) {
-            JSONObject pointOfInterest = points_of_interest.getJSONObject(i);
-            PointOfInterest newPointOfInterest = new PointOfInterest(pointOfInterest.getInt("id"), pointOfInterest.getString("name"), pointOfInterest.getDouble("average_rating"), pointOfInterest.getDouble("latitude"), pointOfInterest.getDouble("longitude"), this, pointOfInterest.getBoolean("editable"));
+    public Path(JsonObject pathJson) {
+        id = pathJson.get("id").getAsInt();
+        name = pathJson.get("name").getAsString();
+        walkCount = pathJson.get("walk_count").getAsInt();
+        rating = pathJson.get("average_rating").getAsDouble();
+        markerPoint = new LatLng(pathJson.get("marker_point").getAsJsonArray().get(0).getAsDouble(), pathJson.get("marker_point").getAsJsonArray().get(1).getAsDouble());
+        JsonArray boundaries = pathJson.get("boundaries").getAsJsonArray();
+        bounds = new LatLngBounds(new LatLng(boundaries.get(0).getAsDouble(), boundaries.get(1).getAsDouble()), new LatLng(boundaries.get(2).getAsDouble(), boundaries.get(3).getAsDouble()));
+        JsonArray points_of_interest = pathJson.get("points_of_interest").getAsJsonArray();
+        for (int i = 0; i < points_of_interest.size(); i++) {
+            PointOfInterest newPointOfInterest = new PointOfInterest(points_of_interest.get(i).getAsJsonObject(), this);
             pointsOfInterest.add(newPointOfInterest);
             PathMap.getInstance().getPointOfInterestList().put(newPointOfInterest.getId(), newPointOfInterest);
         }
-        JSONArray group_walks = pathJson.getJSONArray("group_walks");
-        for (int i = 0; i < group_walks.length(); i++) {
-            JSONObject groupWalk = group_walks.getJSONObject(i);
-            JSONArray attendees = groupWalk.getJSONArray("attendees");
-            ArrayList<String> attendeesList = new ArrayList<>();
-            for (int j = 0; j < attendees.length(); j++) {
-                attendeesList.add(attendees.getJSONObject(j).getString("nickname"));
-            }
-            GroupWalk newGroupWalk = new GroupWalk(this, groupWalk.getInt("id"), groupWalk.getString("title"), groupWalk.getLong("time"), attendeesList, groupWalk.getString("submitter"), groupWalk.getBoolean("attending"), groupWalk.getBoolean("editable"));
-            groupWalks.add(newGroupWalk);
+        JsonArray groupWalks = pathJson.get("group_walks").getAsJsonArray();
+        for (int i = 0; i < groupWalks.size(); i++) {
+            GroupWalk newGroupWalk = new GroupWalk(groupWalks.get(i).getAsJsonObject(), this);
+            this.groupWalks.add(newGroupWalk);
         }
-        JSONArray routes = pathJson.getJSONArray("routes");
-        for (int i = 0; i < routes.length(); i++) {
-            JSONObject route = routes.getJSONObject(i);
-            ArrayList<Double> routeLatitudes = new ArrayList<>();
-            ArrayList<Double> routeLongitudes = new ArrayList<>();
-            ArrayList<Double> routeAltitudes = new ArrayList<>();
-            for (int j = 0; j < route.getJSONArray("latitudes").length(); j++) {
-                routeLatitudes.add(route.getJSONArray("latitudes").getDouble(j));
-                routeLongitudes.add(route.getJSONArray("longitudes").getDouble(j));
-                routeAltitudes.add(route.getJSONArray("altitudes").getDouble(j));
-            }
-            boolean editable = route.getBoolean("editable");
-            int routeId = route.getInt("id");
-            routeList.add(new Route(routeId, this, editable, routeLatitudes, routeLongitudes, routeAltitudes));
+        JsonArray routes = pathJson.get("routes").getAsJsonArray();
+        for (int i = 0; i < routes.size(); i++) {
+            JsonObject route = routes.get(i).getAsJsonObject();
+            routeList.add(new Route(route, this));
         }
     }
 
@@ -119,13 +99,9 @@ public class Path {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
-                    try {
-                        Path newPath = new Path(new JSONObject(response.body().getAsJsonObject().toString()).getJSONObject("path"));
-                        PathMap.getInstance().addPath(newPath);
-                        callback.onGetPathSuccess(newPath);
-                    } catch (JSONException e) {
-                        Log.e("Path", "Getting path from update response", e);
-                    }
+                    Path newPath = new Path(response.body().getAsJsonObject().get("path").getAsJsonObject());
+                    PathMap.getInstance().addPath(newPath);
+                    callback.onGetPathSuccess(newPath);
                 }
             }
 
@@ -237,30 +213,25 @@ public class Path {
     }
 
     public void edit(Context context, String title, PathChangeCallback callback) {
-        JSONObject request = new JSONObject();
-        try {
-            request.put("name", title);
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> editPath = MainActivity.getRetrofitRequests(context).editPath(id, body);
-            editPath.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        Path.this.name = title;
-                        callback.onEditSuccess();
-                    }
+        JsonObject request = new JsonObject();
+        request.addProperty("name", title);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> editPath = MainActivity.getRetrofitRequests(context).editPath(id, body);
+        editPath.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    Path.this.name = title;
+                    callback.onEditSuccess();
                 }
+            }
 
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("Path", "Sending edit group walk request", t);
-                    callback.onEditFailure();
-                }
-            });
-        } catch (JSONException e) {
-            Log.e("Path", "Creating edit path request", e);
-            callback.onEditFailure();
-        }
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("Path", "Sending edit group walk request", t);
+                callback.onEditFailure();
+            }
+        });
     }
 
     public void walk(Context context) {
@@ -269,11 +240,7 @@ public class Path {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
-                    try {
-                        Path.this.walkCount = new JSONObject(response.body().toString()).getInt("new_count");
-                    } catch (JSONException e) {
-                        Log.e("Path", "Getting walk count from walk response", e);
-                    }
+                    Path.this.walkCount = response.body().getAsJsonObject().get("new_count").getAsInt();
                 }
             }
 
@@ -292,66 +259,53 @@ public class Path {
         }
         if (!isLoadingReviews) {
             isLoadingReviews = true;
-            JSONObject request = new JSONObject();
-            try {
-                request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-                Call<JsonElement> getReviews = MainActivity.getRetrofitRequests(context).getPathReviews(id, nextReviewPage, body);
-                getReviews.enqueue(new Callback<JsonElement>() {
-                    @Override
-                    public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                        if (response.isSuccessful()) {
-                            try {
-                                JSONObject responseJson = new JSONObject(response.body().getAsJsonObject().toString());
-                                JSONArray reviews = responseJson.getJSONArray("reviews");
-                                for (int i = 0; i < reviews.length(); i++) {
-                                    JSONObject review = reviews.getJSONObject(i);
-                                    boolean exists = false;
-                                    for (Review pathReview : Path.this.reviews) {
-                                        if (pathReview.getId() == review.getInt("id")) {
-                                            exists = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!exists) {
-                                        Review newReview = new Review(Review.ReviewType.PATH, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"));
-                                        Path.this.reviews.add(newReview);
-                                    }
+            JsonObject request = new JsonObject();
+            request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> getReviews = MainActivity.getRetrofitRequests(context).getPathReviews(id, nextReviewPage, body);
+            getReviews.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    if (response.isSuccessful()) {
+                        JsonObject responseJson = response.body().getAsJsonObject();
+                        JsonArray reviews = responseJson.get("reviews").getAsJsonArray();
+                        for (int i = 0; i < reviews.size(); i++) {
+                            JsonObject review = reviews.get(i).getAsJsonObject();
+                            boolean exists = false;
+                            for (Review pathReview : Path.this.reviews) {
+                                if (pathReview.getId() == review.get("id").getAsInt()) {
+                                    exists = true;
+                                    break;
                                 }
-                                if (responseJson.has("own_review")) {
-                                    JSONObject review = responseJson.getJSONArray("own_review").getJSONObject(0);
-                                    ownReview = new Review(Review.ReviewType.PATH, review.getInt("id"), id, review.getString("submitter"), review.getInt("rating"), review.getString("text"));
-                                }
-                                rating = responseJson.getDouble("average_rating");
-                                nextReviewPage++;
-                                isLoadingReviews = false;
-                                callback.onGetReviewSuccess();
-                            } catch (JSONException e) {
-                                Log.e("Path", "Getting reviews from response", e);
-                                isLoadingReviews = false;
-                                callback.onGetReviewFailure();
                             }
-                        } else {
-                            if (nextReviewPage > 1) {
-                                Toast.makeText(context, R.string.no_more_reviews, Toast.LENGTH_SHORT).show();
-                            } else {
-                                isLoadingReviews = false;
-                                callback.onGetReviewFailure();
+                            if (!exists) {
+                                Review newReview = new Review(review, id, Review.ReviewType.PATH);
+                                Path.this.reviews.add(newReview);
                             }
                         }
+                        if (responseJson.has("own_review")) {
+                            ownReview = new Review(responseJson.get("own_review").getAsJsonArray().get(0).getAsJsonObject(), id, Review.ReviewType.PATH);
+                        }
+                        rating = responseJson.get("average_rating").getAsDouble();
+                        nextReviewPage++;
+                        isLoadingReviews = false;
+                        callback.onGetReviewSuccess();
+                    } else {
+                        if (nextReviewPage > 1) {
+                            Toast.makeText(context, R.string.no_more_reviews, Toast.LENGTH_SHORT).show();
+                        } else {
+                            isLoadingReviews = false;
+                            callback.onGetReviewFailure();
+                        }
                     }
+                }
 
-                    @Override
-                    public void onFailure(Call<JsonElement> call, Throwable t) {
-                        Log.e("Path", "Sending get reviews request", t);
-                        callback.onGetReviewFailure();
-                    }
-                });
-            } catch (JSONException e) {
-                Log.e("Path", "Creating get reviews request", e);
-                isLoadingReviews = false;
-                callback.onGetReviewFailure();
-            }
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.e("Path", "Sending get reviews request", t);
+                    callback.onGetReviewFailure();
+                }
+            });
         }
     }
 
@@ -363,60 +317,48 @@ public class Path {
         }
         if (!isLoadingPictures) {
             isLoadingPictures = true;
-            JSONObject request = new JSONObject();
-            try {
-                request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-                RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-                Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPathPictures(id, nextPicturePage, body);
-                getPictures.enqueue(new Callback<JsonElement>() {
-                    @Override
-                    public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                        if (response.isSuccessful()) {
-                            try {
-                                JSONArray pictures = new JSONObject(response.body().getAsJsonObject().toString()).getJSONArray("pictures");
-                                for (int i = 0; i < pictures.length(); i++) {
-                                    JSONObject picture = pictures.getJSONObject(i);
-                                    boolean exists = false;
-                                    for (Picture pathPicture : Path.this.pictures) {
-                                        if (pathPicture.getId() == picture.getInt("id")) {
-                                            exists = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!exists) {
-                                        Picture newPicture = new Picture(Picture.PictureType.PATH, picture.getInt("id"), id, picture.getString("url"), picture.getInt("width"), picture.getInt("height"), picture.getString("description"), picture.getString("submitter"), picture.getBoolean("editable"));
-                                        Path.this.pictures.add(newPicture);
-                                    }
+            JsonObject request = new JsonObject();
+            request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+            Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPathPictures(id, nextPicturePage, body);
+            getPictures.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    if (response.isSuccessful()) {
+                        JsonArray pictures = response.body().getAsJsonObject().get("pictures").getAsJsonArray();
+                        for (int i = 0; i < pictures.size(); i++) {
+                            JsonObject picture = pictures.get(i).getAsJsonObject();
+                            boolean exists = false;
+                            for (Picture pathPicture : Path.this.pictures) {
+                                if (pathPicture.getId() == picture.get("id").getAsInt()) {
+                                    exists = true;
+                                    break;
                                 }
-                                nextPicturePage++;
-                                isLoadingPictures = false;
-                                callback.onGetPicturesSuccess();
-                            } catch (JSONException e) {
-                                Log.e("Path", "Getting photos from response", e);
-                                isLoadingPictures = false;
-                                callback.onGetPicturesFailure();
                             }
-                        } else {
-                            if (nextPicturePage > 1) {
-                                Toast.makeText(context, R.string.no_more_photos, Toast.LENGTH_SHORT).show();
-                            } else {
-                                isLoadingPictures = false;
-                                callback.onGetPicturesFailure();
+                            if (!exists) {
+                                Picture newPicture = new Picture(picture, id, Picture.PictureType.PATH);
+                                Path.this.pictures.add(newPicture);
                             }
                         }
+                        nextPicturePage++;
+                        isLoadingPictures = false;
+                        callback.onGetPicturesSuccess();
+                    } else {
+                        if (nextPicturePage > 1) {
+                            Toast.makeText(context, R.string.no_more_photos, Toast.LENGTH_SHORT).show();
+                        } else {
+                            isLoadingPictures = false;
+                            callback.onGetPicturesFailure();
+                        }
                     }
+                }
 
-                    @Override
-                    public void onFailure(Call<JsonElement> call, Throwable t) {
-                        Log.e("Path", "Sending get photos request", t);
-                        callback.onGetPicturesFailure();
-                    }
-                });
-            } catch (JSONException e) {
-                Log.e("Path", "Creating get photos request", e);
-                isLoadingPictures = false;
-                callback.onGetPicturesFailure();
-            }
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.e("Path", "Sending get photos request", t);
+                    callback.onGetPicturesFailure();
+                }
+            });
         }
     }
 }

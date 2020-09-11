@@ -6,13 +6,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,17 +55,13 @@ public class PreferencesManager {
         statistics.edit().putFloat("distance_walked", distance + oldDistance).apply();
         increaseTimesWalked();
         updateLongestWalk(distance);
-        ArrayList<JSONObject> goals = getGoals();
-        try {
-            for (JSONObject goal : goals) {
-                if (Calendar.getInstance().getTimeInMillis() < goal.getLong("end_time")) {
-                    goal.put("progress", goal.getDouble("progress") + distance);
-                }
+        ArrayList<JsonObject> goals = getGoals();
+        for (JsonObject goal : goals) {
+            if (Calendar.getInstance().getTimeInMillis() < goal.get("end_time").getAsLong()) {
+                goal.addProperty("progress", goal.get("progress").getAsDouble() + distance);
             }
-            setGoals(goals);
-        } catch (JSONException e) {
-            Log.e("PreferencesManager", "Adding distance walked", e);
         }
+        setGoals(goals);
     }
 
     public void increaseTimesWalked() {
@@ -187,76 +181,64 @@ public class PreferencesManager {
     }
 
 
-    public ArrayList<JSONObject> getGoals() {
-        ArrayList<JSONObject> goalsList = new ArrayList<>();
-        try {
-            JSONArray goalsJsonArray = new JSONArray(preferences.getString("goals", "[]"));
-            for (int i = 0; i < goalsJsonArray.length(); i++) {
-                goalsList.add(goalsJsonArray.getJSONObject(i));
-            }
-        } catch (JSONException e) {
-            Log.e("PreferencesManager", "Getting goals", e);
+    public ArrayList<JsonObject> getGoals() {
+        ArrayList<JsonObject> goalsList = new ArrayList<>();
+        JsonArray goalsJsonArray = JsonParser.parseString(preferences.getString("goals", "[]")).getAsJsonArray();
+        for (int i = 0; i < goalsJsonArray.size(); i++) {
+            goalsList.add(goalsJsonArray.get(i).getAsJsonObject());
         }
         return goalsList;
     }
 
-    public void setGoals(ArrayList<JSONObject> goals) {
-        JSONArray goalsJsonArray = new JSONArray();
-        for (JSONObject goal : goals) {
-            goalsJsonArray.put(goal);
+    public void setGoals(ArrayList<JsonObject> goals) {
+        JsonArray goalsJsonArray = new JsonArray();
+        for (JsonObject goal : goals) {
+            goalsJsonArray.add(goal);
         }
         preferences.edit().putString("goals", goalsJsonArray.toString()).apply();
     }
 
     public void addGoal(long startTime, long endTime, double distanceGoal) {
-        try {
-            JSONObject newGoal = new JSONObject();
-            newGoal.put("start_time", startTime);
-            newGoal.put("end_time", endTime);
-            newGoal.put("distance_goal", distanceGoal);
-            newGoal.put("progress", 0.0);
-            ArrayList<JSONObject> goals = getGoals();
-            goals.add(0, newGoal);
-            setGoals(goals);
-        } catch (JSONException e) {
-            Log.e("PreferencesManager", "Adding goal", e);
-        }
+        JsonObject newGoal = new JsonObject();
+        newGoal.addProperty("start_time", startTime);
+        newGoal.addProperty("end_time", endTime);
+        newGoal.addProperty("distance_goal", distanceGoal);
+        newGoal.addProperty("progress", 0.0);
+        ArrayList<JsonObject> goals = getGoals();
+        goals.add(0, newGoal);
+        setGoals(goals);
     }
 
     public void editGoal(int position, long endTime, double distanceGoal) {
-        try {
-            ArrayList<JSONObject> goals = getGoals();
-            JSONObject goal = goals.get(position);
-            goal.put("end_time", endTime);
-            goal.put("distance_goal", distanceGoal);
-            setGoals(goals);
-        } catch (JSONException e) {
-            Log.e("PreferencesManager", "Editing goal", e);
-        }
+        ArrayList<JsonObject> goals = getGoals();
+        JsonObject goal = goals.get(position);
+        goal.addProperty("end_time", endTime);
+        goal.addProperty("distance_goal", distanceGoal);
+        setGoals(goals);
     }
 
     public void removeGoal(int position) {
-        ArrayList<JSONObject> goals = getGoals();
+        ArrayList<JsonObject> goals = getGoals();
         goals.remove(position);
         setGoals(goals);
     }
 
     public void exportPreferences(Uri location) {
-        JSONObject preferencesJson = new JSONObject();
-        JSONObject statisticsJson = new JSONObject();
+        JsonObject preferencesJson = new JsonObject();
+        JsonObject statisticsJson = new JsonObject();
+        for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
+            preferencesJson.addProperty(entry.getKey(), entry.getValue().toString());
+        }
+        for (Map.Entry<String, ?> entry : statistics.getAll().entrySet()) {
+            statisticsJson.addProperty(entry.getKey(), (Number) entry.getValue());
+        }
+        preferencesJson.add("statistics", statisticsJson);
         try {
-            for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
-                preferencesJson.put(entry.getKey(), entry.getValue().toString());
-            }
-            for (Map.Entry<String, ?> entry : statistics.getAll().entrySet()) {
-                statisticsJson.put(entry.getKey(), entry.getValue());
-            }
-            preferencesJson.put("statistics", statisticsJson);
             OutputStream outputStream = context.getContentResolver().openOutputStream(location);
             Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             writer.write(preferencesJson.toString());
             writer.close();
-        } catch (JSONException | IOException e) {
+        } catch (IOException e) {
             Log.e("PreferencesManager", "Exporting preferences", e);
         }
     }
