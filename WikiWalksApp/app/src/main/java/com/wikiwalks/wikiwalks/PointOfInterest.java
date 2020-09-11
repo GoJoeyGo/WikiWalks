@@ -62,14 +62,12 @@ public class PointOfInterest {
 
     public static void submit(Context context, String name, double latitude, double longitude, Path path, PointOfInterestSubmitCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            attributes.put("path", path.getId());
-            attributes.put("latitude", latitude);
-            attributes.put("longitude", longitude);
-            attributes.put("name", name);
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
+            request.put("path", path.getId());
+            request.put("latitude", latitude);
+            request.put("longitude", longitude);
+            request.put("name", name);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> newPointOfInterest = MainActivity.getRetrofitRequests(context).newPoI(body);
             newPointOfInterest.enqueue(new Callback<JsonElement>() {
@@ -156,10 +154,8 @@ public class PointOfInterest {
 
     public void edit(Context context, String name, PointOfInterestEditCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("name", name);
-            request.put("attributes", attributes);
+            request.put("name", name);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> editPointOfInterest = MainActivity.getRetrofitRequests(context).editPoI(id, body);
             editPointOfInterest.enqueue(new Callback<JsonElement>() {
@@ -187,10 +183,8 @@ public class PointOfInterest {
 
     public void delete(Context context, PointOfInterestEditCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> editPointOfInterest = MainActivity.getRetrofitRequests(context).deletePoI(id, body);
             editPointOfInterest.enqueue(new Callback<JsonElement>() {
@@ -229,10 +223,8 @@ public class PointOfInterest {
         if (!isLoadingReviews) {
             isLoadingReviews = true;
             JSONObject request = new JSONObject();
-            JSONObject attributes = new JSONObject();
             try {
-                attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-                request.put("attributes", attributes);
+                request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
                 Call<JsonElement> getReviews = MainActivity.getRetrofitRequests(context).getPoIReviews(id, nextReviewPage, body);
                 getReviews.enqueue(new Callback<JsonElement>() {
@@ -302,10 +294,8 @@ public class PointOfInterest {
         if (!isLoadingPictures) {
             isLoadingPictures = true;
             JSONObject request = new JSONObject();
-            JSONObject attributes = new JSONObject();
             try {
-                attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-                request.put("attributes", attributes);
+                request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
                 Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPoIPictures(id, nextPicturePage, body);
                 getPictures.enqueue(new Callback<JsonElement>() {

@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    static RetrofitRequests retrofitRequests;
+    private static RetrofitRequests retrofitRequests;
     Bundle savedInstanceState = null;
 
     public interface CheckPermissionsCallback {
@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStackImmediate();
-
         } else {
             finish();
         }

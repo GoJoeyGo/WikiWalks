@@ -42,10 +42,8 @@ public class PathMap {
 
     public void updatePaths(LatLngBounds bounds, Context context) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> getPaths = MainActivity.getRetrofitRequests(context).getPaths(bounds.northeast.latitude, bounds.northeast.longitude, bounds.southwest.latitude, bounds.southwest.longitude, body);
             getPaths.enqueue(new Callback<JsonElement>() {

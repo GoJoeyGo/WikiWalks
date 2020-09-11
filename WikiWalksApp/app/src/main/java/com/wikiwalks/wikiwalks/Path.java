@@ -111,10 +111,8 @@ public class Path {
     }
 
     public static void getPath(Context context, int id, GetPathCallback callback) {
-        JsonObject attributes = new JsonObject();
         JsonObject request = new JsonObject();
-        attributes.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
-        request.add("attributes", attributes);
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
         Call<JsonElement> updatePath = MainActivity.getRetrofitRequests(context).updatePath(id, body);
         updatePath.enqueue(new Callback<JsonElement>() {
@@ -240,10 +238,8 @@ public class Path {
 
     public void edit(Context context, String title, PathChangeCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("name", title);
-            request.put("attributes", attributes);
+            request.put("name", title);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> editPath = MainActivity.getRetrofitRequests(context).editPath(id, body);
             editPath.enqueue(new Callback<JsonElement>() {
@@ -297,10 +293,8 @@ public class Path {
         if (!isLoadingReviews) {
             isLoadingReviews = true;
             JSONObject request = new JSONObject();
-            JSONObject attributes = new JSONObject();
             try {
-                attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-                request.put("attributes", attributes);
+                request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
                 Call<JsonElement> getReviews = MainActivity.getRetrofitRequests(context).getPathReviews(id, nextReviewPage, body);
                 getReviews.enqueue(new Callback<JsonElement>() {
@@ -370,10 +364,8 @@ public class Path {
         if (!isLoadingPictures) {
             isLoadingPictures = true;
             JSONObject request = new JSONObject();
-            JSONObject attributes = new JSONObject();
             try {
-                attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-                request.put("attributes", attributes);
+                request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
                 Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPathPictures(id, nextPicturePage, body);
                 getPictures.enqueue(new Callback<JsonElement>() {

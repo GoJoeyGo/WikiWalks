@@ -44,12 +44,10 @@ public class Review {
 
     public static void submit(Context context, ReviewType type, int parentId, String message, int rating, EditReviewCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            attributes.put("text", message);
-            attributes.put("rating", rating);
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
+            request.put("text", message);
+            request.put("rating", rating);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> newReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).newPathReview(parentId, body) : MainActivity.getRetrofitRequests(context).newPoIReview(parentId, body);
             newReview.enqueue(new Callback<JsonElement>() {
@@ -109,12 +107,10 @@ public class Review {
 
     public void edit(Context context, String message, int rating, EditReviewCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("text", message);
-            attributes.put("rating", rating);
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
+            request.put("text", message);
+            request.put("rating", rating);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> editReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).editPathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).editPoIReview(parentId, id, body);
             editReview.enqueue(new Callback<JsonElement>() {
@@ -150,10 +146,8 @@ public class Review {
 
     public void delete(final Context context, EditReviewCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> deleteReview = (type == ReviewType.PATH) ? MainActivity.getRetrofitRequests(context).deletePathReview(parentId, id, body) : MainActivity.getRetrofitRequests(context).deletePoIReview(parentId, id, body);
             deleteReview.enqueue(new Callback<JsonElement>() {

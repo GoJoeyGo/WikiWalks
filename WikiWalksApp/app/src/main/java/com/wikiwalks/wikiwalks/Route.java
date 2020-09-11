@@ -25,9 +25,9 @@ import retrofit2.Response;
 
 public class Route implements Serializable {
 
-    int id;
-    Path path;
-    boolean editable;
+    private int id;
+    private Path path;
+    private boolean editable;
 
     private ArrayList<Double> latitudes;
     private ArrayList<Double> longitudes;
@@ -64,18 +64,16 @@ public class Route implements Serializable {
 
     public static void submit(Context context, Path path, String title, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, RouteModifyCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            attributes.put("latitudes", new JSONArray(latitudes));
-            attributes.put("longitudes", new JSONArray(longitudes));
-            attributes.put("altitudes", new JSONArray(altitudes));
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
+            request.put("latitudes", new JSONArray(latitudes));
+            request.put("longitudes", new JSONArray(longitudes));
+            request.put("altitudes", new JSONArray(altitudes));
             if (path != null) {
-                attributes.put("path", path.id);
+                request.put("path", path.id);
             } else {
-                attributes.put("name", title);
+                request.put("name", title);
             }
-            request.put("attributes", attributes);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> newRoute = MainActivity.getRetrofitRequests(context).newRoute(body);
             newRoute.enqueue(new Callback<JsonElement>() {
@@ -155,10 +153,8 @@ public class Route implements Serializable {
 
     public void delete(final Context context, RouteModifyCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> deleteRoute = MainActivity.getRetrofitRequests(context).deleteRoute(id, body);
             deleteRoute.enqueue(new Callback<JsonElement>() {

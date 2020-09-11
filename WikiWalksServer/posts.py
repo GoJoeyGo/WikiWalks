@@ -45,7 +45,7 @@ def get_time():
 def set_name():
     try:
         user_schema = UserSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         user.nickname = request_json["name"]
         db.session.commit()
@@ -59,7 +59,7 @@ def set_name():
 def add_route():
     try:
         path_schema = PathSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         if len(request_json["latitudes"]) == len(request_json["longitudes"]) == len(request_json["altitudes"]) \
                 and len(request_json["latitudes"]) > 10:
             user = get_submitter(request_json["device_id"])
@@ -107,7 +107,7 @@ def add_route():
 @posts.route("/routes/<route_id>/delete", methods=["POST"])
 def delete_route(route_id):
     try:
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         route = Route.query.get(route_id)
         path = Path.query.filter_by(id=route.path).first()
@@ -137,7 +137,7 @@ def delete_route(route_id):
 def edit_path(path_id):
     try:
         path_schema = PathSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         path = Path.query.filter_by(id=path_id)
         path.update(dict(path_schema.load(request_json, partial=True)))
         db.session.commit()
@@ -163,7 +163,7 @@ def walk_path(path_id):
 def add_poi():
     try:
         poi_schema = PointOfInterestSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         request_json["created_time"] = get_time()
         user = get_submitter(request_json["device_id"])
         data = poi_schema.load(request_json)
@@ -181,7 +181,7 @@ def add_poi():
 def edit_poi(poi_id):
     try:
         poi_schema = PointOfInterestSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         poi = PointOfInterest.query.filter_by(id=poi_id)
         poi.update(dict(poi_schema.load(request_json, partial=True)))
         db.session.commit()
@@ -194,7 +194,7 @@ def edit_poi(poi_id):
 @posts.route("/pois/<poi_id>/delete", methods=["POST"])
 def delete_point_of_interest(poi_id):
     try:
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         poi = PointOfInterest.query.get(poi_id)
         if poi in user.points_of_interest:
@@ -212,7 +212,7 @@ def delete_point_of_interest(poi_id):
 def add_group_walk(path_id):
     try:
         gw_schema = GroupWalkSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         path = Path.query.filter_by(id=path_id).first()
         user = get_submitter(request_json["device_id"])
         new_gw = GroupWalk(submitter=user.id, created_time=get_time(), path_id=path.id, time=request_json["time"],
@@ -230,7 +230,7 @@ def add_group_walk(path_id):
 def edit_group_walk(path_id, group_walk_id):
     try:
         gw_schema = GroupWalkSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         group_walk = GroupWalk.query.filter_by(id=group_walk_id)
         if group_walk.first() in user.group_walks:
@@ -247,7 +247,7 @@ def edit_group_walk(path_id, group_walk_id):
 @posts.route("/paths/<path_id>/group_walks/<group_walk_id>/delete", methods=["POST"])
 def delete_group_walk(path_id, group_walk_id):
     try:
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         group_walk = GroupWalk.query.filter_by(id=group_walk_id).first()
         if group_walk in user.group_walks:
@@ -264,7 +264,7 @@ def delete_group_walk(path_id, group_walk_id):
 @posts.route("/paths/<path_id>/group_walks/<group_walk_id>/attend", methods=["POST"])
 def toggle_group_walk_attendance(path_id, group_walk_id):
     try:
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         group_walk = GroupWalk.query.get(group_walk_id)
         gw_schema = GroupWalkSchema()
@@ -286,7 +286,7 @@ def toggle_group_walk_attendance(path_id, group_walk_id):
 def add_poi_review(poi_id):
     try:
         poi_review_schema = PointOfInterestReviewSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         if request_json["rating"] > 5 or request_json["rating"] < 0:
             return jsonify({"status": "failed"}), 403
         point_of_interest = PointOfInterest.query.filter_by(id=poi_id).first()
@@ -315,7 +315,7 @@ def add_poi_review(poi_id):
 def edit_poi_review(poi_id, poi_review_id):
     try:
         poi_review_schema = PointOfInterestReviewSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         if request_json["rating"] > 5 or request_json["rating"] < 0:
             return jsonify({"status": "failed"}), 403
         user = get_submitter(request_json["device_id"])
@@ -337,7 +337,7 @@ def edit_poi_review(poi_id, poi_review_id):
 @posts.route("/pois/<poi_id>/reviews/<poi_review_id>/delete", methods=["POST"])
 def delete_poi_review(poi_id, poi_review_id):
     try:
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         poi_review = PointOfInterestReview.query.get(poi_review_id)
         poi = PointOfInterest.query.filter_by(id=poi_review.point_of_interest_id).first()
@@ -362,7 +362,7 @@ def delete_poi_review(poi_id, poi_review_id):
 def add_path_review(path_id):
     try:
         path_review_schema = PathReviewSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         if request_json["rating"] > 5 or request_json["rating"] < 0:
             return jsonify({"status": "failed"}), 403
         path = Path.query.filter_by(id=path_id).first()
@@ -390,7 +390,7 @@ def add_path_review(path_id):
 def edit_path_review(path_id, path_review_id):
     try:
         path_review_schema = PathReviewSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         if request_json["rating"] > 5 or request_json["rating"] < 0:
             return jsonify({"status": "failed"}), 403
         user = get_submitter(request_json["device_id"])
@@ -412,7 +412,7 @@ def edit_path_review(path_id, path_review_id):
 @posts.route("/paths/<path_id>/reviews/<path_review_id>/delete", methods=["POST"])
 def delete_path_review(path_id, path_review_id):
     try:
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         path_review = PathReview.query.get(path_review_id)
         path = Path.query.filter_by(id=path_review.path_id).first()
@@ -461,7 +461,7 @@ def add_path_picture(path_id):
 def edit_path_picture(path_id, path_picture_id):
     try:
         path_picture_schema = PathPictureSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         path_picture = PathPicture.query.filter_by(id=path_picture_id)
         if path_picture.first() in user.path_pictures:
@@ -479,7 +479,7 @@ def edit_path_picture(path_id, path_picture_id):
 @posts.route("/paths/<path_id>/pictures/<path_picture_id>/delete", methods=["POST"])
 def delete_path_picture(path_id, path_picture_id):
     try:
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         path_picture = PathPicture.query.get(path_picture_id)
         if path_picture in user.path_pictures:
@@ -524,7 +524,7 @@ def add_poi_picture(poi_id):
 def edit_poi_picture(poi_id, poi_picture_id):
     try:
         poi_picture_schema = PointOfInterestPictureSchema()
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         poi_picture = PointOfInterestPicture.query.filter_by(id=poi_picture_id)
         if poi_picture.first() in user.poi_pictures:
@@ -541,7 +541,7 @@ def edit_poi_picture(poi_id, poi_picture_id):
 @posts.route("/pois/<poi_id>/pictures/<poi_picture_id>/delete", methods=["POST"])
 def delete_poi_picture(poi_id, poi_picture_id):
     try:
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         poi_picture = PointOfInterestPicture.query.get(poi_picture_id)
         if poi_picture in user.poi_pictures:

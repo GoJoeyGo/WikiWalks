@@ -26,7 +26,7 @@ def get_path(path_id):
         if group_walk.time > int(datetime.now().timestamp()):
             group_walks.append(group_walk)
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         if path in user.paths:
             path.editable = True
@@ -70,7 +70,7 @@ def get_paths():
              (east_boundary < west_boundary <= path.boundaries[3] <= 180 + (180 - east_boundary)))):
             in_range_paths.append(path)
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         for path in in_range_paths:
             if path in user.paths:
@@ -112,12 +112,12 @@ def path_review_list(path_id):
     reviews = PathReview.query.filter_by(path_id=path_id).order_by(PathReview.created_time.desc())
     own_review = None
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         for review in reviews:
             if review in user.path_reviews:
                 review.editable = True
-                if (page == 1):
+                if page == 1:
                     own_review = review
                 reviews = reviews.filter(PathReview.submitter != user.id)
     for review in reviews:
@@ -138,7 +138,7 @@ def path_pictures_list(path_id):
     page = request.args.get('page', default=1, type=int)
     pictures = PathPicture.query.filter_by(path_id=path_id).order_by(PathPicture.created_time.desc())
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         for picture in pictures:
             if picture in user.path_pictures:
@@ -161,7 +161,7 @@ def get_group_walks(path_id):
             group_walk.submitter = User.query.filter_by(id=group_walk.submitter).first().nickname
             upcoming_group_walks.append(group_walk)
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         print(request.get_json(force=True))
         user = get_submitter(request_json["device_id"])
         for group_walk in upcoming_group_walks:
@@ -178,7 +178,7 @@ def get_poi(poi_id):
     if poi is None:
         return jsonify({"error": "poi not found"}), 404
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         if poi in user.points_of_interest:
             poi.editable = True
@@ -201,7 +201,7 @@ def get_pois():
         if north_boundary > lat > south_boundary and east_boundary > long > west_boundary:
             in_range_pois.append(poi)
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         for poi in in_range_pois:
             if poi in user.points_of_interest:
@@ -219,12 +219,12 @@ def poi_review_list(poi_id):
         .order_by(PointOfInterestReview.created_time.desc())
     own_review = None
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         for review in reviews:
             if review in user.poi_reviews:
                 review.editable = True
-                if (page == 1):
+                if page == 1:
                     own_review = review
                 reviews = reviews.filter(PointOfInterestReview.submitter != user.id)
     for review in reviews:
@@ -243,9 +243,10 @@ def poi_review_list(poi_id):
 @gets.route("/pois/<poi_id>/pictures", methods=["GET", "POST"])
 def poi_pictures_list(poi_id):
     page = request.args.get('page', default=1, type=int)
-    pictures = PointOfInterestPicture.query.filter_by(point_of_interest_id=poi_id).order_by(PointOfInterestPicture.created_time.desc())
+    pictures = PointOfInterestPicture.query.filter_by(point_of_interest_id=poi_id)\
+        .order_by(PointOfInterestPicture.created_time.desc())
     if request.method == "POST":
-        request_json = request.get_json(force=True)["attributes"]
+        request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         for picture in pictures:
             if picture in user.poi_pictures:

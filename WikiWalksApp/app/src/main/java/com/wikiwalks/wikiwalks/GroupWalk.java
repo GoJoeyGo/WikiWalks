@@ -21,14 +21,14 @@ import retrofit2.Response;
 
 public class GroupWalk extends DialogFragment {
 
-    int id;
-    String title;
-    long time;
-    ArrayList<String> attendees;
-    String hostName;
-    boolean attending;
-    boolean editable;
-    Path path;
+    private int id;
+    private String title;
+    private long time;
+    private ArrayList<String> attendees;
+    private String hostName;
+    private boolean attending;
+    private boolean editable;
+    private Path path;
 
     public interface EditGroupWalkCallback {
         void onEditSuccess();
@@ -55,13 +55,11 @@ public class GroupWalk extends DialogFragment {
 
     public static void submit(Context context, Path path, long time, String title, EditGroupWalkCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            attributes.put("path_id", path.getId());
-            attributes.put("time", time);
-            attributes.put("title", title);
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
+            request.put("path_id", path.getId());
+            request.put("time", time);
+            request.put("title", title);
         } catch (JSONException e) {
             Log.e("GroupWalk", "Creating new group walk request", e);
         }
@@ -118,10 +116,8 @@ public class GroupWalk extends DialogFragment {
 
     public void toggleAttendance(Context context, AttendGroupWalkCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> attendGroupWalk = MainActivity.getRetrofitRequests(context).attendGroupWalk(path.getId(), this.id, body);
             attendGroupWalk.enqueue(new Callback<JsonElement>() {
@@ -154,12 +150,10 @@ public class GroupWalk extends DialogFragment {
 
     public void edit(Context context, long time, String title, EditGroupWalkCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("title", title);
-            attributes.put("time", time);
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
+            request.put("title", title);
+            request.put("time", time);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> editGroupWalk = MainActivity.getRetrofitRequests(context).editGroupWalk(path.getId(), id, body);
             editGroupWalk.enqueue(new Callback<JsonElement>() {
@@ -186,10 +180,8 @@ public class GroupWalk extends DialogFragment {
 
     public void delete(Context context, EditGroupWalkCallback callback) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> deleteGroupWalk = MainActivity.getRetrofitRequests(context).deleteGroupWalk(path.getId(), id, body);
             deleteGroupWalk.enqueue(new Callback<JsonElement>() {

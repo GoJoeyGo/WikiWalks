@@ -63,11 +63,9 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
     @Override
     public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
         JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
         try {
-            attributes.put("device_id", PreferencesManager.getInstance(getContext()).getDeviceId());
-            attributes.put("name", name);
-            request.put("attributes", attributes);
+            request.put("device_id", PreferencesManager.getInstance(getContext()).getDeviceId());
+            request.put("name", name);
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
             Call<JsonElement> setName = MainActivity.getRetrofitRequests(getContext()).setName(body);
             setName.enqueue(new Callback<JsonElement>() {
