@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.BookmarkedPathRecyclerViewAdapter;
@@ -60,8 +60,8 @@ public class BookmarksFragment extends Fragment {
             ArrayList<Integer> requestPaths = new ArrayList<>();
             for (int i = 0; i < bookmarksArray.length; i++) {
                 int id = Integer.parseInt(bookmarksArray[i]);
-                if (PathMap.getInstance().getPathList().containsKey(id)) {
-                    paths[i] = PathMap.getInstance().getPathList().get(id);
+                if (DataMap.getInstance().getPathList().containsKey(id)) {
+                    paths[i] = DataMap.getInstance().getPathList().get(id);
                 } else {
                     requestPaths.add(i);
                 }

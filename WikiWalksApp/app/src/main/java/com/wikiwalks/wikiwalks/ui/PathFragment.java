@@ -17,8 +17,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
@@ -28,7 +29,7 @@ import com.wikiwalks.wikiwalks.ui.dialogs.NameDialog;
 
 import java.util.ArrayList;
 
-public class PathFragment extends Fragment implements OnMapReadyCallback, NameDialog.EditDialogListener, Path.PathChangeCallback, PathMap.PathMapListener {
+public class PathFragment extends Fragment implements OnMapReadyCallback, NameDialog.EditDialogListener, Path.PathChangeCallback, DataMap.PathMapListener {
 
     private MaterialToolbar toolbar;
     private SupportMapFragment mapFragment;
@@ -49,8 +50,8 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, NameDi
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.path_fragment, container, false);
 
-        path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
-        PathMap.getInstance().addListener(this);
+        path = DataMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        DataMap.getInstance().addListener(this);
 
         toolbar = rootView.findViewById(R.id.path_fragment_toolbar);
         toolbar.setTitle(path.getName());
@@ -115,7 +116,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, NameDi
 
     @Override
     public void onDestroy() {
-        PathMap.getInstance().removeListener(this);
+        DataMap.getInstance().removeListener(this);
         super.onDestroy();
     }
 
@@ -159,7 +160,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, NameDi
 
     @Override
     public void onPathMapUpdateSuccess() {
-        path = PathMap.getInstance().getPathList().get(path.getId());
+        path = DataMap.getInstance().getPathList().get(path.getId());
         if (path != null) {
             for (Polyline polyline : polylines) {
                 polyline.remove();

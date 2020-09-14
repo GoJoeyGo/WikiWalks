@@ -35,7 +35,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.PreferencesManager;
@@ -83,7 +83,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.walk_fragment, container, false);
 
-        path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        path = DataMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         new CountDownTimer(30000, 30000) {
             @Override
             public void onTick(long millisUntilFinished) {

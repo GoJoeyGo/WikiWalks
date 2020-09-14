@@ -18,7 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.wikiwalks.wikiwalks.GroupWalk;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.GroupWalkListFragment;
 
@@ -53,7 +53,7 @@ public class GroupWalkDialog extends DialogFragment implements GroupWalk.EditGro
 
         int pathId = getArguments().getInt("path_id");
         int groupWalkPosition = getArguments().getInt("group_walk_position");
-        path = PathMap.getInstance().getPathList().get(pathId);
+        path = DataMap.getInstance().getPathList().get(pathId);
         calendar = Calendar.getInstance();
 
         title = view.findViewById(R.id.group_walk_dialog_title_input);
@@ -95,7 +95,7 @@ public class GroupWalkDialog extends DialogFragment implements GroupWalk.EditGro
                 .create().show());
 
         if (groupWalkPosition > -1) {
-            walk = PathMap.getInstance().getPathList().get(pathId).getGroupWalksList().get(groupWalkPosition);
+            walk = DataMap.getInstance().getPathList().get(pathId).getGroupWalksList().get(groupWalkPosition);
             title.getEditText().setText(walk.getTitle());
             calendar.setTimeInMillis(walk.getTime() * 1000);
             time.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(calendar.getTime()));

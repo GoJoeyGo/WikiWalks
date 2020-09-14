@@ -73,7 +73,7 @@ public class PointOfInterest {
                 if (response.isSuccessful()) {
                     JsonObject responseJson = response.body().getAsJsonObject().get("poi").getAsJsonObject();
                     PointOfInterest newPointOfInterest = new PointOfInterest(responseJson, path);
-                    PathMap.getInstance().getPointOfInterestList().put(responseJson.get("id").getAsInt(), newPointOfInterest);
+                    DataMap.getInstance().getPointOfInterestList().put(responseJson.get("id").getAsInt(), newPointOfInterest);
                     path.addPointOfInterest(newPointOfInterest);
                     callback.onSubmitPointOfInterestSuccess(newPointOfInterest);
                     PreferencesManager.getInstance(context).changePointsOfInterestMarked(false);
@@ -177,7 +177,7 @@ public class PointOfInterest {
                     path.getPointsOfInterest().remove(PointOfInterest.this);
                     for (Marker marker : markers) marker.remove();
                     markers.clear();
-                    PathMap.getInstance().getPointOfInterestList().remove(id);
+                    DataMap.getInstance().getPointOfInterestList().remove(id);
                     PreferencesManager.getInstance(context).changePointsOfInterestMarked(true);
                     callback.onDeletePointOfInterestSuccess();
                 } else {

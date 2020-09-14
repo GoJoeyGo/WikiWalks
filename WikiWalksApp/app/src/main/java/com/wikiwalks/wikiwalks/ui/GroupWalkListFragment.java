@@ -19,7 +19,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.GroupWalk;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.GroupWalkDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.GroupWalkListRecyclerViewAdapter;
@@ -48,7 +48,7 @@ public class GroupWalkListFragment extends Fragment implements GroupWalk.GetGrou
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.group_walk_list_fragment, container, false);
 
-        path = PathMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
+        path = DataMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
         walks = path.getGroupWalksList();
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.group_walk_list_toolbar);

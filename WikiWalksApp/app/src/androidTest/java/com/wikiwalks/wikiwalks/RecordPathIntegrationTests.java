@@ -42,7 +42,7 @@ public class RecordPathIntegrationTests {
 
     @Test
     public void A_recordRoute() throws InterruptedException {
-        int initialSize = PathMap.getInstance().getPathList().size();
+        int initialSize = DataMap.getInstance().getPathList().size();
         for (int i = 0; i < 10; i++) {
             Location newLocation = new Location("Test");
             newLocation.setLatitude(1 + ((double) (i * 2) / 100000));
@@ -64,7 +64,7 @@ public class RecordPathIntegrationTests {
         fragment.context = appContext;
         fragment.submitRoute("Test", callback);
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(PathMap.getInstance().getPathList().size() > initialSize);
+        assertTrue(DataMap.getInstance().getPathList().size() > initialSize);
     }
 
     @Test
@@ -99,10 +99,10 @@ public class RecordPathIntegrationTests {
 
     @Test
     public void F_deleteRoute() throws InterruptedException {
-        assertTrue(PathMap.getInstance().getPathList().containsValue(path));
+        assertTrue(DataMap.getInstance().getPathList().containsValue(path));
         path.getRoutes().get(0).delete(appContext, mock(Route.RouteModifyCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertFalse(PathMap.getInstance().getPathList().containsValue(path));
+        assertFalse(DataMap.getInstance().getPathList().containsValue(path));
     }
 
 }

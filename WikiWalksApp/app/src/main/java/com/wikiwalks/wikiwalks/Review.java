@@ -54,11 +54,11 @@ public class Review {
                     JsonObject responseJson = response.body().getAsJsonObject().get("review").getAsJsonObject();
                     Review newReview = new Review(responseJson, parentId, type);
                     if (type == ReviewType.PATH) {
-                        Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                        Path parentPath = DataMap.getInstance().getPathList().get(parentId);
                         parentPath.setOwnReview(newReview);
                         parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                     } else {
-                        PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                        PointOfInterest parentPointOfInterest = DataMap.getInstance().getPointOfInterestList().get(parentId);
                         parentPointOfInterest.setOwnReview(newReview);
                         parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                     }
@@ -107,10 +107,10 @@ public class Review {
                     Review.this.message = message;
                     Review.this.rating = rating;
                     if (type == ReviewType.PATH) {
-                        Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                        Path parentPath = DataMap.getInstance().getPathList().get(parentId);
                         parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                     } else {
-                        PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                        PointOfInterest parentPointOfInterest = DataMap.getInstance().getPointOfInterestList().get(parentId);
                         parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                     }
                     callback.onEditReviewSuccess();
@@ -137,11 +137,11 @@ public class Review {
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
                     if (type == ReviewType.PATH) {
-                        Path parentPath = PathMap.getInstance().getPathList().get(parentId);
+                        Path parentPath = DataMap.getInstance().getPathList().get(parentId);
                         parentPath.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                         parentPath.setOwnReview(null);
                     } else {
-                        PointOfInterest parentPointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+                        PointOfInterest parentPointOfInterest = DataMap.getInstance().getPointOfInterestList().get(parentId);
                         parentPointOfInterest.setRating(response.body().getAsJsonObject().get("average_rating").getAsDouble());
                         parentPointOfInterest.setOwnReview(null);
                     }

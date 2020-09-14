@@ -64,7 +64,7 @@ public class Path {
         for (int i = 0; i < points_of_interest.size(); i++) {
             PointOfInterest newPointOfInterest = new PointOfInterest(points_of_interest.get(i).getAsJsonObject(), this);
             pointsOfInterest.add(newPointOfInterest);
-            PathMap.getInstance().getPointOfInterestList().put(newPointOfInterest.getId(), newPointOfInterest);
+            DataMap.getInstance().getPointOfInterestList().put(newPointOfInterest.getId(), newPointOfInterest);
         }
         JsonArray groupWalks = attributes.get("group_walks").getAsJsonArray();
         for (int i = 0; i < groupWalks.size(); i++) {
@@ -88,7 +88,7 @@ public class Path {
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
                     Path newPath = new Path(response.body().getAsJsonObject().get("path").getAsJsonObject());
-                    PathMap.getInstance().addPath(newPath);
+                    DataMap.getInstance().addPath(newPath);
                     callback.onGetPathSuccess(newPath);
                 }
             }

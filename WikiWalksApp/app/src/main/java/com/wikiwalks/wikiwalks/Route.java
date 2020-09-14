@@ -83,7 +83,7 @@ public class Route {
                 if (response.isSuccessful()) {
                     JsonObject responseJson = response.body().getAsJsonObject().get("path").getAsJsonObject();
                     Path newPath = new Path(responseJson);
-                    PathMap.getInstance().addPath(newPath);
+                    DataMap.getInstance().addPath(newPath);
                     callback.onRouteEditSuccess(newPath);
                     PreferencesManager.getInstance(context).changeRoutesRecorded(false);
                 } else {
@@ -158,7 +158,7 @@ public class Route {
                         for (Marker marker : path.getMarkers()) {
                             marker.remove();
                         }
-                        PathMap.getInstance().deletePath(path);
+                        DataMap.getInstance().deletePath(path);
                     }
                     for (Polyline polyline : polylines) {
                         polyline.remove();

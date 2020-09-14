@@ -34,7 +34,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
@@ -86,7 +86,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, N
 
         int pathId = getArguments().getInt("pathId");
         if (pathId > -1) {
-            path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+            path = DataMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         }
 
         if (savedInstanceState != null && savedInstanceState.containsKey("latitudes")) {

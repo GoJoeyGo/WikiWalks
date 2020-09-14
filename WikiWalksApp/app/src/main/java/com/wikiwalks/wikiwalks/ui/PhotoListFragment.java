@@ -20,7 +20,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.MainActivity;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.dialogs.PhotoDialog;
@@ -49,9 +49,9 @@ public class PhotoListFragment extends Fragment implements Photo.GetPhotosCallba
     public void updatePhotosList(boolean refresh) {
         swipeRefreshLayout.setRefreshing(refresh);
         if (type == Photo.PhotoType.PATH) {
-            PathMap.getInstance().getPathList().get(parentId).getPhotos(getContext(), refresh, PhotoListFragment.this);
+            DataMap.getInstance().getPathList().get(parentId).getPhotos(getContext(), refresh, PhotoListFragment.this);
         } else {
-            PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotos(getContext(), refresh, PhotoListFragment.this);
+            DataMap.getInstance().getPointOfInterestList().get(parentId).getPhotos(getContext(), refresh, PhotoListFragment.this);
         }
     }
 
@@ -81,11 +81,11 @@ public class PhotoListFragment extends Fragment implements Photo.GetPhotosCallba
 
         String title;
         if (type == Photo.PhotoType.PATH) {
-            photos = PathMap.getInstance().getPathList().get(parentId).getPhotosList();
-            title = PathMap.getInstance().getPathList().get(parentId).getName();
+            photos = DataMap.getInstance().getPathList().get(parentId).getPhotosList();
+            title = DataMap.getInstance().getPathList().get(parentId).getName();
         } else {
-            photos = PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList();
-            title = PathMap.getInstance().getPointOfInterestList().get(parentId).getName();
+            photos = DataMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList();
+            title = DataMap.getInstance().getPointOfInterestList().get(parentId).getName();
         }
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.photo_list_toolbar);

@@ -69,9 +69,9 @@ public class Photo {
                         JsonObject responseJson = response.body().getAsJsonObject().get("picture").getAsJsonObject();
                         Photo newPhoto = new Photo(responseJson, parentId, type);
                         if (type == PhotoType.PATH) {
-                            PathMap.getInstance().getPathList().get(parentId).getPhotosList().add(0, newPhoto);
+                            DataMap.getInstance().getPathList().get(parentId).getPhotosList().add(0, newPhoto);
                         } else {
-                            PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().add(0, newPhoto);
+                            DataMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().add(0, newPhoto);
                         }
                         PreferencesManager.getInstance(context).changePhotosUploaded(false);
                         callback.onEditPhotoSuccess();
@@ -153,9 +153,9 @@ public class Photo {
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
                     if (type == PhotoType.PATH) {
-                        PathMap.getInstance().getPathList().get(parentId).getPhotosList().remove(Photo.this);
+                        DataMap.getInstance().getPathList().get(parentId).getPhotosList().remove(Photo.this);
                     } else {
-                        PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().remove(Photo.this);
+                        DataMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().remove(Photo.this);
                     }
                     PreferencesManager.getInstance(context).changePhotosUploaded(true);
                     callback.onDeletePhotoSuccess();

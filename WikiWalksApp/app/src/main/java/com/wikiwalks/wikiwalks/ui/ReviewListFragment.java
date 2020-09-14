@@ -21,7 +21,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
@@ -61,11 +61,11 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewsCal
         type = (Review.ReviewType) getArguments().getSerializable("type");
         String title;
         if (type == Review.ReviewType.PATH) {
-            path = PathMap.getInstance().getPathList().get(parentId);
+            path = DataMap.getInstance().getPathList().get(parentId);
             reviews = path.getReviewsList();
             title = path.getName();
         } else {
-            pointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+            pointOfInterest = DataMap.getInstance().getPointOfInterestList().get(parentId);
             reviews = pointOfInterest.getReviewsList();
             title = pointOfInterest.getName();
         }

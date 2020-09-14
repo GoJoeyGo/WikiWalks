@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
 
@@ -76,7 +76,7 @@ public class ReviewDialog extends DialogFragment implements Review.EditReviewCal
         listener = (EditReviewDialogListener) getParentFragment();
         parentId = getArguments().getInt("parentId");
         type = (Review.ReviewType) getArguments().getSerializable("type");
-        review = type == Review.ReviewType.PATH ? PathMap.getInstance().getPathList().get(parentId).getOwnReview() : PathMap.getInstance().getPointOfInterestList().get(parentId).getOwnReview();
+        review = type == Review.ReviewType.PATH ? DataMap.getInstance().getPathList().get(parentId).getOwnReview() : DataMap.getInstance().getPointOfInterestList().get(parentId).getOwnReview();
 
         rating = view.findViewById(R.id.review_dialog_rating_bar);
         rating.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {

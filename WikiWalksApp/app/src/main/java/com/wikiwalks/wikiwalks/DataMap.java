@@ -17,9 +17,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PathMap {
+public class DataMap {
 
-    private static PathMap instance = null;
+    private static DataMap instance = null;
     public ArrayList<PathMapListener> changeListeners = new ArrayList<>();
     private LinkedHashMap<Integer, Path> pathList = new LinkedHashMap<>();
     private LinkedHashMap<Integer, PointOfInterest> pointOfInterestList = new LinkedHashMap<>();
@@ -29,12 +29,9 @@ public class PathMap {
         void onPathMapUpdateFailure();
     }
 
-    private PathMap() {
-    }
-
-    public static PathMap getInstance() {
+    public static DataMap getInstance() {
         if (instance == null) {
-            instance = new PathMap();
+            instance = new DataMap();
         }
         return instance;
     }
@@ -57,7 +54,9 @@ public class PathMap {
                     }
                     triggerChangeListeners();
                 } else {
-                    triggerFailedListeners();
+                    if (!response.body().getAsJsonObject().get("status").getAsString().equals("failed - distance too large")) {
+                        triggerFailedListeners();
+                    }
                 }
             }
 

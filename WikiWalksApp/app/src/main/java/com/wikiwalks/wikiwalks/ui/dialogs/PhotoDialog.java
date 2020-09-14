@@ -29,7 +29,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.squareup.picasso.Picasso;
 import com.wikiwalks.wikiwalks.CustomActivityResultContracts;
 import com.wikiwalks.wikiwalks.MainActivity;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.R;
 
@@ -122,7 +122,7 @@ public class PhotoDialog extends DialogFragment implements Photo.EditPhotoCallba
         type = (Photo.PhotoType) getArguments().getSerializable("photo_type");
         parentId = getArguments().getInt("parent_id");
         if (getArguments().getInt("position") > -1) {
-            photo = type == Photo.PhotoType.PATH ? PathMap.getInstance().getPathList().get(parentId).getPhotosList().get(getArguments().getInt("position")) : PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().get(getArguments().getInt("position"));
+            photo = type == Photo.PhotoType.PATH ? DataMap.getInstance().getPathList().get(parentId).getPhotosList().get(getArguments().getInt("position")) : DataMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().get(getArguments().getInt("position"));
         }
 
         imageView = view.findViewById(R.id.photo_dialog_selected_image);

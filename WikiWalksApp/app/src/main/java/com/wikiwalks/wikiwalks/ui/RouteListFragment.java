@@ -21,7 +21,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.RouteListRecyclerViewAdapter;
@@ -50,7 +50,7 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.route_list_fragment, container, false);
 
-        path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        path = DataMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         routes = path.getRoutes();
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.route_list_toolbar);

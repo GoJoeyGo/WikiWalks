@@ -19,7 +19,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
@@ -51,7 +51,7 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.poi_list_fragment, container, false);
 
-        path = PathMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
+        path = DataMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
         pointOfInterestList = path.getPointsOfInterest();
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.poi_list_toolbar);

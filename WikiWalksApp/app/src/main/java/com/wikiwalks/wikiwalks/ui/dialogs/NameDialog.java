@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,7 +12,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 
@@ -54,9 +53,9 @@ public class NameDialog extends DialogFragment {
             title.getEditText().setText(savedInstanceState.getString("name"));
         } else if (getArguments().getInt("parent_id") > -1) {
             if (type == EditNameDialogType.PATH) {
-                title.getEditText().setText(PathMap.getInstance().getPathList().get(getArguments().getInt("parent_id")).getName());
+                title.getEditText().setText(DataMap.getInstance().getPathList().get(getArguments().getInt("parent_id")).getName());
             } else if (type == EditNameDialogType.POINT_OF_INTEREST) {
-                title.getEditText().setText(PathMap.getInstance().getPointOfInterestList().get(getArguments().getInt("parent_id")).getName());
+                title.getEditText().setText(DataMap.getInstance().getPointOfInterestList().get(getArguments().getInt("parent_id")).getName());
             }
         }
 
