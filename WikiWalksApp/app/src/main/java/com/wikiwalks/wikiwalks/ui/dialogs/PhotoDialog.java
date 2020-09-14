@@ -30,7 +30,7 @@ import com.squareup.picasso.Picasso;
 import com.wikiwalks.wikiwalks.CustomActivityResultContracts;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.PathMap;
-import com.wikiwalks.wikiwalks.Picture;
+import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.R;
 
 import java.io.File;
@@ -39,18 +39,18 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class EditPictureDialog extends DialogFragment implements Picture.EditPictureCallback {
+public class PhotoDialog extends DialogFragment implements Photo.EditPhotoCallback {
 
-    private Picture.PictureType type;
-    private EditPictureDialogListener listener;
+    private Photo.PhotoType type;
+    private EditPhotoDialogListener listener;
     private TextInputLayout title;
     private int parentId;
     private ImageView imageView;
     private Button submitButton;
-    private Picture picture;
+    private Photo photo;
     private Uri photoUri;
 
-    private ActivityResultLauncher<Uri> takePicture = registerForActivityResult(new ActivityResultContracts.TakePicture(), isSuccess -> {
+    private ActivityResultLauncher<Uri> takePhoto = registerForActivityResult(new ActivityResultContracts.TakePicture(), isSuccess -> {
         if (isSuccess) {
             submitButton.setEnabled(false);
             loadIntoImageView();
@@ -59,7 +59,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
             photoUri = null;
         }
     });
-    private ActivityResultLauncher<String> selectPicture = registerForActivityResult(new CustomActivityResultContracts.SelectPicture(), uri -> {
+    private ActivityResultLauncher<String> selectPhoto = registerForActivityResult(new CustomActivityResultContracts.SelectPhoto(), uri -> {
         if (uri != null) {
             submitButton.setEnabled(false);
             photoUri = uri;
@@ -68,15 +68,15 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
         }
     });
 
-    public interface EditPictureDialogListener {
-        void onEditPicture();
-        void onDeletePicture(int position);
+    public interface EditPhotoDialogListener {
+        void onEditPhoto();
+        void onDeletePhoto(int position);
     }
 
-    public static EditPictureDialog newInstance(Picture.PictureType type, int parentId, int position, Bitmap bitmap) {
+    public static PhotoDialog newInstance(Photo.PhotoType type, int parentId, int position, Bitmap bitmap) {
         Bundle args = new Bundle();
-        EditPictureDialog fragment = new EditPictureDialog();
-        args.putSerializable("picture_type", type);
+        PhotoDialog fragment = new PhotoDialog();
+        args.putSerializable("photo_type", type);
         args.putInt("parent_id", parentId);
         args.putInt("position", position);
         if (bitmap != null) {
@@ -87,48 +87,48 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
     }
 
     @Override
-    public void onEditPictureSuccess() {
-        listener.onEditPicture();
+    public void onEditPhotoSuccess() {
+        listener.onEditPhoto();
         dismiss();
         Toast.makeText(getContext(), R.string.save_photo_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onEditPictureFailure() {
+    public void onEditPhotoFailure() {
         Toast.makeText(getContext(), R.string.save_photo_failure, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onDeletePictureSuccess() {
-        listener.onDeletePicture(getArguments().getInt("position"));
+    public void onDeletePhotoSuccess() {
+        listener.onDeletePhoto(getArguments().getInt("position"));
         dismiss();
         Toast.makeText(getContext(), R.string.delete_group_walk_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onDeletePictureFailure() {
+    public void onDeletePhotoFailure() {
         Toast.makeText(getContext(), R.string.delete_photo_failure, Toast.LENGTH_SHORT).show();
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.DialogTheme);
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.edit_picture_dialog, null);
+        View view = inflater.inflate(R.layout.photo_dialog, null);
         builder.setTitle(R.string.photo);
 
-        listener = (EditPictureDialogListener) getParentFragment();
-        type = (Picture.PictureType) getArguments().getSerializable("picture_type");
+        listener = (EditPhotoDialogListener) getParentFragment();
+        type = (Photo.PhotoType) getArguments().getSerializable("photo_type");
         parentId = getArguments().getInt("parent_id");
         if (getArguments().getInt("position") > -1) {
-            picture = type == Picture.PictureType.PATH ? PathMap.getInstance().getPathList().get(parentId).getPicturesList().get(getArguments().getInt("position")) : PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().get(getArguments().getInt("position"));
+            photo = type == Photo.PhotoType.PATH ? PathMap.getInstance().getPathList().get(parentId).getPhotosList().get(getArguments().getInt("position")) : PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().get(getArguments().getInt("position"));
         }
 
-        imageView = view.findViewById(R.id.edit_picture_popup_selected_image);
-        title = view.findViewById(R.id.edit_picture_popup_description);
+        imageView = view.findViewById(R.id.photo_dialog_selected_image);
+        title = view.findViewById(R.id.photo_dialog_caption_input);
 
-        Button cameraButton = view.findViewById(R.id.picture_popup_camera_button);
+        Button cameraButton = view.findViewById(R.id.photo_dialog_camera_button);
         cameraButton.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentValues contentValues = new ContentValues();
@@ -136,7 +136,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                 contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
                 contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/" + R.string.app_name);
                 photoUri = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-                takePicture.launch(photoUri);
+                takePhoto.launch(photoUri);
             } else {
                 MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
                     if (granted) {
@@ -145,46 +145,46 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
                             photoDirectory.mkdir();
                         }
                         photoUri = FileProvider.getUriForFile(getContext(), "com.wikiwalks.wikiwalks.fileprovider", new File(photoDirectory, new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg"));
-                        takePicture.launch(photoUri);
+                        takePhoto.launch(photoUri);
                     }
                 });
             }
         });
 
-        Button galleryButton = view.findViewById(R.id.picture_popup_gallery_button);
+        Button galleryButton = view.findViewById(R.id.photo_dialog_gallery_button);
         galleryButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
             if (granted) {
-                selectPicture.launch(null);
+                selectPhoto.launch(null);
             }
         }));
 
-        submitButton = view.findViewById(R.id.edit_picture_popup_submit_button);
+        submitButton = view.findViewById(R.id.photo_dialog_save_button);
         submitButton.setOnClickListener(v -> {
-            if (picture != null) {
-                if (!picture.getDescription().equals(title.getEditText().getText().toString())) {
-                    picture.edit(getContext(), title.getEditText().getText().toString(), this);
+            if (photo != null) {
+                if (!photo.getDescription().equals(title.getEditText().getText().toString())) {
+                    photo.edit(getContext(), title.getEditText().getText().toString(), this);
                 } else {
                     dismiss();
                 }
             } else {
                 if (photoUri != null) {
-                    Picture.submit(getContext(), type, parentId, photoUri, title.getEditText().getText().toString(), this);
+                    Photo.submit(getContext(), type, parentId, photoUri, title.getEditText().getText().toString(), this);
                 }
             }
         });
 
-        Button deleteButton = view.findViewById(R.id.edit_picture_popup_delete_button);
+        Button deleteButton = view.findViewById(R.id.photo_dialog_delete_button);
         deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
                 .setTitle(R.string.delete_photo_prompt)
-                .setPositiveButton(R.string.yes, (dialog, which) -> picture.delete(getContext(), this))
+                .setPositiveButton(R.string.yes, (dialog, which) -> photo.delete(getContext(), this))
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                 .create().show());
 
-        Button cancelButton = view.findViewById(R.id.edit_picture_popup_cancel_button);
+        Button cancelButton = view.findViewById(R.id.photo_dialog_cancel_button);
         cancelButton.setOnClickListener(v -> dismiss());
 
-        if (picture != null) {
-            title.getEditText().setText(picture.getDescription());
+        if (photo != null) {
+            title.getEditText().setText(photo.getDescription());
             imageView.setImageBitmap(getArguments().getParcelable("image"));
             cameraButton.setVisibility(View.GONE);
             galleryButton.setVisibility(View.GONE);
@@ -233,7 +233,7 @@ public class EditPictureDialog extends DialogFragment implements Picture.EditPic
             }
             Picasso.get().load(photoUri).rotate(degree).into(imageView);
         } catch (IOException e) {
-            Log.e("EditPictureDialog", "Previewing image", e);
+            Log.e("EditPhotoDialog", "Previewing image", e);
         }
     }
 }

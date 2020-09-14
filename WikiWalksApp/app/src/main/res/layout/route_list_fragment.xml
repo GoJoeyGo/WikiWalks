@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorBackgroundFloating">
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     xmlns:tools="http://schemas.android.com/tools"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent"
+                                                     android:background="?attr/colorBackgroundFloating">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="300dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/route_list_frag_collapsing_toolbar_layout"
+            android:id="@+id/route_list_collapsing_toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
@@ -21,7 +21,7 @@
             app:titleEnabled="false">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/map_route_list_frag"
+                android:id="@+id/route_list_map"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
@@ -42,9 +42,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/routes_nested_scroll_view"
+        android:id="@+id/route_list_nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/colorBackgroundFloating"
@@ -58,12 +57,12 @@
             android:paddingBottom="0dp"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toTopOf="@id/select_route_background"
-            app:layout_constraintTop_toBottomOf="@id/map_route_list_frag" />
+            app:layout_constraintTop_toBottomOf="@id/route_list_map" />
 
     </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
-        android:id="@+id/walk_path_option_selector"
+        android:id="@+id/route_list_bottom_button_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -74,7 +73,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <Button
-            android:id="@+id/select_route_button"
+            android:id="@+id/route_list_select_route_button"
             style="@style/ButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -86,7 +85,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/edit_route_button"
+            android:id="@+id/route_list_delete_route_button"
             style="@style/ButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -96,6 +95,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/select_route_button" />
+            app:layout_constraintTop_toBottomOf="@id/route_list_select_route_button" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

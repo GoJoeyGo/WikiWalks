@@ -33,14 +33,14 @@ public class PermissionsFragment extends Fragment {
 
         type = getArguments().getString("type");
 
-        TextView permissionInfo = rootView.findViewById(R.id.permission_info);
+        TextView permissionInfo = rootView.findViewById(R.id.permissions_fragment_information);
         if (type.equals(Manifest.permission.ACCESS_FINE_LOCATION)) {
             permissionInfo.setText(R.string.requires_location);
         } else if (type.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             permissionInfo.setText(R.string.requires_storage);
         }
 
-        Button permissionsButton = rootView.findViewById(R.id.permissions_button);
+        Button permissionsButton = rootView.findViewById(R.id.permissions_fragment_settings_fragment_button);
         permissionsButton.setOnClickListener(v -> startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()))));
 
         return rootView;

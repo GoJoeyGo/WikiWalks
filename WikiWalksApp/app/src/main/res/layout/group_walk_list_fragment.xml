@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorBackgroundFloating">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:background="?attr/colorBackgroundFloating">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/group_walk_list_toolbar_wrapper"
@@ -15,7 +15,7 @@
         app:titleTextColor="?attr/colorOnBackground">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/path_group_walk_list_toolbar"
+            android:id="@+id/group_walk_list_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
@@ -25,13 +25,13 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
-        android:id="@+id/no_group_walks_indicator"
+        android:id="@+id/group_walk_list_empty_indicator"
         style="@style/TextTheme"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/no_walks_scheduled"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/submit_group_walk_background"
+        app:layout_constraintBottom_toTopOf="@id/group_walk_list_bottom_button_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/group_walk_list_toolbar_wrapper" />
@@ -41,11 +41,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@id/submit_group_walk_background"
+        app:layout_constraintBottom_toTopOf="@id/group_walk_list_bottom_button_background"
         app:layout_constraintTop_toBottomOf="@id/group_walk_list_toolbar_wrapper">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/path_group_walk_list_recyclerview"
+            android:id="@+id/group_walk_list_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:paddingBottom="0dp" />
@@ -53,7 +53,7 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
-        android:id="@+id/submit_group_walk_background"
+        android:id="@+id/group_walk_list_bottom_button_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_background"
@@ -63,7 +63,7 @@
         app:layout_constraintHorizontal_bias="1.0">
 
         <Button
-            android:id="@+id/submit_group_walk_button"
+            android:id="@+id/group_walk_list_schedule_group_walk_button"
             style="@style/ButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="50dp"

@@ -58,8 +58,8 @@ public class PointOfInterestListRecyclerViewAdapter extends RecyclerView.Adapter
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            button = itemView.findViewById(R.id.poi_list_frag_button);
-            indicator = itemView.findViewById(R.id.poi_list_frag_indicator);
+            button = itemView.findViewById(R.id.poi_row_button);
+            indicator = itemView.findViewById(R.id.poi_row_colour_indicator);
         }
     }
 }

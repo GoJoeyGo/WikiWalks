@@ -13,35 +13,35 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
-import com.wikiwalks.wikiwalks.Picture;
+import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.R;
-import com.wikiwalks.wikiwalks.ui.PictureListFragment;
+import com.wikiwalks.wikiwalks.ui.PhotoListFragment;
 
 import java.util.ArrayList;
 
-public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<PictureListRecyclerViewAdapter.ViewHolder> {
-    private ArrayList<Picture> pictureList;
-    private PictureListFragment parentFragment;
+public class PhotoListRecyclerViewAdapter extends RecyclerView.Adapter<PhotoListRecyclerViewAdapter.ViewHolder> {
+    private ArrayList<Photo> photoList;
+    private PhotoListFragment parentFragment;
 
-    public PictureListRecyclerViewAdapter(PictureListFragment parentFragment, ArrayList<Picture> pictureList) {
+    public PhotoListRecyclerViewAdapter(PhotoListFragment parentFragment, ArrayList<Photo> photoList) {
         this.parentFragment = parentFragment;
-        this.pictureList = pictureList;
+        this.photoList = photoList;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parentFragment.getContext());
-        View view = inflater.inflate(R.layout.picture_list_row, parent, false);
+        View view = inflater.inflate(R.layout.photo_list_row, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        Picture picture = pictureList.get(position);
-        Picasso.get().load(parentFragment.getString(R.string.local_url) + "/pictures/" + picture.getUrl()).placeholder(R.drawable.banner_background).into(holder.imageView);
+        Photo photo = photoList.get(position);
+        Picasso.get().load(parentFragment.getString(R.string.local_url) + "/pictures/" + photo.getUrl()).resize(photo.getWidth(), photo.getHeight()).onlyScaleDown().placeholder(R.drawable.banner_background).into(holder.imageView);
 
-        if (picture.isEditable()) {
+        if (photo.isEditable()) {
             holder.name.setTypeface(holder.name.getTypeface(), Typeface.BOLD_ITALIC);
             holder.name.setText(parentFragment.getString(R.string.you));
             holder.editButton.setVisibility(View.VISIBLE);
@@ -49,12 +49,12 @@ public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<Picture
         } else {
             holder.editButton.setVisibility(View.INVISIBLE);
             holder.name.setTypeface(holder.name.getTypeface(), Typeface.NORMAL);
-            holder.name.setText(picture.getSubmitter());
+            holder.name.setText(photo.getSubmitter());
         }
 
-        if (!picture.getDescription().isEmpty()) {
+        if (!photo.getDescription().isEmpty()) {
             holder.description.setTypeface(holder.description.getTypeface(), Typeface.NORMAL);
-            holder.description.setText(picture.getDescription());
+            holder.description.setText(photo.getDescription());
         } else {
             holder.description.setTypeface(holder.description.getTypeface(), Typeface.ITALIC);
             holder.description.setText(parentFragment.getString(R.string.photo_no_caption));
@@ -68,7 +68,7 @@ public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<Picture
 
     @Override
     public int getItemCount() {
-        return pictureList.size();
+        return photoList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -80,10 +80,10 @@ public class PictureListRecyclerViewAdapter extends RecyclerView.Adapter<Picture
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = itemView.findViewById(R.id.path_picture_row_name);
-            description = itemView.findViewById(R.id.path_picture_row_text);
-            imageView = itemView.findViewById(R.id.path_picture_row_image);
-            editButton = itemView.findViewById(R.id.path_picture_edit_button);
+            name = itemView.findViewById(R.id.path_photo_row_name);
+            description = itemView.findViewById(R.id.path_photo_row_text);
+            imageView = itemView.findViewById(R.id.path_photo_row_image);
+            editButton = itemView.findViewById(R.id.path_photo_edit_button);
         }
     }
 }

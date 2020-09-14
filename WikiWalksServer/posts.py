@@ -61,7 +61,7 @@ def add_route():
         path_schema = PathSchema()
         request_json = request.get_json(force=True)
         if len(request_json["latitudes"]) == len(request_json["longitudes"]) == len(request_json["altitudes"]) \
-                and len(request_json["latitudes"]) > 10:
+                and len(request_json["latitudes"]) >= 10:
             user = get_submitter(request_json["device_id"])
             time = get_time()
             boundaries = [min(request_json["latitudes"]), min(request_json["longitudes"]),
@@ -278,6 +278,7 @@ def toggle_group_walk_attendance(path_id, group_walk_id):
             attending = True
         db.session.commit()
         group_walk.attending = attending
+        group_walk.submitter = User.query.filter_by(id=group_walk.submitter).first().nickname
         return jsonify({"status": "success", "group_walk": gw_schema.dump(group_walk)}), 201
     except Exception as e:
         print(e)

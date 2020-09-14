@@ -21,82 +21,82 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.PathMap;
-import com.wikiwalks.wikiwalks.Picture;
+import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.R;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditPictureDialog;
-import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PictureListRecyclerViewAdapter;
+import com.wikiwalks.wikiwalks.ui.dialogs.PhotoDialog;
+import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.PhotoListRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
-public class PictureListFragment extends Fragment implements Picture.GetPicturesCallback, EditPictureDialog.EditPictureDialogListener {
+public class PhotoListFragment extends Fragment implements Photo.GetPhotosCallback, PhotoDialog.EditPhotoDialogListener {
 
     private int parentId;
     private RecyclerView recyclerView;
-    private ArrayList<Picture> pictures;
-    private TextView noPicturesIndicator;
-    private Picture.PictureType type;
+    private ArrayList<Photo> photos;
+    private TextView noPhotosIndicator;
+    private Photo.PhotoType type;
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    public static PictureListFragment newInstance(Picture.PictureType type, int parentId) {
+    public static PhotoListFragment newInstance(Photo.PhotoType type, int parentId) {
         Bundle args = new Bundle();
         args.putInt("parentId", parentId);
         args.putSerializable("type", type);
-        PictureListFragment fragment = new PictureListFragment();
+        PhotoListFragment fragment = new PhotoListFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public void updatePicturesList(boolean refresh) {
+    public void updatePhotosList(boolean refresh) {
         swipeRefreshLayout.setRefreshing(refresh);
-        if (type == Picture.PictureType.PATH) {
-            PathMap.getInstance().getPathList().get(parentId).getPictures(getContext(), refresh, PictureListFragment.this);
+        if (type == Photo.PhotoType.PATH) {
+            PathMap.getInstance().getPathList().get(parentId).getPhotos(getContext(), refresh, PhotoListFragment.this);
         } else {
-            PathMap.getInstance().getPointOfInterestList().get(parentId).getPictures(getContext(), refresh, PictureListFragment.this);
+            PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotos(getContext(), refresh, PhotoListFragment.this);
         }
     }
 
     public void updateRecyclerView() {
-        if (pictures.size() == 0) {
+        if (photos.size() == 0) {
             recyclerView.setVisibility(View.GONE);
-            noPicturesIndicator.setVisibility(View.VISIBLE);
+            noPhotosIndicator.setVisibility(View.VISIBLE);
         } else {
             recyclerView.setVisibility(View.VISIBLE);
-            noPicturesIndicator.setVisibility(View.GONE);
+            noPhotosIndicator.setVisibility(View.GONE);
             recyclerView.getAdapter().notifyDataSetChanged();
-            recyclerView.getAdapter().notifyItemRangeChanged(0, pictures.size());
+            recyclerView.getAdapter().notifyItemRangeChanged(0, photos.size());
         }
         swipeRefreshLayout.setRefreshing(false);
     }
 
     public void launchEditDialog(int position, Bitmap bitmap) {
-        EditPictureDialog.newInstance(type, parentId, position, bitmap).show(getChildFragmentManager(), "PicturePopup");
+        PhotoDialog.newInstance(type, parentId, position, bitmap).show(getChildFragmentManager(), "PhotoPopup");
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.picture_list_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.photo_list_fragment, container, false);
 
         parentId = getArguments().getInt("parentId");
-        type = (Picture.PictureType) getArguments().getSerializable("type");
+        type = (Photo.PhotoType) getArguments().getSerializable("type");
 
         String title;
-        if (type == Picture.PictureType.PATH) {
-            pictures = PathMap.getInstance().getPathList().get(parentId).getPicturesList();
+        if (type == Photo.PhotoType.PATH) {
+            photos = PathMap.getInstance().getPathList().get(parentId).getPhotosList();
             title = PathMap.getInstance().getPathList().get(parentId).getName();
         } else {
-            pictures = PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList();
+            photos = PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList();
             title = PathMap.getInstance().getPointOfInterestList().get(parentId).getName();
         }
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.path_picture_list_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.photo_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(String.format(getString(R.string.photos_title), title));
 
-        noPicturesIndicator = rootView.findViewById(R.id.no_pictures_indicator);
+        noPhotosIndicator = rootView.findViewById(R.id.photo_list_empty_indicator);
 
-        recyclerView = rootView.findViewById(R.id.path_picture_list_recyclerview);
-        recyclerView.setAdapter(new PictureListRecyclerViewAdapter(this, pictures));
+        recyclerView = rootView.findViewById(R.id.path_photo_list_recyclerview);
+        recyclerView.setAdapter(new PhotoListRecyclerViewAdapter(this, photos));
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         } else {
@@ -107,16 +107,16 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(1) && !swipeRefreshLayout.isRefreshing()) {
-                    updatePicturesList(false);
+                    updatePhotosList(false);
                 }
             }
         });
 
-        swipeRefreshLayout = rootView.findViewById(R.id.picture_list_swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(() -> updatePicturesList(true));
+        swipeRefreshLayout = rootView.findViewById(R.id.photo_list_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(() -> updatePhotosList(true));
 
-        Button submitPictureButton = rootView.findViewById(R.id.submit_group_walk_button);
-        submitPictureButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
+        Button addPhotoButton = rootView.findViewById(R.id.photo_list_add_photo_button);
+        addPhotoButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
             if (granted) {
                 launchEditDialog(-1, null);
             } else {
@@ -124,7 +124,7 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
             }
         }));
         if (savedInstanceState == null) {
-            updatePicturesList(true);
+            updatePhotosList(true);
         }
 
         return rootView;
@@ -137,25 +137,25 @@ public class PictureListFragment extends Fragment implements Picture.GetPictures
     }
 
     @Override
-    public void onGetPicturesSuccess() {
+    public void onGetPhotosSuccess() {
         updateRecyclerView();
     }
 
     @Override
-    public void onGetPicturesFailure() {
+    public void onGetPhotosFailure() {
         Toast.makeText(getContext(), R.string.get_photos_failure, Toast.LENGTH_SHORT).show();
         swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
-    public void onEditPicture() {
+    public void onEditPhoto() {
         updateRecyclerView();
     }
 
     @Override
-    public void onDeletePicture(int position) {
+    public void onDeletePhoto(int position) {
         recyclerView.getAdapter().notifyItemRemoved(position);
-        recyclerView.getAdapter().notifyItemRangeChanged(position, pictures.size());
+        recyclerView.getAdapter().notifyItemRangeChanged(position, photos.size());
         updateRecyclerView();
     }
 }

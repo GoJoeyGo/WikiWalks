@@ -29,7 +29,8 @@ public class PathMap {
         void onPathMapUpdateFailure();
     }
 
-    private PathMap() {}
+    private PathMap() {
+    }
 
     public static PathMap getInstance() {
         if (instance == null) {

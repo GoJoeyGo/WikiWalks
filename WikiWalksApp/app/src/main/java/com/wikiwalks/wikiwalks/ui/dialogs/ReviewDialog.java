@@ -1,6 +1,5 @@
 package com.wikiwalks.wikiwalks.ui.dialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,7 +18,7 @@ import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
 
-public class EditReviewDialog extends DialogFragment implements Review.EditReviewCallback {
+public class ReviewDialog extends DialogFragment implements Review.EditReviewCallback {
 
     private int parentId;
     private EditReviewDialogListener listener;
@@ -27,18 +26,17 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
     private RatingBar rating;
     private Button saveButton;
     private Review review;
-    private AlertDialog confirmationDialog;
     private Review.ReviewType type;
 
     public interface EditReviewDialogListener {
         void onEditReview();
     }
 
-    public static EditReviewDialog newInstance(Review.ReviewType type, int parentId) {
+    public static ReviewDialog newInstance(Review.ReviewType type, int parentId) {
         Bundle args = new Bundle();
         args.putInt("parentId", parentId);
         args.putSerializable("type", type);
-        EditReviewDialog dialog = new EditReviewDialog();
+        ReviewDialog dialog = new ReviewDialog();
         dialog.setArguments(args);
         return dialog;
     }
@@ -70,9 +68,9 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.DialogTheme);
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.edit_review_dialog, null);
+        View view = inflater.inflate(R.layout.review_dialog, null);
         builder.setTitle(R.string.review);
 
         listener = (EditReviewDialogListener) getParentFragment();
@@ -80,7 +78,7 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
         type = (Review.ReviewType) getArguments().getSerializable("type");
         review = type == Review.ReviewType.PATH ? PathMap.getInstance().getPathList().get(parentId).getOwnReview() : PathMap.getInstance().getPointOfInterestList().get(parentId).getOwnReview();
 
-        rating = view.findViewById(R.id.edit_review_rating_bar);
+        rating = view.findViewById(R.id.review_dialog_rating_bar);
         rating.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
             if ((int) rating > 0) {
                 saveButton.setEnabled(true);
@@ -89,9 +87,9 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
             }
         });
 
-        message = view.findViewById(R.id.edit_review_path_name);
+        message = view.findViewById(R.id.review_dialog_text);
 
-        saveButton = view.findViewById(R.id.edit_review_popup_save_button);
+        saveButton = view.findViewById(R.id.review_dialog_save_button);
         saveButton.setOnClickListener(v -> {
             if (review == null) {
                 Review.submit(getContext(), type, parentId, message.getEditText().getText().toString(), (int) rating.getRating(), this);
@@ -104,19 +102,19 @@ public class EditReviewDialog extends DialogFragment implements Review.EditRevie
             }
         });
 
-        Button deleteButton = view.findViewById(R.id.edit_review_popup_delete_button);
+        Button deleteButton = view.findViewById(R.id.review_dialog_delete_button);
         if (review != null) {
             deleteButton.setVisibility(View.VISIBLE);
             deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
                     .setTitle(R.string.delete_review_prompt)
                     .setPositiveButton(R.string.yes, (dialog, which) -> review.delete(getContext(), this))
-                    .setNegativeButton(R.string.no, (dialog, which) -> confirmationDialog.dismiss())
+                    .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                     .create().show());
             message.getEditText().setText(review.getMessage());
             rating.setRating(review.getRating());
         }
 
-        Button cancelButton = view.findViewById(R.id.edit_review_popup_cancel_button);
+        Button cancelButton = view.findViewById(R.id.review_dialog_cancel_button);
         cancelButton.setOnClickListener(v -> {
             dismiss();
         });

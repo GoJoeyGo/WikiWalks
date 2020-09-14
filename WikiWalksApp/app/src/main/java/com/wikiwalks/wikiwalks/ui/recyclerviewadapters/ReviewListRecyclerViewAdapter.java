@@ -63,9 +63,9 @@ public class ReviewListRecyclerViewAdapter extends RecyclerView.Adapter<ReviewLi
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = itemView.findViewById(R.id.path_review_row_name);
-            ratingBar = itemView.findViewById(R.id.path_review_row_rating);
-            message = itemView.findViewById(R.id.path_review_row_text);
+            name = itemView.findViewById(R.id.review_row_name);
+            ratingBar = itemView.findViewById(R.id.review_row_rating);
+            message = itemView.findViewById(R.id.review_row_text);
         }
     }
 }

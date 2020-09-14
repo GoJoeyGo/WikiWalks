@@ -17,7 +17,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Picture {
+public class Photo {
     private int id;
     private int parentId;
     private String url;
@@ -26,21 +26,21 @@ public class Picture {
     private String description;
     private String submitter;
     private boolean editable;
-    private PictureType type;
+    private PhotoType type;
 
-    public interface GetPicturesCallback {
-        void onGetPicturesSuccess();
-        void onGetPicturesFailure();
+    public interface GetPhotosCallback {
+        void onGetPhotosSuccess();
+        void onGetPhotosFailure();
     }
 
-    public interface EditPictureCallback {
-        void onEditPictureSuccess();
-        void onEditPictureFailure();
-        void onDeletePictureSuccess();
-        void onDeletePictureFailure();
+    public interface EditPhotoCallback {
+        void onEditPhotoSuccess();
+        void onEditPhotoFailure();
+        void onDeletePhotoSuccess();
+        void onDeletePhotoFailure();
     }
 
-    public Picture(JsonObject attributes, int parentId, PictureType type) {
+    public Photo(JsonObject attributes, int parentId, PhotoType type) {
         id = attributes.get("id").getAsInt();
         url = attributes.get("url").getAsString();
         width = attributes.get("width").getAsInt();
@@ -52,43 +52,43 @@ public class Picture {
         this.type = type;
     }
 
-    public static void submit(Context context, PictureType type, int parentId, Uri uri, String description, EditPictureCallback callback) {
+    public static void submit(Context context, PhotoType type, int parentId, Uri uri, String description, EditPhotoCallback callback) {
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
             byte[] buffer = new byte[inputStream.available()];
             inputStream.read(buffer);
             RequestBody imageBody = RequestBody.create(MediaType.parse(context.getContentResolver().getType(uri)), buffer);
-            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", "new_picture.jpg", imageBody);
+            MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", "new_photo.jpg", imageBody);
             RequestBody deviceIdBody = RequestBody.create(MultipartBody.FORM, PreferencesManager.getInstance(context).getDeviceId());
             RequestBody descriptionBody = RequestBody.create(MultipartBody.FORM, description);
-            Call<JsonElement> newPicture = (type == PictureType.PATH) ? MainActivity.getRetrofitRequests(context).newPathPicture(parentId, imagePart, deviceIdBody, descriptionBody) : MainActivity.getRetrofitRequests(context).newPoIPicture(parentId, imagePart, deviceIdBody, descriptionBody);
-            newPicture.enqueue(new Callback<JsonElement>() {
+            Call<JsonElement> newPhoto = (type == PhotoType.PATH) ? MainActivity.getRetrofitRequests(context).newPathPhoto(parentId, imagePart, deviceIdBody, descriptionBody) : MainActivity.getRetrofitRequests(context).newPoIPhoto(parentId, imagePart, deviceIdBody, descriptionBody);
+            newPhoto.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
                         JsonObject responseJson = response.body().getAsJsonObject().get("picture").getAsJsonObject();
-                        Picture newPicture = new Picture(responseJson, parentId, type);
-                        if (type == PictureType.PATH) {
-                            PathMap.getInstance().getPathList().get(parentId).getPicturesList().add(0, newPicture);
+                        Photo newPhoto = new Photo(responseJson, parentId, type);
+                        if (type == PhotoType.PATH) {
+                            PathMap.getInstance().getPathList().get(parentId).getPhotosList().add(0, newPhoto);
                         } else {
-                            PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().add(0, newPicture);
+                            PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().add(0, newPhoto);
                         }
-                        PreferencesManager.getInstance(context).changePicturesUploaded(false);
-                        callback.onEditPictureSuccess();
+                        PreferencesManager.getInstance(context).changePhotosUploaded(false);
+                        callback.onEditPhotoSuccess();
                     } else {
-                        callback.onEditPictureFailure();
+                        callback.onEditPhotoFailure();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("Picture", "Sending new photo request", t);
-                    callback.onEditPictureFailure();
+                    Log.e("Photo", "Sending new photo request", t);
+                    callback.onEditPhotoFailure();
                 }
             });
         } catch (IOException e) {
-            Log.e("Picture", "Creating new photo request", e);
-            callback.onEditPictureFailure();
+            Log.e("Photo", "Creating new photo request", e);
+            callback.onEditPhotoFailure();
         }
     }
 
@@ -120,57 +120,57 @@ public class Picture {
         return editable;
     }
 
-    public void edit(Context context, String description, EditPictureCallback callback) {
+    public void edit(Context context, String description, EditPhotoCallback callback) {
         JsonObject request = new JsonObject();
         request.addProperty("description", description);
         request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-        Call<JsonElement> editPicture = (type == PictureType.PATH) ? MainActivity.getRetrofitRequests(context).editPathPicture(parentId, id, body) : MainActivity.getRetrofitRequests(context).editPoIPicture(parentId, id, body);
-        editPicture.enqueue(new Callback<JsonElement>() {
+        Call<JsonElement> editPhoto = (type == PhotoType.PATH) ? MainActivity.getRetrofitRequests(context).editPathPhoto(parentId, id, body) : MainActivity.getRetrofitRequests(context).editPoIPhoto(parentId, id, body);
+        editPhoto.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
-                    Picture.this.description = description;
-                    callback.onEditPictureSuccess();
+                    Photo.this.description = description;
+                    callback.onEditPhotoSuccess();
                 }
             }
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
-                Log.e("Picture", "Sending edit photo request", t);
-                callback.onEditPictureFailure();
+                Log.e("Photo", "Sending edit photo request", t);
+                callback.onEditPhotoFailure();
             }
         });
     }
 
-    public void delete(Context context, EditPictureCallback callback) {
+    public void delete(Context context, EditPhotoCallback callback) {
         JsonObject request = new JsonObject();
         request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-        Call<JsonElement> deletePicture = (type == PictureType.PATH) ? MainActivity.getRetrofitRequests(context).deletePathPicture(parentId, id, body) : MainActivity.getRetrofitRequests(context).deletePoIPicture(parentId, id, body);
-        deletePicture.enqueue(new Callback<JsonElement>() {
+        Call<JsonElement> deletePhoto = (type == PhotoType.PATH) ? MainActivity.getRetrofitRequests(context).deletePathPhoto(parentId, id, body) : MainActivity.getRetrofitRequests(context).deletePoIPhoto(parentId, id, body);
+        deletePhoto.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
-                    if (type == PictureType.PATH) {
-                        PathMap.getInstance().getPathList().get(parentId).getPicturesList().remove(Picture.this);
+                    if (type == PhotoType.PATH) {
+                        PathMap.getInstance().getPathList().get(parentId).getPhotosList().remove(Photo.this);
                     } else {
-                        PathMap.getInstance().getPointOfInterestList().get(parentId).getPicturesList().remove(Picture.this);
+                        PathMap.getInstance().getPointOfInterestList().get(parentId).getPhotosList().remove(Photo.this);
                     }
-                    PreferencesManager.getInstance(context).changePicturesUploaded(true);
-                    callback.onDeletePictureSuccess();
+                    PreferencesManager.getInstance(context).changePhotosUploaded(true);
+                    callback.onDeletePhotoSuccess();
                 } else {
-                    callback.onDeletePictureFailure();
+                    callback.onDeletePhotoFailure();
                 }
             }
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
-                Log.e("Picture", "Sending delete photo request", t);
-                callback.onDeletePictureFailure();
+                Log.e("Photo", "Sending delete photo request", t);
+                callback.onDeletePhotoFailure();
             }
         });
     }
 
-    public enum PictureType {PATH, POINT_OF_INTEREST}
+    public enum PhotoType {PATH, POINT_OF_INTEREST}
 }

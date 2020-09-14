@@ -26,7 +26,7 @@ public class BookmarkedPathRecyclerViewAdapter extends RecyclerView.Adapter<Book
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parentFragment.getContext());
-        View view = inflater.inflate(R.layout.bookmarks_list_row, parent, false);
+        View view = inflater.inflate(R.layout.bookmark_list_row, parent, false);
         return new BookmarkedPathRecyclerViewAdapter.ViewHolder(view);
     }
 
@@ -58,8 +58,8 @@ public class BookmarkedPathRecyclerViewAdapter extends RecyclerView.Adapter<Book
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            button = itemView.findViewById(R.id.bookmark_button);
-            separator = itemView.findViewById(R.id.bookmark_separator);
+            button = itemView.findViewById(R.id.bookmark_row_button);
+            separator = itemView.findViewById(R.id.bookmark_row_separator);
         }
     }
 }

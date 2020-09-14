@@ -62,11 +62,11 @@ public class RouteListFragment extends Fragment implements OnMapReadyCallback {
         recyclerView.setAdapter(new RouteListRecyclerViewAdapter(this, routes));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        selectRouteButton = rootView.findViewById(R.id.select_route_button);
+        selectRouteButton = rootView.findViewById(R.id.route_list_select_route_button);
 
-        deleteButton = rootView.findViewById(R.id.edit_route_button);
+        deleteButton = rootView.findViewById(R.id.route_list_delete_route_button);
 
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_route_list_frag);
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.route_list_map);
 
         return rootView;
     }

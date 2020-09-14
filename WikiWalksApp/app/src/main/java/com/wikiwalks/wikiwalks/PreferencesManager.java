@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -70,7 +69,6 @@ public class PreferencesManager {
         statistics.edit().putInt("times_walked", timesWalked + 1).apply();
     }
 
-
     public void updateLongestWalk(float distance) {
         float oldDistance = statistics.getFloat("longest_walk", 0);
         if (distance > oldDistance) {
@@ -108,14 +106,14 @@ public class PreferencesManager {
         statistics.edit().putInt("reviews_written", reviewsWritten).apply();
     }
 
-    public void changePicturesUploaded(boolean deleted) {
-        int picturesUploaded = statistics.getInt("pictures_uploaded", 0);
+    public void changePhotosUploaded(boolean deleted) {
+        int photosUploaded = statistics.getInt("photos_uploaded", 0);
         if (deleted) {
-            picturesUploaded--;
+            photosUploaded--;
         } else {
-            picturesUploaded++;
+            photosUploaded++;
         }
-        statistics.edit().putInt("pictures_uploaded", picturesUploaded).apply();
+        statistics.edit().putInt("photos_uploaded", photosUploaded).apply();
     }
 
     public String getBookmarks() {
@@ -165,7 +163,7 @@ public class PreferencesManager {
         if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
             strings[0] = String.format(context.getString(R.string.distance_walked), distanceWalked * 0.000621371, context.getString(R.string.miles));
             strings[2] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0) * 0.000621371, context.getString(R.string.miles));
-            strings[3] = String.format(context.getString(R.string.average_walk), (distanceWalked / timesWalked) * 0.000621371,context.getString(R.string.miles));
+            strings[3] = String.format(context.getString(R.string.average_walk), (distanceWalked / timesWalked) * 0.000621371, context.getString(R.string.miles));
         } else {
             strings[0] = String.format(context.getString(R.string.distance_walked), distanceWalked * 0.001, context.getString(R.string.kilometres));
             strings[2] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0) * 0.001, context.getString(R.string.kilometres));
@@ -179,10 +177,9 @@ public class PreferencesManager {
         strings[5] = String.format(context.getString(R.string.routes_recorded), statistics.getInt("routes_recorded", 0));
         strings[6] = String.format(context.getString(R.string.points_marked), statistics.getInt("points_marked", 0));
         strings[7] = String.format(context.getString(R.string.reviews_written), statistics.getInt("reviews_written", 0));
-        strings[8] = String.format(context.getString(R.string.pictures_uploaded), statistics.getInt("pictures_uploaded", 0));
+        strings[8] = String.format(context.getString(R.string.photos_uploaded), statistics.getInt("photos_uploaded", 0));
         return strings;
     }
-
 
     public ArrayList<JsonObject> getGoals() {
         ArrayList<JsonObject> goalsList = new ArrayList<>();

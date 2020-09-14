@@ -38,17 +38,17 @@ public class BookmarksFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.bookmarks_list_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.bookmark_list_fragment, container, false);
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.bookmarks_list_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.bookmark_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(R.string.bookmarks);
 
-        recyclerView = rootView.findViewById(R.id.bookmarks_list_recyclerview);
+        recyclerView = rootView.findViewById(R.id.bookmark_list_recyclerview);
         String bookmarks = PreferencesManager.getInstance(getContext()).getBookmarks();
         if (bookmarks.isEmpty()) {
-            TextView noBookmarks = rootView.findViewById(R.id.no_bookmarks_indicator);
+            TextView noBookmarks = rootView.findViewById(R.id.bookmark_list_empty_indicator);
             noBookmarks.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {

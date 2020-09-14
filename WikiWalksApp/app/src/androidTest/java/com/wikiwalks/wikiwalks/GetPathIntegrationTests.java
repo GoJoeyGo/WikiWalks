@@ -43,14 +43,6 @@ public class GetPathIntegrationTests {
     }
 
     @Test
-    public void getAllPaths() throws InterruptedException {
-        bounds = new LatLngBounds(new LatLng(-90, -180), new LatLng(90, 179));
-        pathMap.updatePaths(bounds, appContext);
-        new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(PathMap.getInstance().getPathList().size() > 0);
-    }
-
-    @Test
     public void getSomePaths() throws InterruptedException {
         bounds = new LatLngBounds(new LatLng(-28, 152), new LatLng(-27, 153));
         pathMap.updatePaths(bounds, appContext);
@@ -70,9 +62,11 @@ public class GetPathIntegrationTests {
         ArrayList<Double> latitudes = new ArrayList<>();
         ArrayList<Double> longitudes = new ArrayList<>();
         ArrayList<Double> altitudes = new ArrayList<>();
-        latitudes.add(1.00);
-        longitudes.add(1.00);
-        altitudes.add(1.00);
+        for (int i = 0; i < 10; i++) {
+            latitudes.add(1.00);
+            longitudes.add(1.00);
+            altitudes.add(1.00);
+        }
         Route.submit(appContext, null, "Test Path", latitudes, longitudes, altitudes, mock(Route.RouteModifyCallback.class));
     }
 

@@ -25,7 +25,7 @@ import com.wikiwalks.wikiwalks.ui.GroupWalkListFragment;
 import java.text.DateFormat;
 import java.util.Calendar;
 
-public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.EditGroupWalkCallback {
+public class GroupWalkDialog extends DialogFragment implements GroupWalk.EditGroupWalkCallback {
 
     private Path path;
     private GroupWalk walk;
@@ -34,9 +34,9 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
     private Button submitButton;
     private Calendar calendar;
 
-    public static EditGroupWalkDialog newInstance(int pathId, int groupWalkPosition) {
+    public static GroupWalkDialog newInstance(int pathId, int groupWalkPosition) {
         Bundle args = new Bundle();
-        EditGroupWalkDialog fragment = new EditGroupWalkDialog();
+        GroupWalkDialog fragment = new GroupWalkDialog();
         args.putInt("path_id", pathId);
         args.putInt("group_walk_position", groupWalkPosition);
         fragment.setArguments(args);
@@ -46,9 +46,9 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.DialogTheme);
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.edit_group_walk_dialog, null);
+        View view = inflater.inflate(R.layout.group_walk_dialog, null);
         builder.setTitle(R.string.group_walk);
 
         int pathId = getArguments().getInt("path_id");
@@ -56,10 +56,10 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
         path = PathMap.getInstance().getPathList().get(pathId);
         calendar = Calendar.getInstance();
 
-        title = view.findViewById(R.id.edit_group_walk_title);
+        title = view.findViewById(R.id.group_walk_dialog_title_input);
 
-        time = view.findViewById(R.id.edit_group_walk_popup_time);
-        Button selectTimeButton = view.findViewById(R.id.edit_group_walk_select_time_button);
+        time = view.findViewById(R.id.group_walk_dialog_time);
+        Button selectTimeButton = view.findViewById(R.id.group_walk_dialog_select_time_button);
         selectTimeButton.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (datePicker, year, monthOfYear, dayOfMonth) -> {
                 calendar.set(year, monthOfYear, dayOfMonth);
@@ -74,7 +74,7 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
             datePickerDialog.show();
         });
 
-        submitButton = view.findViewById(R.id.edit_group_walk_popup_submit_button);
+        submitButton = view.findViewById(R.id.group_walk_dialog_save_button);
         submitButton.setOnClickListener(v -> {
             String walkTitle = (title.getEditText().getText().toString().isEmpty()) ? String.format("Walk at %s", path.getName()) : title.getEditText().getText().toString();
             if (walk == null) {
@@ -84,10 +84,10 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
             }
         });
 
-        Button cancelButton = view.findViewById(R.id.edit_group_walk_popup_cancel_button);
+        Button cancelButton = view.findViewById(R.id.group_walk_dialog_cancel_button);
         cancelButton.setOnClickListener(v -> dismiss());
 
-        Button deleteButton = view.findViewById(R.id.edit_group_walk_popup_delete_button);
+        Button deleteButton = view.findViewById(R.id.group_walk_dialog_delete_button);
         deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
                 .setTitle(R.string.cancel_group_walk_prompt)
                 .setPositiveButton(R.string.yes, (dialog, which) -> walk.delete(getContext(), this))

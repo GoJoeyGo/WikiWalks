@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,19 +17,19 @@ import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 
-public class EditNameDialog extends DialogFragment {
+public class NameDialog extends DialogFragment {
 
     private EditDialogListener listener;
     private TextInputLayout title;
 
     public interface EditDialogListener {
-        void setEditNameDialog(EditNameDialog editNameDialog);
+        void setNameDialog(NameDialog nameDialog);
         void onEditName(EditNameDialogType type, String name);
     }
 
-    public static EditNameDialog newInstance(EditNameDialogType type, int parentId) {
+    public static NameDialog newInstance(EditNameDialogType type, int parentId) {
         Bundle args = new Bundle();
-        EditNameDialog fragment = new EditNameDialog();
+        NameDialog fragment = new NameDialog();
         args.putSerializable("type", type);
         args.putInt("parent_id", parentId);
         fragment.setArguments(args);
@@ -38,16 +39,16 @@ public class EditNameDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.DialogTheme);
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.edit_name_dialog, null);
+        View view = inflater.inflate(R.layout.name_dialog, null);
         builder.setTitle(R.string.name);
 
         listener = (EditDialogListener) getParentFragment();
-        listener.setEditNameDialog(this);
+        listener.setNameDialog(this);
 
         EditNameDialogType type = (EditNameDialogType) getArguments().getSerializable("type");
-        title = view.findViewById(R.id.edit_name);
+        title = view.findViewById(R.id.name_dialog_name_input);
 
         if (savedInstanceState != null && savedInstanceState.containsKey("name")) {
             title.getEditText().setText(savedInstanceState.getString("name"));
@@ -62,12 +63,13 @@ public class EditNameDialog extends DialogFragment {
         if (type == EditNameDialogType.USERNAME) {
             title.getEditText().setText(PreferencesManager.getInstance(getContext()).getName());
         }
-        Button editButton = view.findViewById(R.id.edit_popup_save_button);
+        Button editButton = view.findViewById(R.id.name_dialog_save_button);
         editButton.setOnClickListener(v -> {
             listener.onEditName(type, title.getEditText().getText().toString());
         });
-        Button cancelButton = view.findViewById(R.id.edit_popup_cancel_button);
+        Button cancelButton = view.findViewById(R.id.name_dialog_cancel_button);
         cancelButton.setOnClickListener(v -> dismiss());
+
         builder.setView(view);
         return builder.create();
     }

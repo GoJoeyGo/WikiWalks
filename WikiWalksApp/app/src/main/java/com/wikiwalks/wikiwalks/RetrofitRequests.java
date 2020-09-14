@@ -114,46 +114,46 @@ public interface RetrofitRequests {
                                       @Body RequestBody body);
 
     @POST("/paths/{id}/pictures")
-    Call<JsonElement> getPathPictures(@Path("id") int id,
-                                      @Query("page") int page,
-                                      @Body RequestBody body);
+    Call<JsonElement> getPathPhotos(@Path("id") int id,
+                                    @Query("page") int page,
+                                    @Body RequestBody body);
 
     @Multipart
     @POST("/paths/{id}/pictures/new")
-    Call<JsonElement> newPathPicture(@Path("id") int id,
-                                     @Part MultipartBody.Part image,
-                                     @Part("device_id") RequestBody deviceId,
-                                     @Part("description") RequestBody description);
+    Call<JsonElement> newPathPhoto(@Path("id") int id,
+                                   @Part MultipartBody.Part image,
+                                   @Part("device_id") RequestBody deviceId,
+                                   @Part("description") RequestBody description);
 
-    @POST("/paths/{id}/pictures/{picture_id}/edit")
-    Call<JsonElement> editPathPicture(@Path("id") int id,
-                                      @Path("picture_id") int pictureId,
+    @POST("/paths/{id}/pictures/{photo_id}/edit")
+    Call<JsonElement> editPathPhoto(@Path("id") int id,
+                                    @Path("photo_id") int photoId,
+                                    @Body RequestBody body);
+
+    @POST("/paths/{id}/pictures/{photo_id}/delete")
+    Call<JsonElement> deletePathPhoto(@Path("id") int id,
+                                      @Path("photo_id") int photoId,
                                       @Body RequestBody body);
 
-    @POST("/paths/{id}/pictures/{picture_id}/delete")
-    Call<JsonElement> deletePathPicture(@Path("id") int id,
-                                        @Path("picture_id") int pictureId,
-                                        @Body RequestBody body);
-
     @POST("/pois/{id}/pictures")
-    Call<JsonElement> getPoIPictures(@Path("id") int id,
-                                     @Query("page") int page,
-                                     @Body RequestBody body);
+    Call<JsonElement> getPoIPhotos(@Path("id") int id,
+                                   @Query("page") int page,
+                                   @Body RequestBody body);
 
     @Multipart
     @POST("/pois/{id}/pictures/new")
-    Call<JsonElement> newPoIPicture(@Path("id") int id,
-                                    @Part MultipartBody.Part image,
-                                    @Part("device_id") RequestBody deviceId,
-                                    @Part("description") RequestBody description);
+    Call<JsonElement> newPoIPhoto(@Path("id") int id,
+                                  @Part MultipartBody.Part image,
+                                  @Part("device_id") RequestBody deviceId,
+                                  @Part("description") RequestBody description);
 
-    @POST("/pois/{id}/pictures/{picture_id}/edit")
-    Call<JsonElement> editPoIPicture(@Path("id") int id,
-                                     @Path("picture_id") int pictureId,
+    @POST("/pois/{id}/pictures/{photo_id}/edit")
+    Call<JsonElement> editPoIPhoto(@Path("id") int id,
+                                   @Path("photo_id") int photoId,
+                                   @Body RequestBody body);
+
+    @POST("/pois/{id}/pictures/{photo_id}/delete")
+    Call<JsonElement> deletePoIPhoto(@Path("id") int id,
+                                     @Path("photo_id") int photoId,
                                      @Body RequestBody body);
-
-    @POST("/pois/{id}/pictures/{picture_id}/delete")
-    Call<JsonElement> deletePoIPicture(@Path("id") int id,
-                                       @Path("picture_id") int pictureId,
-                                       @Body RequestBody body);
 }

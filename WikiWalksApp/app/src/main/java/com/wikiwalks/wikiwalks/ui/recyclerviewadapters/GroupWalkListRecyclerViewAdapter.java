@@ -89,7 +89,7 @@ public class GroupWalkListRecyclerViewAdapter extends RecyclerView.Adapter<Group
             time = itemView.findViewById(R.id.group_walk_row_time);
             host = itemView.findViewById(R.id.group_walk_row_host);
             attendees = itemView.findViewById(R.id.group_walk_row_attendees);
-            attendingButton = itemView.findViewById(R.id.group_walk_row_attend_button);
+            attendingButton = itemView.findViewById(R.id.group_walk_rows_attend_button);
             editButton = itemView.findViewById(R.id.group_walk_row_edit_button);
         }
     }

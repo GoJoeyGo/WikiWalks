@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     xmlns:tools="http://schemas.android.com/tools"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="300dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/poi_list_frag_collapsing_toolbar_layout"
+            android:id="@+id/poi_list_collapsing_toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
@@ -20,7 +20,7 @@
             app:titleEnabled="false">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/map_poi_list_frag"
+                android:id="@+id/poi_list_map"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -31,7 +31,7 @@
                 tools:context=".ui.main.PathFragment" />
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/poi_list_frag_toolbar"
+                android:id="@+id/poi_list_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="#00FFFFFF"
@@ -46,7 +46,6 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/points_nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/colorBackgroundFloating"
@@ -65,7 +64,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/no_points_indicator"
+                android:id="@+id/poi_list_empty_indicator"
                 style="@style/TextTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -76,9 +75,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

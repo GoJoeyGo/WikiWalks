@@ -119,7 +119,7 @@
     <string name="routes_recorded">Routes Recorded - %d</string>
     <string name="points_marked">Points of Interest Marked - %d</string>
     <string name="reviews_written">Reviews Written - %d</string>
-    <string name="pictures_uploaded">Pictures Uploaded - %d</string>
+    <string name="photos_uploaded">Photos Uploaded - %d</string>
 
     <string name="goal">Goal</string>
     <string name="goals">Goals</string>

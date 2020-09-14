@@ -1,7 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,12 +47,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.map_fragment, container, false);
 
         PathMap.getInstance().addListener(this);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.main_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.map_fragment_toolbar);
         toolbar.setTitle(R.string.app_name);
         toolbar.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
@@ -67,10 +66,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             return true;
         });
 
-        Button createPath = rootView.findViewById(R.id.create_path_button);
+        Button createPath = rootView.findViewById(R.id.map_fragment_add_button);
         createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack("Map").commit());
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_frag);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment_map);
         mapFragment.getMapAsync(this);
 
         return rootView;

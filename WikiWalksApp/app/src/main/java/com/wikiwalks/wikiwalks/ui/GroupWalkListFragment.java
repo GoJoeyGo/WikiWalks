@@ -21,7 +21,7 @@ import com.wikiwalks.wikiwalks.GroupWalk;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.PathMap;
 import com.wikiwalks.wikiwalks.R;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditGroupWalkDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.GroupWalkDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.GroupWalkListRecyclerViewAdapter;
 
 import java.util.ArrayList;
@@ -51,22 +51,22 @@ public class GroupWalkListFragment extends Fragment implements GroupWalk.GetGrou
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
         walks = path.getGroupWalksList();
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.path_group_walk_list_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.group_walk_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(String.format(getString(R.string.group_walks_title), path.getName()));
 
-        Button scheduleButton = rootView.findViewById(R.id.submit_group_walk_button);
+        Button scheduleButton = rootView.findViewById(R.id.group_walk_list_schedule_group_walk_button);
         scheduleButton.setOnClickListener(v -> launchEditDialog(-1));
 
         swipeRefreshLayout = rootView.findViewById(R.id.group_walk_list_swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this::updateGroupWalksList);
 
-        recyclerView = rootView.findViewById(R.id.path_group_walk_list_recyclerview);
+        recyclerView = rootView.findViewById(R.id.group_walk_list_recyclerview);
         recyclerView.setAdapter(new GroupWalkListRecyclerViewAdapter(this, walks));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
 
-        noWalksIndicator = rootView.findViewById(R.id.no_group_walks_indicator);
+        noWalksIndicator = rootView.findViewById(R.id.group_walk_list_empty_indicator);
         if (walks.size() == 0) {
             recyclerView.setVisibility(View.GONE);
             noWalksIndicator.setVisibility(View.VISIBLE);
@@ -123,7 +123,7 @@ public class GroupWalkListFragment extends Fragment implements GroupWalk.GetGrou
     }
 
     public void launchEditDialog(int position) {
-        EditGroupWalkDialog.newInstance(path.getId(), position).show(getChildFragmentManager(), "GroupWalkPopup");
+        GroupWalkDialog.newInstance(path.getId(), position).show(getChildFragmentManager(), "GroupWalkPopup");
     }
 
     @Override

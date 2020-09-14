@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import jsonify, request, Blueprint, send_from_directory
 from schemas import *
 
@@ -20,11 +20,6 @@ def get_path(path_id):
     path = Path.query.get(path_id)
     if path is None:
         return jsonify({"error": "path not found"}), 404
-    all_group_walks = GroupWalk.query.filter_by(path_id=path.id)
-    group_walks = []
-    for group_walk in all_group_walks:
-        if group_walk.time > int(datetime.now().timestamp()):
-            group_walks.append(group_walk)
     if request.method == "POST":
         request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
@@ -34,17 +29,10 @@ def get_path(path_id):
         for poi in pois:
             if poi in user.points_of_interest:
                 poi.editable = True
-        for group_walk in group_walks:
-            if group_walk in user.group_walks:
-                group_walk.editable = True
-            if group_walk in user.group_walks_attending:
-                group_walk.attending = True
         routes = Route.query.filter_by(path=path.id)
         for route in routes:
             if route in user.routes:
                 route.editable = True
-    for group_walk in group_walks:
-        group_walk.submitter = User.query.filter_by(id=group_walk.submitter).first().nickname
     path_schema = PathSchema()
     output = path_schema.dump(path)
     return jsonify({"path": output})
@@ -79,27 +67,10 @@ def get_paths():
             for poi in pois:
                 if poi in user.points_of_interest:
                     poi.editable = True
-            all_group_walks = GroupWalk.query.filter_by(path_id=path.id)
-            group_walks = []
-            for group_walk in all_group_walks:
-                if group_walk.time > int(datetime.now().timestamp()):
-                    group_walks.append(group_walk)
-            for group_walk in group_walks:
-                if group_walk in user.group_walks:
-                    group_walk.editable = True
-                if group_walk in user.group_walks_attending:
-                    group_walk.attending = True
             routes = Route.query.filter_by(path=path.id)
             for route in routes:
                 if route in user.routes:
                     route.editable = True
-    for path in in_range_paths:
-        all_group_walks = GroupWalk.query.filter_by(path_id=path.id)
-        group_walks = []
-        for group_walk in all_group_walks:
-            if group_walk.time > int(datetime.now().timestamp()):
-                group_walk.submitter = User.query.filter_by(id=group_walk.submitter).first().nickname
-                group_walks.append(group_walk)
     path_schema = PathSchema(many=True)
     output = path_schema.dump(in_range_paths)
     return jsonify({"paths": output})
@@ -167,6 +138,8 @@ def get_group_walks(path_id):
         for group_walk in upcoming_group_walks:
             if group_walk in user.group_walks:
                 group_walk.editable = True
+            if group_walk in user.group_walks_attending:
+                group_walk.attending = True
     group_walks_list_schema = GroupWalkSchema(many=True)
     output = group_walks_list_schema.dump(upcoming_group_walks)
     return jsonify({"group_walks": output})
@@ -213,7 +186,7 @@ def get_pois():
 
 @gets.route("/pois/<poi_id>/reviews", methods=["GET", "POST"])
 def poi_review_list(poi_id):
-    point_of_interest = Path.query.filter_by(id=poi_id).first()
+    point_of_interest = PointOfInterest.query.filter_by(id=poi_id).first()
     page = request.args.get('page', default=1, type=int)
     reviews = PointOfInterestReview.query.filter_by(point_of_interest_id=poi_id) \
         .order_by(PointOfInterestReview.created_time.desc())

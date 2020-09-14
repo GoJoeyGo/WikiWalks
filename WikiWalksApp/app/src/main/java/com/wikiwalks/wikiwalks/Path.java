@@ -29,14 +29,14 @@ public class Path {
 
     private ArrayList<Route> routeList = new ArrayList<>();
     private ArrayList<PointOfInterest> pointsOfInterest = new ArrayList<>();
-    private ArrayList<Picture> pictures = new ArrayList<>();
+    private ArrayList<Photo> photos = new ArrayList<>();
     private ArrayList<Review> reviews = new ArrayList<>();
     private ArrayList<GroupWalk> groupWalks = new ArrayList<>();
     private Review ownReview;
     private int nextReviewPage = 1;
-    private int nextPicturePage = 1;
+    private int nextPhotoPage = 1;
     private boolean isLoadingReviews = false;
-    private boolean isLoadingPictures = false;
+    private boolean isLoadingPhotos = false;
 
     private ArrayList<Marker> markers = new ArrayList<>();
     private LatLng markerPoint;
@@ -130,8 +130,8 @@ public class Path {
         this.rating = rating;
     }
 
-    public ArrayList<Picture> getPicturesList() {
-        return pictures;
+    public ArrayList<Photo> getPhotosList() {
+        return photos;
     }
 
     public ArrayList<Review> getReviewsList() {
@@ -149,6 +149,7 @@ public class Path {
     public void setOwnReview(Review ownReview) {
         this.ownReview = ownReview;
     }
+
     public ArrayList<Double> getAllAltitudes() {
         ArrayList<Double> allAltitudes = new ArrayList<>();
         for (Route route : routeList) {
@@ -172,6 +173,7 @@ public class Path {
         }
         return allLongitudes;
     }
+
     public ArrayList<PointOfInterest> getPointsOfInterest() {
         return pointsOfInterest;
     }
@@ -297,46 +299,46 @@ public class Path {
         }
     }
 
-    public void getPictures(Context context, boolean refresh, Picture.GetPicturesCallback callback) {
+    public void getPhotos(Context context, boolean refresh, Photo.GetPhotosCallback callback) {
         if (refresh) {
-            pictures.clear();
-            nextPicturePage = 1;
-            isLoadingPictures = false;
+            photos.clear();
+            nextPhotoPage = 1;
+            isLoadingPhotos = false;
         }
-        if (!isLoadingPictures) {
-            isLoadingPictures = true;
+        if (!isLoadingPhotos) {
+            isLoadingPhotos = true;
             JsonObject request = new JsonObject();
             request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPathPictures(id, nextPicturePage, body);
-            getPictures.enqueue(new Callback<JsonElement>() {
+            Call<JsonElement> getPhotos = MainActivity.getRetrofitRequests(context).getPathPhotos(id, nextPhotoPage, body);
+            getPhotos.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                        JsonArray pictures = response.body().getAsJsonObject().get("pictures").getAsJsonArray();
-                        for (int i = 0; i < pictures.size(); i++) {
-                            JsonObject picture = pictures.get(i).getAsJsonObject();
+                        JsonArray photos = response.body().getAsJsonObject().get("pictures").getAsJsonArray();
+                        for (int i = 0; i < photos.size(); i++) {
+                            JsonObject photo = photos.get(i).getAsJsonObject();
                             boolean exists = false;
-                            for (Picture pathPicture : Path.this.pictures) {
-                                if (pathPicture.getId() == picture.get("id").getAsInt()) {
+                            for (Photo pathPhoto : Path.this.photos) {
+                                if (pathPhoto.getId() == photo.get("id").getAsInt()) {
                                     exists = true;
                                     break;
                                 }
                             }
                             if (!exists) {
-                                Picture newPicture = new Picture(picture, id, Picture.PictureType.PATH);
-                                Path.this.pictures.add(newPicture);
+                                Photo newPhoto = new Photo(photo, id, Photo.PhotoType.PATH);
+                                Path.this.photos.add(newPhoto);
                             }
                         }
-                        nextPicturePage++;
-                        isLoadingPictures = false;
-                        callback.onGetPicturesSuccess();
+                        nextPhotoPage++;
+                        isLoadingPhotos = false;
+                        callback.onGetPhotosSuccess();
                     } else {
-                        if (nextPicturePage > 1) {
+                        if (nextPhotoPage > 1) {
                             Toast.makeText(context, R.string.no_more_photos, Toast.LENGTH_SHORT).show();
                         } else {
-                            isLoadingPictures = false;
-                            callback.onGetPicturesFailure();
+                            isLoadingPhotos = false;
+                            callback.onGetPhotosFailure();
                         }
                     }
                 }
@@ -344,7 +346,7 @@ public class Path {
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Log.e("Path", "Sending get photos request", t);
-                    callback.onGetPicturesFailure();
+                    callback.onGetPhotosFailure();
                 }
             });
         }
@@ -354,7 +356,7 @@ public class Path {
         JsonObject request = new JsonObject();
         request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-        Call<JsonElement> getGroupWalks =MainActivity.getRetrofitRequests(context).getGroupWalks(id, body);
+        Call<JsonElement> getGroupWalks = MainActivity.getRetrofitRequests(context).getGroupWalks(id, body);
         getGroupWalks.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {

@@ -1,7 +1,6 @@
 package com.wikiwalks.wikiwalks.ui.recyclerviewadapters;
 
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ public class GoalsListRecyclerViewAdapter extends RecyclerView.Adapter<GoalsList
     @Override
     public GoalsListRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parentFragment.getContext());
-        View view = inflater.inflate(R.layout.goals_list_row, parent, false);
+        View view = inflater.inflate(R.layout.goal_list_row, parent, false);
         return new GoalsListRecyclerViewAdapter.ViewHolder(view);
     }
 
@@ -85,10 +84,10 @@ public class GoalsListRecyclerViewAdapter extends RecyclerView.Adapter<GoalsList
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            dateRange = itemView.findViewById(R.id.goal_date_range);
-            progress = itemView.findViewById(R.id.goal_progress);
-            editButton = itemView.findViewById(R.id.goal_edit_button);
-            separator = itemView.findViewById(R.id.goal_separator);
+            dateRange = itemView.findViewById(R.id.goal_row_date_range);
+            progress = itemView.findViewById(R.id.goal_row_progress_indicator);
+            editButton = itemView.findViewById(R.id.goal_row_edit_button);
+            separator = itemView.findViewById(R.id.goal_row_separator);
         }
     }
 }

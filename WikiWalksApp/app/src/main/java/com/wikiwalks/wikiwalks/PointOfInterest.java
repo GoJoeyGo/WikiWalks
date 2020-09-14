@@ -25,13 +25,13 @@ public class PointOfInterest {
     private LatLng coordinates;
     private int id;
     private String name;
-    private ArrayList<Picture> picturesList = new ArrayList<>();
+    private ArrayList<Photo> photosList = new ArrayList<>();
     private ArrayList<Review> reviewsList = new ArrayList<>();
     private Review ownReview;
     private int nextReviewPage = 1;
-    private int nextPicturePage = 1;
+    private int nextPhotoPage = 1;
     private boolean isLoadingReviews = false;
-    private boolean isLoadingPictures = false;
+    private boolean isLoadingPhotos = false;
     private double rating;
     private boolean editable;
     private Path path;
@@ -133,8 +133,8 @@ public class PointOfInterest {
         return reviewsList;
     }
 
-    public ArrayList<Picture> getPicturesList() {
-        return picturesList;
+    public ArrayList<Photo> getPhotosList() {
+        return photosList;
     }
 
     public boolean isEditable() {
@@ -209,30 +209,30 @@ public class PointOfInterest {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                            JsonObject responseJson = response.body().getAsJsonObject();
-                            JsonArray reviews = responseJson.get("reviews").getAsJsonArray();
-                            for (int i = 0; i < reviews.size(); i++) {
-                                JsonObject review = reviews.get(i).getAsJsonObject();
-                                boolean exists = false;
-                                for (Review pointOfInterestReview : reviewsList) {
-                                    if (pointOfInterestReview.getId() == review.get("id").getAsInt()) {
-                                        exists = true;
-                                        break;
-                                    }
-                                }
-                                if (!exists) {
-                                    Review newReview = new Review(review, id, Review.ReviewType.POINT_OF_INTEREST);
-                                    reviewsList.add(newReview);
+                        JsonObject responseJson = response.body().getAsJsonObject();
+                        JsonArray reviews = responseJson.get("reviews").getAsJsonArray();
+                        for (int i = 0; i < reviews.size(); i++) {
+                            JsonObject review = reviews.get(i).getAsJsonObject();
+                            boolean exists = false;
+                            for (Review pointOfInterestReview : reviewsList) {
+                                if (pointOfInterestReview.getId() == review.get("id").getAsInt()) {
+                                    exists = true;
+                                    break;
                                 }
                             }
-                            if (responseJson.has("own_review")) {
-                                JsonObject review = responseJson.get("own_review").getAsJsonArray().get(0).getAsJsonObject();
-                                ownReview = new Review(review, id, Review.ReviewType.POINT_OF_INTEREST);
+                            if (!exists) {
+                                Review newReview = new Review(review, id, Review.ReviewType.POINT_OF_INTEREST);
+                                reviewsList.add(newReview);
                             }
-                            rating = responseJson.get("average_rating").getAsDouble();
-                            nextReviewPage++;
-                            isLoadingReviews = false;
-                            callback.onGetReviewSuccess();
+                        }
+                        if (responseJson.has("own_review")) {
+                            JsonObject review = responseJson.get("own_review").getAsJsonArray().get(0).getAsJsonObject();
+                            ownReview = new Review(review, id, Review.ReviewType.POINT_OF_INTEREST);
+                        }
+                        rating = responseJson.get("average_rating").getAsDouble();
+                        nextReviewPage++;
+                        isLoadingReviews = false;
+                        callback.onGetReviewSuccess();
                     } else {
                         if (nextReviewPage > 1) {
                             Toast.makeText(context, R.string.no_more_reviews, Toast.LENGTH_SHORT).show();
@@ -252,46 +252,46 @@ public class PointOfInterest {
         }
     }
 
-    public void getPictures(Context context, boolean refresh, Picture.GetPicturesCallback callback) {
+    public void getPhotos(Context context, boolean refresh, Photo.GetPhotosCallback callback) {
         if (refresh) {
-            picturesList.clear();
-            nextPicturePage = 1;
-            isLoadingPictures = false;
+            photosList.clear();
+            nextPhotoPage = 1;
+            isLoadingPhotos = false;
         }
-        if (!isLoadingPictures) {
-            isLoadingPictures = true;
+        if (!isLoadingPhotos) {
+            isLoadingPhotos = true;
             JsonObject request = new JsonObject();
             request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
             RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> getPictures = MainActivity.getRetrofitRequests(context).getPoIPictures(id, nextPicturePage, body);
-            getPictures.enqueue(new Callback<JsonElement>() {
+            Call<JsonElement> getPhotos = MainActivity.getRetrofitRequests(context).getPoIPhotos(id, nextPhotoPage, body);
+            getPhotos.enqueue(new Callback<JsonElement>() {
                 @Override
                 public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                     if (response.isSuccessful()) {
-                        JsonArray pictures = response.body().getAsJsonObject().get("pictures").getAsJsonArray();
-                        for (int i = 0; i < pictures.size(); i++) {
-                            JsonObject picture = pictures.get(i).getAsJsonObject();
+                        JsonArray photos = response.body().getAsJsonObject().get("pictures").getAsJsonArray();
+                        for (int i = 0; i < photos.size(); i++) {
+                            JsonObject photo = photos.get(i).getAsJsonObject();
                             boolean exists = false;
-                            for (Picture poiPicture : PointOfInterest.this.picturesList) {
-                                if (poiPicture.getId() == picture.get("id").getAsInt()) {
+                            for (Photo poiPhoto : PointOfInterest.this.photosList) {
+                                if (poiPhoto.getId() == photo.get("id").getAsInt()) {
                                     exists = true;
                                     break;
                                 }
                             }
                             if (!exists) {
-                                Picture newPicture = new Picture(picture, id, Picture.PictureType.POINT_OF_INTEREST);
-                                PointOfInterest.this.picturesList.add(newPicture);
+                                Photo newPhoto = new Photo(photo, id, Photo.PhotoType.POINT_OF_INTEREST);
+                                PointOfInterest.this.photosList.add(newPhoto);
                             }
                         }
-                        nextPicturePage++;
-                        isLoadingPictures = false;
-                        callback.onGetPicturesSuccess();
+                        nextPhotoPage++;
+                        isLoadingPhotos = false;
+                        callback.onGetPhotosSuccess();
                     } else {
-                        if (nextPicturePage > 1) {
+                        if (nextPhotoPage > 1) {
                             Toast.makeText(context, R.string.no_more_photos, Toast.LENGTH_SHORT).show();
                         } else {
-                            isLoadingPictures = false;
-                            callback.onGetPicturesFailure();
+                            isLoadingPhotos = false;
+                            callback.onGetPhotosFailure();
                         }
                     }
                 }
@@ -299,7 +299,7 @@ public class PointOfInterest {
                 @Override
                 public void onFailure(Call<JsonElement> call, Throwable t) {
                     Log.e("PointOfInterest", "Sending get photos request", t);
-                    callback.onGetPicturesFailure();
+                    callback.onGetPhotosFailure();
                 }
             });
         }

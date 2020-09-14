@@ -27,7 +27,7 @@ public class GroupWalk extends DialogFragment {
     private boolean editable;
     private Path path;
 
-    public interface GetGroupWalksCallback{
+    public interface GetGroupWalksCallback {
         void onGetGroupWalksSuccess();
         void onGetGroupWalksFailure();
     }
@@ -45,17 +45,7 @@ public class GroupWalk extends DialogFragment {
     }
 
     public GroupWalk(JsonObject attributes, Path path) {
-        id = attributes.get("id").getAsInt();
-        title = attributes.get("title").getAsString();
-        time = attributes.get("time").getAsLong();
-        JsonArray attendees = attributes.get("attendees").getAsJsonArray();
-        ArrayList<String> attendeesList = new ArrayList<>();
-        for (int i = 0; i < attendees.size(); i++) {
-            attendeesList.add(attendees.get(i).getAsJsonObject().get("nickname").getAsString());
-        }
-        hostName = attributes.get("submitter").getAsString();
-        attending = attributes.get("attending").getAsBoolean();
-        editable = attributes.get("editable").getAsBoolean();
+        setAttributes(attributes);
         this.path = path;
     }
 
@@ -88,8 +78,18 @@ public class GroupWalk extends DialogFragment {
         });
     }
 
-    public int getGroupWalkId() {
-        return id;
+    private void setAttributes(JsonObject attributes) {
+        attendees.clear();
+        id = attributes.get("id").getAsInt();
+        title = attributes.get("title").getAsString();
+        time = attributes.get("time").getAsLong();
+        JsonArray attendees = attributes.get("attendees").getAsJsonArray();
+        for (int i = 0; i < attendees.size(); i++) {
+            this.attendees.add(attendees.get(i).getAsJsonObject().get("nickname").getAsString());
+        }
+        hostName = attributes.get("submitter").getAsString();
+        attending = attributes.get("attending").getAsBoolean();
+        editable = attributes.get("editable").getAsBoolean();
     }
 
     public long getTime() {
@@ -125,13 +125,7 @@ public class GroupWalk extends DialogFragment {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
-                    JsonObject groupWalk = response.body().getAsJsonObject().get("group_walk").getAsJsonObject();
-                    attending = groupWalk.get("attending").getAsBoolean();
-                    attendees.clear();
-                    JsonArray newAttendees = groupWalk.get("attendees").getAsJsonArray();
-                    for (int i = 0; i < newAttendees.size(); i++) {
-                        attendees.add(newAttendees.get(i).getAsJsonObject().get("nickname").getAsString());
-                    }
+                    setAttributes(response.body().getAsJsonObject().get("group_walk").getAsJsonObject());
                     callback.toggleAttendanceSuccess();
                 } else {
                     callback.toggleAttendanceFailure();

@@ -22,7 +22,7 @@ import com.wikiwalks.wikiwalks.CustomActivityResultContracts;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.NameDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,9 +32,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SettingsFragment extends Fragment implements EditNameDialog.EditDialogListener {
+public class SettingsFragment extends Fragment implements NameDialog.EditDialogListener {
 
-    EditNameDialog editNameDialog;
+    NameDialog nameDialog;
     ActivityResultLauncher<String> exportSettings = registerForActivityResult(new CustomActivityResultContracts.ExportSettings(), uri -> {
         if (uri != null) {
             PreferencesManager.getInstance(getContext()).exportPreferences(uri);
@@ -54,12 +54,12 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
     }
 
     @Override
-    public void setEditNameDialog(EditNameDialog editNameDialog) {
-        this.editNameDialog = editNameDialog;
+    public void setNameDialog(NameDialog nameDialog) {
+        this.nameDialog = nameDialog;
     }
 
     @Override
-    public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
+    public void onEditName(NameDialog.EditNameDialogType type, String name) {
         JsonObject request = new JsonObject();
         request.addProperty("device_id", PreferencesManager.getInstance(getContext()).getDeviceId());
         request.addProperty("name", name);
@@ -69,7 +69,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
-                    editNameDialog.dismiss();
+                    nameDialog.dismiss();
                     PreferencesManager.getInstance(getContext()).setName(name);
                     Toast.makeText(getContext(), R.string.save_name_success, Toast.LENGTH_SHORT).show();
                 } else {
@@ -91,21 +91,21 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.settings_fragment, container, false);
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.settings_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.settings_fragment_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(R.string.settings_title);
 
-        Button setNameButton = rootView.findViewById(R.id.settings_set_name_button);
-        setNameButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
+        Button setNameButton = rootView.findViewById(R.id.settings_fragment_set_name_button);
+        setNameButton.setOnClickListener(v -> NameDialog.newInstance(NameDialog.EditNameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
 
-        Button statisticsButton = rootView.findViewById(R.id.settings_statistics_button);
+        Button statisticsButton = rootView.findViewById(R.id.settings_fragment_statistics_button);
         statisticsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, StatisticsFragment.newInstance()).addToBackStack(null).commit());
 
-        Button goalsButton = rootView.findViewById(R.id.settings_goals_button);
+        Button goalsButton = rootView.findViewById(R.id.settings_fragment_goals_button);
         goalsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, GoalsFragment.newInstance()).addToBackStack(null).commit());
 
-        Button exportSettingsButton = rootView.findViewById(R.id.settings_export_settings_button);
+        Button exportSettingsButton = rootView.findViewById(R.id.settings_fragment_export_settings_fragment_button);
         exportSettingsButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
             if (granted) {
                 exportSettings.launch("wikiwalks_backup_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".json");
@@ -114,7 +114,7 @@ public class SettingsFragment extends Fragment implements EditNameDialog.EditDia
             }
         }));
 
-        Button importSettingsButton = rootView.findViewById(R.id.settings_import_settings_button);
+        Button importSettingsButton = rootView.findViewById(R.id.settings_fragment_import_settings_fragment_button);
         importSettingsButton.setOnClickListener(v -> MainActivity.checkPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, granted -> {
             if (granted) {
                 importSettings.launch(new String[]{"application/json", "application/octet-stream"});
