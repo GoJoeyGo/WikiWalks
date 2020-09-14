@@ -41,6 +41,10 @@ public interface RetrofitRequests {
     Call<JsonElement> deleteRoute(@Path("id") int id,
                                   @Body RequestBody body);
 
+    @POST("/paths/{id}/group_walks")
+    Call<JsonElement> getGroupWalks(@Path("id") int id,
+                                    @Body RequestBody body);
+
     @POST("/paths/{id}/group_walks/new")
     Call<JsonElement> addGroupWalk(@Path("id") int id,
                                    @Body RequestBody body);

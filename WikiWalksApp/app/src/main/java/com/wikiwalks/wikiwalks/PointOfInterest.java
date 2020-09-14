@@ -193,7 +193,7 @@ public class PointOfInterest {
         });
     }
 
-    public void getReviews(Context context, boolean refresh, Review.GetReviewCallback callback) {
+    public void getReviews(Context context, boolean refresh, Review.GetReviewsCallback callback) {
         if (refresh) {
             reviewsList.clear();
             nextReviewPage = 1;

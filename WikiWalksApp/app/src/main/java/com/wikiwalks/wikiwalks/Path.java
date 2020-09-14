@@ -52,38 +52,26 @@ public class Path {
         void onEditFailure();
     }
 
-    public Path(int id, String name, int walkCount, double rating, double[] bounds) {
-        this.id = id;
-        this.name = name;
-        this.walkCount = walkCount;
-        this.rating = rating;
-        this.bounds = new LatLngBounds(new LatLng(bounds[0], bounds[1]), new LatLng(bounds[2], bounds[3]));
-    }
-
-    public Path() {
-        id = -1;
-    }
-
-    public Path(JsonObject pathJson) {
-        id = pathJson.get("id").getAsInt();
-        name = pathJson.get("name").getAsString();
-        walkCount = pathJson.get("walk_count").getAsInt();
-        rating = pathJson.get("average_rating").getAsDouble();
-        markerPoint = new LatLng(pathJson.get("marker_point").getAsJsonArray().get(0).getAsDouble(), pathJson.get("marker_point").getAsJsonArray().get(1).getAsDouble());
-        JsonArray boundaries = pathJson.get("boundaries").getAsJsonArray();
+    public Path(JsonObject attributes) {
+        id = attributes.get("id").getAsInt();
+        name = attributes.get("name").getAsString();
+        walkCount = attributes.get("walk_count").getAsInt();
+        rating = attributes.get("average_rating").getAsDouble();
+        markerPoint = new LatLng(attributes.get("marker_point").getAsJsonArray().get(0).getAsDouble(), attributes.get("marker_point").getAsJsonArray().get(1).getAsDouble());
+        JsonArray boundaries = attributes.get("boundaries").getAsJsonArray();
         bounds = new LatLngBounds(new LatLng(boundaries.get(0).getAsDouble(), boundaries.get(1).getAsDouble()), new LatLng(boundaries.get(2).getAsDouble(), boundaries.get(3).getAsDouble()));
-        JsonArray points_of_interest = pathJson.get("points_of_interest").getAsJsonArray();
+        JsonArray points_of_interest = attributes.get("points_of_interest").getAsJsonArray();
         for (int i = 0; i < points_of_interest.size(); i++) {
             PointOfInterest newPointOfInterest = new PointOfInterest(points_of_interest.get(i).getAsJsonObject(), this);
             pointsOfInterest.add(newPointOfInterest);
             PathMap.getInstance().getPointOfInterestList().put(newPointOfInterest.getId(), newPointOfInterest);
         }
-        JsonArray groupWalks = pathJson.get("group_walks").getAsJsonArray();
+        JsonArray groupWalks = attributes.get("group_walks").getAsJsonArray();
         for (int i = 0; i < groupWalks.size(); i++) {
             GroupWalk newGroupWalk = new GroupWalk(groupWalks.get(i).getAsJsonObject(), this);
             this.groupWalks.add(newGroupWalk);
         }
-        JsonArray routes = pathJson.get("routes").getAsJsonArray();
+        JsonArray routes = attributes.get("routes").getAsJsonArray();
         for (int i = 0; i < routes.size(); i++) {
             JsonObject route = routes.get(i).getAsJsonObject();
             routeList.add(new Route(route, this));
@@ -150,7 +138,7 @@ public class Path {
         return reviews;
     }
 
-    public ArrayList<GroupWalk> getGroupWalks() {
+    public ArrayList<GroupWalk> getGroupWalksList() {
         return groupWalks;
     }
 
@@ -251,7 +239,7 @@ public class Path {
         });
     }
 
-    public void getReviews(Context context, boolean refresh, Review.GetReviewCallback callback) {
+    public void getReviews(Context context, boolean refresh, Review.GetReviewsCallback callback) {
         if (refresh) {
             reviews.clear();
             nextReviewPage = 1;
@@ -360,5 +348,31 @@ public class Path {
                 }
             });
         }
+    }
+
+    public void getGroupWalks(Context context, GroupWalk.GetGroupWalksCallback callback) {
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> getGroupWalks =MainActivity.getRetrofitRequests(context).getGroupWalks(id, body);
+        getGroupWalks.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    groupWalks.clear();
+                    JsonArray newGroupWalks = response.body().getAsJsonObject().get("group_walks").getAsJsonArray();
+                    for (JsonElement groupWalk : newGroupWalks) {
+                        groupWalks.add(new GroupWalk(groupWalk.getAsJsonObject(), Path.this));
+                    }
+                    callback.onGetGroupWalksSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("Path", "Sending get group walks request", t);
+                callback.onGetGroupWalksFailure();
+            }
+        });
     }
 }

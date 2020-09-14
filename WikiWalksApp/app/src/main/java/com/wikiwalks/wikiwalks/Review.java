@@ -19,7 +19,7 @@ public class Review {
     private String message;
     private ReviewType type;
 
-    public interface GetReviewCallback {
+    public interface GetReviewsCallback {
         void onGetReviewSuccess();
         void onGetReviewFailure();
     }

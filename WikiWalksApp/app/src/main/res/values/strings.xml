@@ -101,6 +101,7 @@
     <string name="attend_group_walk_prompt">Attend Group Walk?</string>
     <string name="cancel_group_walk_attendance_prompt">Cancel Attendance?</string>
     <string name="cancel_group_walk_prompt">Cancel Group Walk?</string>
+    <string name="get_group_walks_failure">Failed to get group walks…</string>
     <string name="save_group_walk_success">Saved group walk successfully!</string>
     <string name="save_group_walk_failure">Failed to save group walk…</string>
     <string name="delete_group_walk_success">Cancelled group walk successfully!</string>

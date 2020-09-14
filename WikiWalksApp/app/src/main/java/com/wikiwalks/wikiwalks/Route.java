@@ -144,7 +144,7 @@ public class Route {
         return editable;
     }
 
-    public void delete(final Context context, RouteModifyCallback callback) {
+    public void delete(Context context, RouteModifyCallback callback) {
         JsonObject request = new JsonObject();
         request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
@@ -159,7 +159,6 @@ public class Route {
                             marker.remove();
                         }
                         PathMap.getInstance().deletePath(path);
-
                     }
                     for (Polyline polyline : polylines) {
                         polyline.remove();

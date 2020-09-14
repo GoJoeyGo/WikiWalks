@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -25,12 +26,13 @@ import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.GroupWalkListRecyclerView
 
 import java.util.ArrayList;
 
-public class GroupWalkListFragment extends Fragment {
+public class GroupWalkListFragment extends Fragment implements GroupWalk.GetGroupWalksCallback {
 
     private Path path;
     private RecyclerView recyclerView;
     private TextView noWalksIndicator;
     private ArrayList<GroupWalk> walks;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public static GroupWalkListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
@@ -47,7 +49,7 @@ public class GroupWalkListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.group_walk_list_fragment, container, false);
 
         path = PathMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
-        walks = path.getGroupWalks();
+        walks = path.getGroupWalksList();
 
         MaterialToolbar toolbar = rootView.findViewById(R.id.path_group_walk_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
@@ -56,6 +58,9 @@ public class GroupWalkListFragment extends Fragment {
 
         Button scheduleButton = rootView.findViewById(R.id.submit_group_walk_button);
         scheduleButton.setOnClickListener(v -> launchEditDialog(-1));
+
+        swipeRefreshLayout = rootView.findViewById(R.id.group_walk_list_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this::updateGroupWalksList);
 
         recyclerView = rootView.findViewById(R.id.path_group_walk_list_recyclerview);
         recyclerView.setAdapter(new GroupWalkListRecyclerViewAdapter(this, walks));
@@ -70,7 +75,14 @@ public class GroupWalkListFragment extends Fragment {
             noWalksIndicator.setVisibility(View.GONE);
         }
 
+        updateGroupWalksList();
+
         return rootView;
+    }
+
+    private void updateGroupWalksList() {
+        swipeRefreshLayout.setRefreshing(true);
+        path.getGroupWalks(getContext(), this);
     }
 
     public void updateRecyclerView() {
@@ -83,10 +95,11 @@ public class GroupWalkListFragment extends Fragment {
         }
         recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.getAdapter().notifyItemRangeChanged(0, walks.size());
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     public void toggleAttendance(int position, View checkbox) {
-        GroupWalk walk = path.getGroupWalks().get(position);
+        GroupWalk walk = path.getGroupWalksList().get(position);
         checkbox.setEnabled(false);
         new MaterialAlertDialogBuilder(getContext())
                 .setTitle((walk.isAttending()) ? R.string.cancel_group_walk_attendance_prompt : R.string.attend_group_walk_prompt)
@@ -111,5 +124,15 @@ public class GroupWalkListFragment extends Fragment {
 
     public void launchEditDialog(int position) {
         EditGroupWalkDialog.newInstance(path.getId(), position).show(getChildFragmentManager(), "GroupWalkPopup");
+    }
+
+    @Override
+    public void onGetGroupWalksSuccess() {
+        updateRecyclerView();
+    }
+
+    @Override
+    public void onGetGroupWalksFailure() {
+        Toast.makeText(getContext(), R.string.get_group_walks_failure, Toast.LENGTH_SHORT).show();
     }
 }

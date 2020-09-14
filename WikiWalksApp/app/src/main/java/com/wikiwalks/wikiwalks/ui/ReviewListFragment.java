@@ -30,7 +30,7 @@ import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.ReviewListRecyclerViewAda
 
 import java.util.ArrayList;
 
-public class ReviewListFragment extends Fragment implements Review.GetReviewCallback, EditReviewDialog.EditReviewDialogListener {
+public class ReviewListFragment extends Fragment implements Review.GetReviewsCallback, EditReviewDialog.EditReviewDialogListener {
 
     private Button writeReviewButton;
     private int parentId;

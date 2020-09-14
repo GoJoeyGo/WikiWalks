@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import okhttp3.MediaType;
@@ -85,7 +86,7 @@ public class Picture {
                     callback.onEditPictureFailure();
                 }
             });
-        } catch (Exception e) {
+        } catch (IOException e) {
             Log.e("Picture", "Creating new photo request", e);
             callback.onEditPictureFailure();
         }

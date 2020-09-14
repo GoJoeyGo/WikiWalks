@@ -28,6 +28,7 @@
         android:id="@+id/statistics_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/statistics_toolbar_wrapper" />
+        app:layout_constraintTop_toBottomOf="@id/statistics_toolbar_wrapper"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

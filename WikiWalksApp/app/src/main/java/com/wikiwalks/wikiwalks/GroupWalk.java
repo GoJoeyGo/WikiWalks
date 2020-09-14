@@ -27,6 +27,11 @@ public class GroupWalk extends DialogFragment {
     private boolean editable;
     private Path path;
 
+    public interface GetGroupWalksCallback{
+        void onGetGroupWalksSuccess();
+        void onGetGroupWalksFailure();
+    }
+
     public interface EditGroupWalkCallback {
         void onEditSuccess();
         void onEditFailure();
@@ -68,7 +73,7 @@ public class GroupWalk extends DialogFragment {
                 if (response.isSuccessful()) {
                     JsonObject responseJson = response.body().getAsJsonObject().get("group_walk").getAsJsonObject();
                     GroupWalk newGroupWalk = new GroupWalk(responseJson, path);
-                    path.getGroupWalks().add(newGroupWalk);
+                    path.getGroupWalksList().add(newGroupWalk);
                     callback.onEditSuccess();
                 } else {
                     callback.onEditFailure();
@@ -175,7 +180,7 @@ public class GroupWalk extends DialogFragment {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
-                    path.getGroupWalks().remove(GroupWalk.this);
+                    path.getGroupWalksList().remove(GroupWalk.this);
                     callback.onDeleteSuccess();
                 } else {
                     callback.onDeleteFailure();

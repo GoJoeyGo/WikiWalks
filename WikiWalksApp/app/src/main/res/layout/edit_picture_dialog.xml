@@ -60,7 +60,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textAutoCorrect"
+                android:inputType="textCapSentences|textAutoCorrect"
                 android:maxLength="200" />
 
         </com.google.android.material.textfield.TextInputLayout>

@@ -25,6 +25,7 @@ public class BookmarksFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private Path[] paths;
+    private int pathsRequested = 0;
 
     public static BookmarksFragment newInstance() {
         Bundle args = new Bundle();
@@ -78,7 +79,6 @@ public class BookmarksFragment extends Fragment {
 
                         @Override
                         public void onGetPathFailure() {
-                            paths[integer] = new Path();
                             initialiseRecyclerView();
                         }
                     });
@@ -90,14 +90,8 @@ public class BookmarksFragment extends Fragment {
     }
 
     public void initialiseRecyclerView() {
-        boolean notNull = true;
-        for (Path path : paths) {
-            if (path == null) {
-                notNull = false;
-                break;
-            }
-        }
-        if (notNull) {
+        pathsRequested++;
+        if (pathsRequested == paths.length) {
             recyclerView.getAdapter().notifyDataSetChanged();
         }
     }

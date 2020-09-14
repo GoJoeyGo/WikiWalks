@@ -95,7 +95,7 @@ public class EditGroupWalkDialog extends DialogFragment implements GroupWalk.Edi
                 .create().show());
 
         if (groupWalkPosition > -1) {
-            walk = PathMap.getInstance().getPathList().get(pathId).getGroupWalks().get(groupWalkPosition);
+            walk = PathMap.getInstance().getPathList().get(pathId).getGroupWalksList().get(groupWalkPosition);
             title.getEditText().setText(walk.getTitle());
             calendar.setTimeInMillis(walk.getTime() * 1000);
             time.setText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(calendar.getTime()));

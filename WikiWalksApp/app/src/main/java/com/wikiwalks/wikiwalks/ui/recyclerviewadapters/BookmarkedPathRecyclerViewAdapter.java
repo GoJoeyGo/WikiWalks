@@ -32,7 +32,7 @@ public class BookmarkedPathRecyclerViewAdapter extends RecyclerView.Adapter<Book
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if (paths[position] == null || paths[position].getId() == -1) {
+        if (paths[position] == null) {
             holder.button.setVisibility(View.GONE);
             holder.separator.setVisibility(View.GONE);
         } else {
