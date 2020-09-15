@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+
 from flask import jsonify, request, Blueprint, send_from_directory
 from schemas import *
 

@@ -1,7 +1,10 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -32,6 +35,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.wikiwalks.wikiwalks.LocationService;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.DataMap;
@@ -64,11 +68,24 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, N
     private ArrayList<Double> poiLongitudes = new ArrayList<>();
     private int submittedPointsOfInterest = 0;
     private Location lastLocation;
-    LocationCallback locationCallback = new LocationCallback() {
+    private LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
             onLocationChanged(locationResult.getLastLocation());
+        }
+    };
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra("latitudes")) {
+                latitudes.addAll((ArrayList<Double>) intent.getSerializableExtra("latitudes"));
+                longitudes.addAll((ArrayList<Double>) intent.getSerializableExtra("longitudes"));
+                altitudes.addAll((ArrayList<Double>) intent.getSerializableExtra("altitudes"));
+                latLngs.addAll(intent.getParcelableArrayListExtra("latLngs"));
+                distanceWalked += intent.getFloatExtra("distance_walked", 0);
+            }
+            startLocationUpdates();
         }
     };
 
@@ -180,6 +197,8 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, N
 
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.recording_fragment_map);
         mapFragment.getMapAsync(this);
+
+
 
         return rootView;
     }
@@ -350,5 +369,33 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, N
     @Override
     public void onSubmitPointOfInterestFailure() {
         Toast.makeText(context, R.string.save_point_of_interest_failure, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        recording = false;
+        getActivity().unregisterReceiver(receiver);
+        Intent intent = new Intent(getActivity(), LocationService.class);
+        intent.setAction(LocationService.START_SERVICE);
+        getActivity().startService(intent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().registerReceiver(receiver, new IntentFilter(LocationService.RECORDED_LOCATIONS));
+        Intent intent = new Intent(getActivity(), LocationService.class);
+        intent.setAction(LocationService.END_SERVICE);
+        getActivity().startService(intent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Intent intent = new Intent(getActivity(), LocationService.class);
+        intent.setAction(LocationService.END_SERVICE);
+        getActivity().startService(intent);
     }
 }
