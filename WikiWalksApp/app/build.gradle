@@ -8,8 +8,8 @@ android {
         applicationId "com.wikiwalks.wikiwalks"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 1
-        versionName "0.1-beta"
+        versionCode 2
+        versionName "0.1.1-beta"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

@@ -46,13 +46,11 @@ public class PermissionsFragment extends Fragment {
         }
 
         Button permissionsButton = rootView.findViewById(R.id.permissions_fragment_settings_fragment_button);
-        permissionsButton.setOnClickListener(v -> getActivity().registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), exited -> {
-            MainActivity.checkPermission(getActivity(), type, result -> {
-                if (result) {
-                    getParentFragmentManager().popBackStack();
-                }
-            });
-        }).launch(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()))));
+        permissionsButton.setOnClickListener(v -> getActivity().registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), exited -> MainActivity.checkPermission(getActivity(), type, result -> {
+            if (result) {
+                getParentFragmentManager().popBackStack();
+            }
+        })).launch(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()))));
 
         return rootView;
     }

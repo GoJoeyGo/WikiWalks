@@ -8,12 +8,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
@@ -51,11 +49,14 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (intent.getAction().equals(START_SERVICE)) {
-            createNotification();
-            startLocationUpdates();
-        } else if (intent.getAction().equals(END_SERVICE)) {
-            stopLocationUpdates();
+        switch (intent.getAction()) {
+            case START_SERVICE:
+                createNotification();
+                startLocationUpdates();
+                break;
+            case END_SERVICE:
+                stopLocationUpdates();
+                break;
         }
         return START_STICKY;
     }
@@ -73,11 +74,12 @@ public class LocationService extends Service {
             channel.setDescription("Foreground service for recording paths");
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
-            notification = new NotificationCompat.Builder(this, CHANNEL_ID).setOngoing(true).setPriority(NotificationManager.IMPORTANCE_MIN).setCategory(Notification.CATEGORY_SERVICE).setContentTitle("Recording route...").build();
+            notification = new NotificationCompat.Builder(this, CHANNEL_ID).setOngoing(true).setPriority(NotificationManager.IMPORTANCE_MIN).setCategory(Notification.CATEGORY_SERVICE).build();
+            startForeground(1, notification);
         } else {
             notification = new Notification();
+            startForeground(2, notification);
         }
-        startForeground(1, notification);
     }
 
     private void startLocationUpdates() {
