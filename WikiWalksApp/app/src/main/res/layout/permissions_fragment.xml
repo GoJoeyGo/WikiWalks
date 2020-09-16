@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:background="?attr/colorBackgroundFloating"
-    android:gravity="center"
-    android:orientation="vertical">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_gravity="center"
+              android:background="?attr/colorBackgroundFloating"
+              android:gravity="center"
+              android:orientation="vertical">
 
     <TextView
-        android:id="@+id/permission_info"
+        android:id="@+id/permissions_fragment_information"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
@@ -17,18 +17,18 @@
         android:padding="10dp"
         android:textAlignment="center"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@id/permissions_button"
+        app:layout_constraintBottom_toTopOf="@id/permissions_fragment_settings_fragment_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:id="@+id/permissions_button"
+        android:id="@+id/permissions_fragment_settings_fragment_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
         android:text="@string/open_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/permission_info" />
+        app:layout_constraintTop_toBottomOf="@id/permissions_fragment_information" />
 
 </LinearLayout>

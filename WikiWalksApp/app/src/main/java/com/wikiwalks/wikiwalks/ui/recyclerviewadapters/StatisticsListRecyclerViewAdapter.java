@@ -48,8 +48,8 @@ public class StatisticsListRecyclerViewAdapter extends RecyclerView.Adapter<Stat
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            entry = itemView.findViewById(R.id.statistics_entry);
-            separator = itemView.findViewById(R.id.statistics_separator);
+            entry = itemView.findViewById(R.id.statistics_row_entry);
+            separator = itemView.findViewById(R.id.statistics_row_separator);
         }
     }
 }

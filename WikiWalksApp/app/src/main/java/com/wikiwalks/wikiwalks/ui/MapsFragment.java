@@ -1,7 +1,6 @@
 package com.wikiwalks.wikiwalks.ui;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,14 +23,14 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, PathMap.PathMapListener {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, DataMap.PathMapListener {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -48,12 +47,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.maps_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.map_fragment, container, false);
 
-        PathMap.getInstance().addListener(this);
+        DataMap.getInstance().addListener(this);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.main_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.map_fragment_toolbar);
         toolbar.setTitle(R.string.app_name);
         toolbar.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
@@ -67,10 +66,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             return true;
         });
 
-        Button createPath = rootView.findViewById(R.id.create_path_button);
-        createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack("Map").commit());
+        Button createPath = rootView.findViewById(R.id.map_fragment_add_button);
+        createPath.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, RecordingFragment.newInstance(-1)).addToBackStack(null).commit());
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_frag);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment_map);
         mapFragment.getMapAsync(this);
 
         return rootView;
@@ -78,7 +77,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public void onDestroy() {
-        PathMap.getInstance().removeListener(this);
+        DataMap.getInstance().removeListener(this);
         super.onDestroy();
     }
 
@@ -89,12 +88,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         setMapLocation();
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
-        PathMap pathMap = PathMap.getInstance();
-        pathMap.addListener(this);
+        DataMap dataMap = DataMap.getInstance();
+        dataMap.addListener(this);
         mMap.setOnCameraIdleListener(() -> {
             LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
             if (Math.abs(bounds.northeast.latitude - bounds.southwest.latitude) < 3) {
-                pathMap.updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getContext());
+                dataMap.updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getContext());
             }
         });
     }
@@ -125,8 +124,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public void onPathMapUpdateSuccess() {
-        PathMap pathMap = PathMap.getInstance();
-        HashMap<Integer, Path> paths = pathMap.getPathList();
+        DataMap dataMap = DataMap.getInstance();
+        HashMap<Integer, Path> paths = dataMap.getPathList();
         for (Map.Entry<Integer, Polyline> polylineEntry : polylines.entrySet()) {
             polylineEntry.getValue().remove();
             polylines.remove(polylineEntry);

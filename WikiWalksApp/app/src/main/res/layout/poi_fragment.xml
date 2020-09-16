@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     xmlns:tools="http://schemas.android.com/tools"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="300dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/poi_frag_collapsing_toolbar_layout"
+            android:id="@+id/poi_fragment_collapsing_toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
@@ -20,7 +20,7 @@
             app:titleEnabled="false">
 
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/map_poi_preview_frag"
+                android:id="@+id/poi_fragment_map"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -31,7 +31,7 @@
                 tools:context=".ui.main.PoIFragment" />
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/poi_frag_toolbar"
+                android:id="@+id/poi_fragment_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -55,29 +55,27 @@
             android:layout_height="match_parent"
             android:padding="16dp">
 
-
             <TextView
-                android:id="@+id/poi_frag_description"
+                android:id="@+id/poi_fragment_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toStartOf="@id/poi_frag_rating_bar"
+                app:layout_constraintEnd_toStartOf="@id/poi_fragment_rating_bar"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <RatingBar
-                android:id="@+id/poi_frag_rating_bar"
+                android:id="@+id/poi_fragment_rating_bar"
                 style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:isIndicator="true"
                 android:numStars="5"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/poi_frag_description"
+                app:layout_constraintStart_toEndOf="@id/poi_fragment_description"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
             <Button
-                android:id="@+id/poi_frag_reviews_button"
+                android:id="@+id/poi_fragment_reviews_button"
                 style="@style/TextButtonTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,10 +83,10 @@
                 android:gravity="center_vertical"
                 android:text="@string/reviews"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/poi_frag_description" />
+                app:layout_constraintTop_toBottomOf="@id/poi_fragment_description" />
 
             <Button
-                android:id="@+id/poi_frag_pictures_button"
+                android:id="@+id/poi_fragment_photos_button"
                 style="@style/TextButtonTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -96,8 +94,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/photos"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/poi_frag_reviews_button" />
-
+                app:layout_constraintTop_toBottomOf="@id/poi_fragment_reviews_button" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

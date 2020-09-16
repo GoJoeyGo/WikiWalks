@@ -82,8 +82,8 @@ public class RouteListRecyclerViewAdapter extends RecyclerView.Adapter<RouteList
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            button = itemView.findViewById(R.id.route_list_frag_button);
-            indicator = itemView.findViewById(R.id.route_list_frag_indicator);
+            button = itemView.findViewById(R.id.route_row_button);
+            indicator = itemView.findViewById(R.id.route_row_colour_indicator);
         }
     }
 }

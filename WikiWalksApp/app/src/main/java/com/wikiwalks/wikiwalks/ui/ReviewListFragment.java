@@ -21,16 +21,16 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditReviewDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.ReviewDialog;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.ReviewListRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
-public class ReviewListFragment extends Fragment implements Review.GetReviewCallback, EditReviewDialog.EditReviewDialogListener {
+public class ReviewListFragment extends Fragment implements Review.GetReviewsCallback, ReviewDialog.EditReviewDialogListener {
 
     private Button writeReviewButton;
     private int parentId;
@@ -61,25 +61,25 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
         type = (Review.ReviewType) getArguments().getSerializable("type");
         String title;
         if (type == Review.ReviewType.PATH) {
-            path = PathMap.getInstance().getPathList().get(parentId);
+            path = DataMap.getInstance().getPathList().get(parentId);
             reviews = path.getReviewsList();
             title = path.getName();
         } else {
-            pointOfInterest = PathMap.getInstance().getPointOfInterestList().get(parentId);
+            pointOfInterest = DataMap.getInstance().getPointOfInterestList().get(parentId);
             reviews = pointOfInterest.getReviewsList();
             title = pointOfInterest.getName();
         }
         final View rootView = inflater.inflate(R.layout.review_list_fragment, container, false);
-        ownReviewLayout = rootView.findViewById(R.id.path_review_list_own_review);
-        ownReviewMessage = rootView.findViewById(R.id.path_review_own_review_row_text);
-        ownReviewRatingBar = rootView.findViewById(R.id.path_review_own_review_row_rating);
-        separator = rootView.findViewById(R.id.path_review_separator);
-        MaterialToolbar toolbar = rootView.findViewById(R.id.path_review_list_toolbar);
+        ownReviewLayout = rootView.findViewById(R.id.review_list_own_review);
+        ownReviewMessage = rootView.findViewById(R.id.review_list_own_review_text);
+        ownReviewRatingBar = rootView.findViewById(R.id.review_list_own_review_rating);
+        separator = rootView.findViewById(R.id.review_list_separator);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.review_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(String.format(getString(R.string.reviews_title), title));
-        noReviewsIndicator = rootView.findViewById(R.id.no_reviews_indicator);
-        recyclerView = rootView.findViewById(R.id.path_review_list_recyclerview);
+        noReviewsIndicator = rootView.findViewById(R.id.review_list_empty_indicator);
+        recyclerView = rootView.findViewById(R.id.review_list_recyclerview);
         recyclerView.setAdapter(new ReviewListRecyclerViewAdapter(this, reviews));
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -97,8 +97,8 @@ public class ReviewListFragment extends Fragment implements Review.GetReviewCall
         });
         swipeRefreshLayout = rootView.findViewById(R.id.review_list_swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(() -> updateReviewsList(true));
-        writeReviewButton = rootView.findViewById(R.id.path_write_review_button);
-        writeReviewButton.setOnClickListener(v -> EditReviewDialog.newInstance(type, parentId).show(getChildFragmentManager(), "EditPopup"));
+        writeReviewButton = rootView.findViewById(R.id.review_list_write_review_button);
+        writeReviewButton.setOnClickListener(v -> ReviewDialog.newInstance(type, parentId).show(getChildFragmentManager(), "EditPopup"));
         updateReviewsList(true);
         return rootView;
     }

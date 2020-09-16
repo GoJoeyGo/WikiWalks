@@ -6,7 +6,7 @@
                                                    android:background="?attr/colorBackgroundFloating">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/statistics_fragment_toolbar_wrapper"
+        android:id="@+id/goal_list_toolbar_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorBackgroundFloating"
@@ -15,7 +15,7 @@
         app:titleTextColor="?attr/colorOnBackground">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/statistics_fragment_toolbar"
+            android:id="@+id/goal_list_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
@@ -24,11 +24,41 @@
             app:titleTextColor="?attr/colorOnBackground" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <TextView
+        android:id="@+id/goal_list_empty_indicator"
+        style="@style/TextTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_goals"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/goal_list_bottom_button_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/goal_list_toolbar_wrapper" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/statistics_fragment_recyclerview"
+        android:id="@+id/goal_list_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/statistics_fragment_toolbar_wrapper" />
+        android:paddingBottom="0dp"
+        app:layout_constraintBottom_toTopOf="@id/goal_list_bottom_button_background"
+        app:layout_constraintTop_toBottomOf="@id/goal_list_toolbar_wrapper" />
 
+    <LinearLayout
+        android:id="@+id/goal_list_bottom_button_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/goal_list_set_goal_button"
+            style="@style/ButtonTheme"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:fontFamily="monospace"
+            android:text="@string/set_goal" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

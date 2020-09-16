@@ -3,7 +3,6 @@ package com.wikiwalks.wikiwalks.ui.dialogs;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -16,27 +15,25 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.JsonObject;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.GoalsFragment;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class EditGoalDialog extends DialogFragment {
+public class GoalDialog extends DialogFragment {
 
     private TextView time;
     private Button submitButton;
     private Calendar calendar;
     private TextInputLayout distance;
 
-    public static EditGoalDialog newInstance(int position) {
+    public static GoalDialog newInstance(int position) {
         Bundle args = new Bundle();
-        EditGoalDialog fragment = new EditGoalDialog();
+        GoalDialog fragment = new GoalDialog();
         args.putInt("position", position);
         fragment.setArguments(args);
         return fragment;
@@ -45,25 +42,25 @@ public class EditGoalDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.DialogTheme);
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.edit_goal_dialog, null);
+        View view = inflater.inflate(R.layout.goal_dialog, null);
         builder.setTitle(R.string.goal);
 
         GoalsFragment listener = (GoalsFragment) getParentFragment();
         int position = getArguments().getInt("position");
 
-        distance = view.findViewById(R.id.edit_goal_distance);
+        distance = view.findViewById(R.id.goal_dialog_distance_input);
 
-        TextView unit = view.findViewById(R.id.edit_goal_distance_unit);
+        TextView unit = view.findViewById(R.id.goal_dialog_distance_unit);
         String country = Locale.getDefault().getCountry();
         boolean imperial = country.equals("US") || country.equals("LR") || country.equals("MM");
         unit.setText(imperial ? R.string.miles : R.string.kilometres);
 
         calendar = Calendar.getInstance();
-        time = view.findViewById(R.id.edit_goal_popup_time);
+        time = view.findViewById(R.id.goal_dialog_time);
 
-        Button selectTimeButton = view.findViewById(R.id.edit_goal_select_time_button);
+        Button selectTimeButton = view.findViewById(R.id.goal_dialog_end_date_button);
         selectTimeButton.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (datePicker, year, monthOfYear, dayOfMonth) -> {
                 calendar.set(year, monthOfYear, dayOfMonth);
@@ -78,7 +75,7 @@ public class EditGoalDialog extends DialogFragment {
             datePickerDialog.show();
         });
 
-        submitButton = view.findViewById(R.id.edit_goal_popup_submit_button);
+        submitButton = view.findViewById(R.id.goal_dialog_save_button);
         submitButton.setOnClickListener(v -> {
             try {
                 if (Double.parseDouble(distance.getEditText().getText().toString()) > 0) {
@@ -96,10 +93,10 @@ public class EditGoalDialog extends DialogFragment {
             }
         });
 
-        Button cancelButton = view.findViewById(R.id.edit_goal_popup_cancel_button);
+        Button cancelButton = view.findViewById(R.id.goal_dialog_cancel_button);
         cancelButton.setOnClickListener(v -> dismiss());
 
-        Button deleteButton = view.findViewById(R.id.edit_goal_popup_delete_button);
+        Button deleteButton = view.findViewById(R.id.goal_dialog_delete_button);
         deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
                 .setTitle(R.string.delete_goal)
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
@@ -111,16 +108,12 @@ public class EditGoalDialog extends DialogFragment {
                 .create().show());
 
         if (position > -1) {
-            try {
-                JSONObject goal = PreferencesManager.getInstance(getContext()).getGoals().get(position);
-                calendar.setTimeInMillis(goal.getLong("end_time"));
-                time.setText(String.format(getString(R.string.goal_ends), DateFormat.getDateInstance(DateFormat.SHORT).format(calendar.getTime())));
-                distance.getEditText().setText(String.valueOf(goal.getDouble("distance_goal") / (imperial ? 1609.34 : 1000)));
-                deleteButton.setVisibility(View.VISIBLE);
-                submitButton.setEnabled(true);
-            } catch (JSONException e) {
-                Log.e("EditGoalDialog", "Getting goal attributes", e);
-            }
+            JsonObject goal = PreferencesManager.getInstance(getContext()).getGoals().get(position);
+            calendar.setTimeInMillis(goal.get("end_time").getAsLong());
+            time.setText(String.format(getString(R.string.goal_ends), DateFormat.getDateInstance(DateFormat.SHORT).format(calendar.getTime())));
+            distance.getEditText().setText(String.valueOf(goal.get("distance_goal").getAsDouble() / (imperial ? 1609.34 : 1000)));
+            deleteButton.setVisibility(View.VISIBLE);
+            submitButton.setEnabled(true);
         }
 
         if (savedInstanceState != null) {

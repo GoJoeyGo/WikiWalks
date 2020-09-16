@@ -21,20 +21,20 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.wikiwalks.wikiwalks.PathMap;
-import com.wikiwalks.wikiwalks.Picture;
+import com.wikiwalks.wikiwalks.DataMap;
+import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.Route;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.NameDialog;
 
-public class PointOfInterestFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestEditCallback {
+public class PointOfInterestFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, NameDialog.EditDialogListener, PointOfInterest.PointOfInterestEditCallback {
 
     private MaterialToolbar toolbar;
     private PointOfInterest pointOfInterest;
     private SupportMapFragment mapFragment;
-    private EditNameDialog editNameDialog;
+    private NameDialog nameDialog;
 
     public static PointOfInterestFragment newInstance(int pointOfInterestId) {
         Bundle args = new Bundle();
@@ -50,9 +50,9 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.poi_fragment, container, false);
 
-        pointOfInterest = PathMap.getInstance().getPointOfInterestList().get(getArguments().getInt("point_of_interest_id"));
+        pointOfInterest = DataMap.getInstance().getPointOfInterestList().get(getArguments().getInt("point_of_interest_id"));
 
-        toolbar = rootView.findViewById(R.id.poi_frag_toolbar);
+        toolbar = rootView.findViewById(R.id.poi_fragment_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         if (pointOfInterest.isEditable()) {
@@ -61,7 +61,7 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.point_of_interest_menu_edit:
-                    EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, pointOfInterest.getId()).show(getChildFragmentManager(), "EditPopup");
+                    NameDialog.newInstance(NameDialog.EditNameDialogType.POINT_OF_INTEREST, pointOfInterest.getId()).show(getChildFragmentManager(), "EditPopup");
                     break;
 
                 case R.id.point_of_interest_menu_delete:
@@ -76,21 +76,21 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
         });
         toolbar.setTitle(pointOfInterest.getName());
 
-        TextView description = rootView.findViewById(R.id.poi_frag_description);
+        TextView description = rootView.findViewById(R.id.poi_fragment_description);
         description.setText(String.format(getString(R.string.point_of_interest_description), pointOfInterest.getPath().getName()));
 
-        Button reviewsButton = rootView.findViewById(R.id.poi_frag_reviews_button);
+        Button reviewsButton = rootView.findViewById(R.id.poi_fragment_reviews_button);
         reviewsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, ReviewListFragment.newInstance(Review.ReviewType.POINT_OF_INTEREST, pointOfInterest.getId())).addToBackStack(null).commit());
 
-        Button picturesButton = rootView.findViewById(R.id.poi_frag_pictures_button);
-        picturesButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PictureListFragment.newInstance(Picture.PictureType.POINT_OF_INTEREST, pointOfInterest.getId())).addToBackStack(null).commit());
+        Button photosButton = rootView.findViewById(R.id.poi_fragment_photos_button);
+        photosButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, PhotoListFragment.newInstance(Photo.PhotoType.POINT_OF_INTEREST, pointOfInterest.getId())).addToBackStack(null).commit());
 
-        RatingBar ratingBar = rootView.findViewById(R.id.poi_frag_rating_bar);
+        RatingBar ratingBar = rootView.findViewById(R.id.poi_fragment_rating_bar);
         ratingBar.setRating((float) pointOfInterest.getRating());
 
         getParentFragmentManager().setFragmentResultListener("update_point_rating", this, (requestKey, result) -> ratingBar.setRating((float) pointOfInterest.getRating()));
 
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_poi_preview_frag);
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.poi_fragment_map);
 
         return rootView;
     }
@@ -117,12 +117,12 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
     }
 
     @Override
-    public void setEditNameDialog(EditNameDialog editNameDialog) {
-        this.editNameDialog = editNameDialog;
+    public void setNameDialog(NameDialog nameDialog) {
+        this.nameDialog = nameDialog;
     }
 
     @Override
-    public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
+    public void onEditName(NameDialog.EditNameDialogType type, String name) {
         pointOfInterest.edit(getContext(), name, this);
     }
 
@@ -130,7 +130,7 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
     public void onEditPointOfInterestSuccess() {
         toolbar.setTitle(pointOfInterest.getName());
         getParentFragmentManager().setFragmentResult("update_poi_list", new Bundle());
-        editNameDialog.dismiss();
+        nameDialog.dismiss();
         Toast.makeText(getContext(), R.string.save_point_of_interest_success, Toast.LENGTH_SHORT).show();
     }
 

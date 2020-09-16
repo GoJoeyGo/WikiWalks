@@ -2,7 +2,6 @@ package com.wikiwalks.wikiwalks;
 
 import android.content.Context;
 import android.location.Location;
-import android.location.LocationManager;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -32,7 +31,6 @@ import static org.mockito.Mockito.mock;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RecordPathIntegrationTests {
     static Path path;
-    Location[] exampleLocations;
     RecordingFragment fragment;
     Context appContext;
 
@@ -40,24 +38,18 @@ public class RecordPathIntegrationTests {
     public void setup() {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         fragment = RecordingFragment.newInstance(-1);
-        exampleLocations = new Location[]{new Location(LocationManager.GPS_PROVIDER), new Location(LocationManager.GPS_PROVIDER), new Location(LocationManager.GPS_PROVIDER)};
-        exampleLocations[0].setLatitude(1);
-        exampleLocations[0].setLongitude(1);
-        exampleLocations[0].setAltitude(1);
-        exampleLocations[1].setLatitude(1.00002);
-        exampleLocations[1].setLongitude(1.00002);
-        exampleLocations[1].setAltitude(1);
-        exampleLocations[2].setLatitude(1.00004);
-        exampleLocations[2].setLongitude(1.00004);
-        exampleLocations[2].setAltitude(1);
     }
 
     @Test
     public void A_recordRoute() throws InterruptedException {
-        int initialSize = PathMap.getInstance().getPathList().size();
-        fragment.addLocation(exampleLocations[0]);
-        fragment.addLocation(exampleLocations[1]);
-        fragment.addLocation(exampleLocations[2]);
+        int initialSize = DataMap.getInstance().getPathList().size();
+        for (int i = 0; i < 10; i++) {
+            Location newLocation = new Location("Test");
+            newLocation.setLatitude(1 + ((double) (i * 2) / 100000));
+            newLocation.setLongitude(1 + ((double) (i * 2) / 100000));
+            newLocation.setAltitude(1);
+            fragment.addLocation(newLocation);
+        }
         Route.RouteModifyCallback callback = new Route.RouteModifyCallback() {
             @Override
             public void onRouteEditSuccess(Path path) {
@@ -72,14 +64,14 @@ public class RecordPathIntegrationTests {
         fragment.context = appContext;
         fragment.submitRoute("Test", callback);
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(PathMap.getInstance().getPathList().size() > initialSize);
+        assertTrue(DataMap.getInstance().getPathList().size() > initialSize);
     }
 
     @Test
     public void B_addPointOfInterest() throws InterruptedException {
         PointOfInterest.submit(appContext, "Test Point of Interest", 1.0, 1.0, path, mock(PointOfInterest.PointOfInterestSubmitCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(path.getPointsOfInterest().size() == 1);
+        assertEquals(1, path.getPointsOfInterest().size());
     }
 
     @Test
@@ -95,7 +87,7 @@ public class RecordPathIntegrationTests {
         PointOfInterest pointOfInterest = path.getPointsOfInterest().get(0);
         pointOfInterest.delete(appContext, mock(PointOfInterest.PointOfInterestEditCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(path.getPointsOfInterest().size() == 0);
+        assertEquals(0, path.getPointsOfInterest().size());
     }
 
     @Test
@@ -107,10 +99,10 @@ public class RecordPathIntegrationTests {
 
     @Test
     public void F_deleteRoute() throws InterruptedException {
-        assertTrue(PathMap.getInstance().getPathList().containsValue(path));
+        assertTrue(DataMap.getInstance().getPathList().containsValue(path));
         path.getRoutes().get(0).delete(appContext, mock(Route.RouteModifyCallback.class));
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertFalse(PathMap.getInstance().getPathList().containsValue(path));
+        assertFalse(DataMap.getInstance().getPathList().containsValue(path));
     }
 
 }

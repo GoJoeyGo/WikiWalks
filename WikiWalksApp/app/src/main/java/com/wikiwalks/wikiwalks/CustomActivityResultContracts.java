@@ -18,7 +18,7 @@ public abstract class CustomActivityResultContracts {
         }
     }
 
-    public static class SelectPicture extends ActivityResultContracts.GetContent {
+    public static class SelectPhoto extends ActivityResultContracts.GetContent {
         @Override
         public Intent createIntent(@NonNull Context context, @NonNull String input) {
             super.createIntent(context, input);

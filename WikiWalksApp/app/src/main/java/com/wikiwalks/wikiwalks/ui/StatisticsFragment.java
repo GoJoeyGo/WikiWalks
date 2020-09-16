@@ -31,12 +31,12 @@ public class StatisticsFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.statistics_fragment, container, false);
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.statistics_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.statistics_fragment_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(R.string.statistics);
 
-        RecyclerView recyclerView = rootView.findViewById(R.id.statistics_recycler_view);
+        RecyclerView recyclerView = rootView.findViewById(R.id.statistics_fragment_recyclerview);
         recyclerView.setAdapter(new StatisticsListRecyclerViewAdapter(getContext(), PreferencesManager.getInstance(getContext()).getStatistics()));
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return rootView;

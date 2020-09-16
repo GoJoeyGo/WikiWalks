@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.recyclerviewadapters.BookmarkedPathRecyclerViewAdapter;
@@ -25,6 +25,7 @@ public class BookmarksFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private Path[] paths;
+    private int pathsRequested = 0;
 
     public static BookmarksFragment newInstance() {
         Bundle args = new Bundle();
@@ -37,17 +38,17 @@ public class BookmarksFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.bookmarks_list_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.bookmark_list_fragment, container, false);
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.bookmarks_list_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.bookmark_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(R.string.bookmarks);
 
-        recyclerView = rootView.findViewById(R.id.bookmarks_list_recyclerview);
+        recyclerView = rootView.findViewById(R.id.bookmark_list_recyclerview);
         String bookmarks = PreferencesManager.getInstance(getContext()).getBookmarks();
         if (bookmarks.isEmpty()) {
-            TextView noBookmarks = rootView.findViewById(R.id.no_bookmarks_indicator);
+            TextView noBookmarks = rootView.findViewById(R.id.bookmark_list_empty_indicator);
             noBookmarks.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
@@ -59,8 +60,8 @@ public class BookmarksFragment extends Fragment {
             ArrayList<Integer> requestPaths = new ArrayList<>();
             for (int i = 0; i < bookmarksArray.length; i++) {
                 int id = Integer.parseInt(bookmarksArray[i]);
-                if (PathMap.getInstance().getPathList().containsKey(id)) {
-                    paths[i] = PathMap.getInstance().getPathList().get(id);
+                if (DataMap.getInstance().getPathList().containsKey(id)) {
+                    paths[i] = DataMap.getInstance().getPathList().get(id);
                 } else {
                     requestPaths.add(i);
                 }
@@ -78,7 +79,6 @@ public class BookmarksFragment extends Fragment {
 
                         @Override
                         public void onGetPathFailure() {
-                            paths[integer] = new Path();
                             initialiseRecyclerView();
                         }
                     });
@@ -90,14 +90,8 @@ public class BookmarksFragment extends Fragment {
     }
 
     public void initialiseRecyclerView() {
-        boolean notNull = true;
-        for (Path path : paths) {
-            if (path == null) {
-                notNull = false;
-                break;
-            }
-        }
-        if (notNull) {
+        pathsRequested++;
+        if (pathsRequested == paths.length) {
             recyclerView.getAdapter().notifyDataSetChanged();
         }
     }

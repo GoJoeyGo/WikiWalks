@@ -5,14 +5,12 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,24 +55,19 @@ public class PreferencesManager {
         statistics.edit().putFloat("distance_walked", distance + oldDistance).apply();
         increaseTimesWalked();
         updateLongestWalk(distance);
-        ArrayList<JSONObject> goals = getGoals();
-        try {
-            for (JSONObject goal : goals) {
-                if (Calendar.getInstance().getTimeInMillis() < goal.getLong("end_time")) {
-                    goal.put("progress", goal.getDouble("progress") + distance);
-                }
+        ArrayList<JsonObject> goals = getGoals();
+        for (JsonObject goal : goals) {
+            if (Calendar.getInstance().getTimeInMillis() < goal.get("end_time").getAsLong()) {
+                goal.addProperty("progress", goal.get("progress").getAsDouble() + distance);
             }
-            setGoals(goals);
-        } catch (JSONException e) {
-            Log.e("PreferencesManager", "Adding distance walked", e);
         }
+        setGoals(goals);
     }
 
     public void increaseTimesWalked() {
         int timesWalked = statistics.getInt("times_walked", 0);
         statistics.edit().putInt("times_walked", timesWalked + 1).apply();
     }
-
 
     public void updateLongestWalk(float distance) {
         float oldDistance = statistics.getFloat("longest_walk", 0);
@@ -113,14 +106,14 @@ public class PreferencesManager {
         statistics.edit().putInt("reviews_written", reviewsWritten).apply();
     }
 
-    public void changePicturesUploaded(boolean deleted) {
-        int picturesUploaded = statistics.getInt("pictures_uploaded", 0);
+    public void changePhotosUploaded(boolean deleted) {
+        int photosUploaded = statistics.getInt("photos_uploaded", 0);
         if (deleted) {
-            picturesUploaded--;
+            photosUploaded--;
         } else {
-            picturesUploaded++;
+            photosUploaded++;
         }
-        statistics.edit().putInt("pictures_uploaded", picturesUploaded).apply();
+        statistics.edit().putInt("photos_uploaded", photosUploaded).apply();
     }
 
     public String getBookmarks() {
@@ -170,94 +163,85 @@ public class PreferencesManager {
         if (country.equals("US") || country.equals("LR") || country.equals("MM")) {
             strings[0] = String.format(context.getString(R.string.distance_walked), distanceWalked * 0.000621371, context.getString(R.string.miles));
             strings[2] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0) * 0.000621371, context.getString(R.string.miles));
-            strings[3] = String.format(context.getString(R.string.average_walk_distance), (distanceWalked / timesWalked) * 0.000621371,context.getString(R.string.miles));
+            strings[3] = String.format(context.getString(R.string.average_walk), (distanceWalked / timesWalked) * 0.000621371, context.getString(R.string.miles));
         } else {
             strings[0] = String.format(context.getString(R.string.distance_walked), distanceWalked * 0.001, context.getString(R.string.kilometres));
             strings[2] = String.format(context.getString(R.string.longest_walk), statistics.getFloat("longest_walk", 0) * 0.001, context.getString(R.string.kilometres));
-            strings[3] = String.format(context.getString(R.string.average_walk_distance), (distanceWalked / timesWalked) * 0.001, context.getString(R.string.kilometres));
-
+            strings[3] = String.format(context.getString(R.string.average_walk), (distanceWalked / timesWalked) * 0.001, context.getString(R.string.kilometres));
+        }
+        if (timesWalked == 0) {
+            strings[3] = context.getString(R.string.average_walk_n_a);
         }
         strings[1] = String.format(context.getString(R.string.earth_circumference_walked), statistics.getFloat("distance_walked", 0) / 400750000);
         strings[4] = String.format(context.getString(R.string.times_walked), timesWalked);
         strings[5] = String.format(context.getString(R.string.routes_recorded), statistics.getInt("routes_recorded", 0));
         strings[6] = String.format(context.getString(R.string.points_marked), statistics.getInt("points_marked", 0));
         strings[7] = String.format(context.getString(R.string.reviews_written), statistics.getInt("reviews_written", 0));
-        strings[8] = String.format(context.getString(R.string.pictures_uploaded), statistics.getInt("pictures_uploaded", 0));
+        strings[8] = String.format(context.getString(R.string.photos_uploaded), statistics.getInt("photos_uploaded", 0));
         return strings;
     }
 
-
-    public ArrayList<JSONObject> getGoals() {
-        ArrayList<JSONObject> goalsList = new ArrayList<>();
-        try {
-            JSONArray goalsJsonArray = new JSONArray(preferences.getString("goals", "[]"));
-            for (int i = 0; i < goalsJsonArray.length(); i++) {
-                goalsList.add(goalsJsonArray.getJSONObject(i));
-            }
-        } catch (JSONException e) {
-            Log.e("PreferencesManager", "Getting goals", e);
+    public ArrayList<JsonObject> getGoals() {
+        ArrayList<JsonObject> goalsList = new ArrayList<>();
+        JsonArray goalsJsonArray = JsonParser.parseString(preferences.getString("goals", "[]")).getAsJsonArray();
+        for (int i = 0; i < goalsJsonArray.size(); i++) {
+            goalsList.add(goalsJsonArray.get(i).getAsJsonObject());
         }
         return goalsList;
     }
 
-    public void setGoals(ArrayList<JSONObject> goals) {
-        JSONArray goalsJsonArray = new JSONArray();
-        for (JSONObject goal : goals) {
-            goalsJsonArray.put(goal);
+    public void setGoals(ArrayList<JsonObject> goals) {
+        JsonArray goalsJsonArray = new JsonArray();
+        for (JsonObject goal : goals) {
+            goalsJsonArray.add(goal);
         }
         preferences.edit().putString("goals", goalsJsonArray.toString()).apply();
     }
 
     public void addGoal(long startTime, long endTime, double distanceGoal) {
-        try {
-            JSONObject newGoal = new JSONObject();
-            newGoal.put("start_time", startTime);
-            newGoal.put("end_time", endTime);
-            newGoal.put("distance_goal", distanceGoal);
-            newGoal.put("progress", 0.0);
-            ArrayList<JSONObject> goals = getGoals();
-            goals.add(0, newGoal);
-            setGoals(goals);
-        } catch (JSONException e) {
-            Log.e("PreferencesManager", "Adding goal", e);
-        }
+        JsonObject newGoal = new JsonObject();
+        newGoal.addProperty("start_time", startTime);
+        newGoal.addProperty("end_time", endTime);
+        newGoal.addProperty("distance_goal", distanceGoal);
+        newGoal.addProperty("progress", 0.0);
+        ArrayList<JsonObject> goals = getGoals();
+        goals.add(0, newGoal);
+        setGoals(goals);
     }
 
     public void editGoal(int position, long endTime, double distanceGoal) {
-        try {
-            ArrayList<JSONObject> goals = getGoals();
-            JSONObject goal = goals.get(position);
-            goal.put("end_time", endTime);
-            goal.put("distance_goal", distanceGoal);
-            setGoals(goals);
-        } catch (JSONException e) {
-            Log.e("PreferencesManager", "Editing goal", e);
-        }
+        ArrayList<JsonObject> goals = getGoals();
+        JsonObject goal = goals.get(position);
+        goal.addProperty("end_time", endTime);
+        goal.addProperty("distance_goal", distanceGoal);
+        setGoals(goals);
     }
 
     public void removeGoal(int position) {
-        ArrayList<JSONObject> goals = getGoals();
+        ArrayList<JsonObject> goals = getGoals();
         goals.remove(position);
         setGoals(goals);
     }
 
     public void exportPreferences(Uri location) {
-        JSONObject preferencesJson = new JSONObject();
-        JSONObject statisticsJson = new JSONObject();
+        JsonObject preferencesJson = new JsonObject();
+        JsonObject statisticsJson = new JsonObject();
+        for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
+            preferencesJson.addProperty(entry.getKey(), entry.getValue().toString());
+        }
+        for (Map.Entry<String, ?> entry : statistics.getAll().entrySet()) {
+            statisticsJson.addProperty(entry.getKey(), (Number) entry.getValue());
+        }
+        preferencesJson.add("statistics", statisticsJson);
         try {
-            for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
-                preferencesJson.put(entry.getKey(), entry.getValue().toString());
-            }
-            for (Map.Entry<String, ?> entry : statistics.getAll().entrySet()) {
-                statisticsJson.put(entry.getKey(), entry.getValue());
-            }
-            preferencesJson.put("statistics", statisticsJson);
             OutputStream outputStream = context.getContentResolver().openOutputStream(location);
             Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             writer.write(preferencesJson.toString());
             writer.close();
-        } catch (JSONException | IOException e) {
+            Toast.makeText(context, R.string.export_data_success, Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
             Log.e("PreferencesManager", "Exporting preferences", e);
+            Toast.makeText(context, R.string.export_data_failure, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -279,8 +263,10 @@ public class PreferencesManager {
                     preferences.edit().putString(entry.getKey(), entry.getValue().getAsString()).apply();
                 }
             }
+            Toast.makeText(context, R.string.import_data_success, Toast.LENGTH_SHORT).show();
         } catch (FileNotFoundException e) {
             Log.e("PreferencesManager", "Importing preferences", e);
+            Toast.makeText(context, R.string.import_data_failure, Toast.LENGTH_SHORT).show();
         }
     }
 }

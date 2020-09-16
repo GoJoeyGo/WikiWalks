@@ -35,25 +35,25 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
-import com.wikiwalks.wikiwalks.Picture;
+import com.wikiwalks.wikiwalks.DataMap;
+import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.PreferencesManager;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditNameDialog;
-import com.wikiwalks.wikiwalks.ui.dialogs.EditPictureDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.NameDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.PhotoDialog;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, EditNameDialog.EditDialogListener, PointOfInterest.PointOfInterestSubmitCallback, EditPictureDialog.EditPictureDialogListener {
+public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, NameDialog.EditDialogListener, PointOfInterest.PointOfInterestSubmitCallback, PhotoDialog.EditPhotoDialogListener {
 
     private float distanceWalked = 0;
     private TextView offTrackVariable;
     private ImageView offTrackDirectionIndicator;
     private Location lastLocation;
-    private EditNameDialog editNameDialog;
+    private NameDialog nameDialog;
     private Button markPointButton;
     private int routeNumber;
     private GoogleMap mMap;
@@ -83,7 +83,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.walk_fragment, container, false);
 
-        path = PathMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
+        path = DataMap.getInstance().getPathList().get(getArguments().getInt("pathId"));
         new CountDownTimer(30000, 30000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -98,24 +98,30 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         routeNumber = getArguments().getInt("routeNumber");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.walk_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.walk_fragment_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(path.getName());
 
-        markPointButton = rootView.findViewById(R.id.mark_poi_button);
-        markPointButton.setOnClickListener(v -> EditNameDialog.newInstance(EditNameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "EditPopup"));
+        markPointButton = rootView.findViewById(R.id.walk_fragment_mark_point_button);
+        markPointButton.setOnClickListener(v -> NameDialog.newInstance(NameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "EditPopup"));
 
-        Button addPhotoButton = rootView.findViewById(R.id.take_picture_button);
-        addPhotoButton.setOnClickListener(v -> EditPictureDialog.newInstance(Picture.PictureType.PATH, path.getId(), -1, null).show(getChildFragmentManager(), "PicturePopup"));
+        Button addPhotoButton = rootView.findViewById(R.id.walk_fragment_add_photo_button);
+        addPhotoButton.setOnClickListener(v -> PhotoDialog.newInstance(Photo.PhotoType.PATH, path.getId(), -1, null).show(getChildFragmentManager(), "PhotoPopup"));
 
-        outOfRangeBanner = rootView.findViewById(R.id.out_of_range_banner);
-        offTrackVariable = rootView.findViewById(R.id.off_track_variable);
-        offTrackDirectionIndicator = rootView.findViewById(R.id.off_track_direction_indicator);
+        outOfRangeBanner = rootView.findViewById(R.id.walk_fragment_out_of_range_banner);
+        offTrackVariable = rootView.findViewById(R.id.walk_fragment_off_track_distance);
+        offTrackDirectionIndicator = rootView.findViewById(R.id.walk_fragment_off_track_direction_indicator);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_map_frag);
+        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.walk_fragment_map);
         mapFragment.getMapAsync(this);
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        super.onDestroyView();
     }
 
     @Override
@@ -224,12 +230,12 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
-    public void setEditNameDialog(EditNameDialog editNameDialog) {
-        this.editNameDialog = editNameDialog;
+    public void setNameDialog(NameDialog nameDialog) {
+        this.nameDialog = nameDialog;
     }
 
     @Override
-    public void onEditName(EditNameDialog.EditNameDialogType type, String name) {
+    public void onEditName(NameDialog.EditNameDialogType type, String name) {
         if (name.isEmpty()) {
             name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());
         }
@@ -238,7 +244,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public void onSubmitPointOfInterestSuccess(PointOfInterest pointOfInterest) {
-        editNameDialog.dismiss();
+        nameDialog.dismiss();
         Toast.makeText(getContext(), R.string.save_point_of_interest_success, Toast.LENGTH_SHORT).show();
         pointOfInterest.makeMarker(mMap, BitmapDescriptorFactory.HUE_RED);
     }
@@ -249,18 +255,12 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
-    public void onEditPicture() {
+    public void onEditPhoto() {
         Toast.makeText(getContext(), R.string.save_photo_success, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onDeletePicture(int position) {
+    public void onDeletePhoto(int position) {
 
-    }
-
-    @Override
-    public void onDestroyView() {
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        super.onDestroyView();
     }
 }

@@ -9,9 +9,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 import okhttp3.RequestBody;
@@ -21,14 +18,19 @@ import retrofit2.Response;
 
 public class GroupWalk extends DialogFragment {
 
-    int id;
-    String title;
-    long time;
-    ArrayList<String> attendees;
-    String hostName;
-    boolean attending;
-    boolean editable;
-    Path path;
+    private int id;
+    private String title;
+    private long time;
+    private ArrayList<String> attendees = new ArrayList<>();
+    private String hostName;
+    private boolean attending;
+    private boolean editable;
+    private Path path;
+
+    public interface GetGroupWalksCallback {
+        void onGetGroupWalksSuccess();
+        void onGetGroupWalksFailure();
+    }
 
     public interface EditGroupWalkCallback {
         void onEditSuccess();
@@ -42,29 +44,17 @@ public class GroupWalk extends DialogFragment {
         void toggleAttendanceFailure();
     }
 
-    public GroupWalk(Path path, int id, String title, long time, ArrayList<String> attendees, String hostName, boolean attending, boolean editable) {
+    public GroupWalk(JsonObject attributes, Path path) {
+        setAttributes(attributes);
         this.path = path;
-        this.id = id;
-        this.title = title;
-        this.time = time;
-        this.attendees = attendees;
-        this.hostName = hostName;
-        this.attending = attending;
-        this.editable = editable;
     }
 
     public static void submit(Context context, Path path, long time, String title, EditGroupWalkCallback callback) {
-        JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
-        try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            attributes.put("path_id", path.getId());
-            attributes.put("time", time);
-            attributes.put("title", title);
-            request.put("attributes", attributes);
-        } catch (JSONException e) {
-            Log.e("GroupWalk", "Creating new group walk request", e);
-        }
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        request.addProperty("path_id", path.getId());
+        request.addProperty("time", time);
+        request.addProperty("title", title);
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
         Call<JsonElement> newGroupWalk = MainActivity.getRetrofitRequests(context).addGroupWalk(path.getId(), body);
         newGroupWalk.enqueue(new Callback<JsonElement>() {
@@ -72,8 +62,8 @@ public class GroupWalk extends DialogFragment {
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (response.isSuccessful()) {
                     JsonObject responseJson = response.body().getAsJsonObject().get("group_walk").getAsJsonObject();
-                    GroupWalk newGroupWalk = new GroupWalk(path, responseJson.get("id").getAsInt(), title, time, new ArrayList<>(), responseJson.get("submitter").getAsString(), false, true);
-                    path.getGroupWalks().add(newGroupWalk);
+                    GroupWalk newGroupWalk = new GroupWalk(responseJson, path);
+                    path.getGroupWalksList().add(newGroupWalk);
                     callback.onEditSuccess();
                 } else {
                     callback.onEditFailure();
@@ -88,8 +78,18 @@ public class GroupWalk extends DialogFragment {
         });
     }
 
-    public int getGroupWalkId() {
-        return id;
+    private void setAttributes(JsonObject attributes) {
+        attendees.clear();
+        id = attributes.get("id").getAsInt();
+        title = attributes.get("title").getAsString();
+        time = attributes.get("time").getAsLong();
+        JsonArray attendees = attributes.get("attendees").getAsJsonArray();
+        for (int i = 0; i < attendees.size(); i++) {
+            this.attendees.add(attendees.get(i).getAsJsonObject().get("nickname").getAsString());
+        }
+        hostName = attributes.get("submitter").getAsString();
+        attending = attributes.get("attending").getAsBoolean();
+        editable = attributes.get("editable").getAsBoolean();
     }
 
     public long getTime() {
@@ -117,101 +117,75 @@ public class GroupWalk extends DialogFragment {
     }
 
     public void toggleAttendance(Context context, AttendGroupWalkCallback callback) {
-        JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
-        try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> attendGroupWalk = MainActivity.getRetrofitRequests(context).attendGroupWalk(path.getId(), this.id, body);
-            attendGroupWalk.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        JsonObject groupWalk = response.body().getAsJsonObject().get("group_walk").getAsJsonObject();
-                        attending = groupWalk.get("attending").getAsBoolean();
-                        attendees.clear();
-                        JsonArray newAttendees = groupWalk.get("attendees").getAsJsonArray();
-                        for (int i = 0; i < newAttendees.size(); i++) {
-                            attendees.add(newAttendees.get(i).getAsJsonObject().get("nickname").getAsString());
-                        }
-                        callback.toggleAttendanceSuccess();
-                    } else {
-                        callback.toggleAttendanceFailure();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("GroupWalk", "Sending toggle group walk attendance request", t);
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> attendGroupWalk = MainActivity.getRetrofitRequests(context).attendGroupWalk(path.getId(), this.id, body);
+        attendGroupWalk.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    setAttributes(response.body().getAsJsonObject().get("group_walk").getAsJsonObject());
+                    callback.toggleAttendanceSuccess();
+                } else {
                     callback.toggleAttendanceFailure();
                 }
-            });
-        } catch (JSONException e) {
-            Log.e("GroupWalk", "Creating toggle group walk attendance request", e);
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("GroupWalk", "Sending toggle group walk attendance request", t);
+                callback.toggleAttendanceFailure();
+            }
+        });
     }
 
     public void edit(Context context, long time, String title, EditGroupWalkCallback callback) {
-        JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
-        try {
-            attributes.put("title", title);
-            attributes.put("time", time);
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> editGroupWalk = MainActivity.getRetrofitRequests(context).editGroupWalk(path.getId(), id, body);
-            editGroupWalk.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        GroupWalk.this.title = title;
-                        GroupWalk.this.time = time;
-                        callback.onEditSuccess();
-                    }
+        JsonObject request = new JsonObject();
+        request.addProperty("title", title);
+        request.addProperty("time", time);
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> editGroupWalk = MainActivity.getRetrofitRequests(context).editGroupWalk(path.getId(), id, body);
+        editGroupWalk.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    GroupWalk.this.title = title;
+                    GroupWalk.this.time = time;
+                    callback.onEditSuccess();
                 }
+            }
 
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("GroupWalk", "Sending edit group walk request", t);
-                    callback.onEditFailure();
-                }
-            });
-        } catch (JSONException e) {
-            Log.e("GroupWalk", "Creating edit group walk request", e);
-            callback.onEditFailure();
-        }
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("GroupWalk", "Sending edit group walk request", t);
+                callback.onEditFailure();
+            }
+        });
     }
 
     public void delete(Context context, EditGroupWalkCallback callback) {
-        JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
-        try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> deleteGroupWalk = MainActivity.getRetrofitRequests(context).deleteGroupWalk(path.getId(), id, body);
-            deleteGroupWalk.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        path.getGroupWalks().remove(GroupWalk.this);
-                        callback.onDeleteSuccess();
-                    } else {
-                        callback.onDeleteFailure();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("GroupWalk", "Creating delete group walk request", t);
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> deleteGroupWalk = MainActivity.getRetrofitRequests(context).deleteGroupWalk(path.getId(), id, body);
+        deleteGroupWalk.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    path.getGroupWalksList().remove(GroupWalk.this);
+                    callback.onDeleteSuccess();
+                } else {
                     callback.onDeleteFailure();
                 }
-            });
-        } catch (JSONException e) {
-            Log.e("GroupWalk", "Creating delete group walk request", e);
-            callback.onDeleteFailure();
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("GroupWalk", "Creating delete group walk request", t);
+                callback.onDeleteFailure();
+            }
+        });
     }
 }

@@ -9,13 +9,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import okhttp3.RequestBody;
@@ -23,15 +22,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Route implements Serializable {
+public class Route {
 
-    int id;
-    Path path;
-    boolean editable;
+    private int id;
+    private Path path;
+    private boolean editable;
 
-    private ArrayList<Double> latitudes;
-    private ArrayList<Double> longitudes;
-    private ArrayList<Double> altitudes;
+    private ArrayList<Double> latitudes = new ArrayList<>();
+    private ArrayList<Double> longitudes = new ArrayList<>();
+    private ArrayList<Double> altitudes = new ArrayList<>();
     private double distance;
 
     private ArrayList<Polyline> polylines = new ArrayList<>();
@@ -41,71 +40,63 @@ public class Route implements Serializable {
         void onRouteEditFailure();
     }
 
-    public Route(int id, Path path, boolean editable, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes) {
-        this.id = id;
-        this.path = path;
-        this.editable = editable;
-        this.latitudes = latitudes;
-        this.longitudes = longitudes;
-        this.altitudes = altitudes;
-        Location lastLocation = new Location("import");
-        lastLocation.setLatitude(latitudes.get(0));
-        lastLocation.setLongitude(longitudes.get(0));
-        lastLocation.setAltitude(altitudes.get(0));
-        for (int i = 1; i < latitudes.size(); i++) {
+    public Route(JsonObject attributes, Path path) {
+        id = attributes.get("id").getAsInt();
+        editable = attributes.get("editable").getAsBoolean();
+        JsonArray latitudesJson = attributes.get("latitudes").getAsJsonArray();
+        JsonArray longitudesJson = attributes.get("longitudes").getAsJsonArray();
+        JsonArray altitudesJson = attributes.get("altitudes").getAsJsonArray();
+        Location lastLocation = null;
+        for (int i = 0; i < latitudesJson.size(); i++) {
+            latitudes.add(latitudesJson.get(i).getAsDouble());
+            longitudes.add(longitudesJson.get(i).getAsDouble());
+            altitudes.add(altitudesJson.get(i).getAsDouble());
             Location newLocation = new Location("import");
-            newLocation.setLatitude(latitudes.get(i));
-            newLocation.setLongitude(longitudes.get(i));
-            newLocation.setAltitude(altitudes.get(i));
-            distance += (newLocation.distanceTo(lastLocation));
+            newLocation.setLatitude(latitudesJson.get(i).getAsDouble());
+            newLocation.setLongitude(longitudesJson.get(i).getAsDouble());
+            newLocation.setAltitude(altitudesJson.get(i).getAsDouble());
+            if (lastLocation != null) {
+                distance += (newLocation.distanceTo(lastLocation));
+            }
             lastLocation = newLocation;
         }
+        this.path = path;
     }
 
     public static void submit(Context context, Path path, String title, ArrayList<Double> latitudes, ArrayList<Double> longitudes, ArrayList<Double> altitudes, RouteModifyCallback callback) {
-        JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
-        try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            attributes.put("latitudes", new JSONArray(latitudes));
-            attributes.put("longitudes", new JSONArray(longitudes));
-            attributes.put("altitudes", new JSONArray(altitudes));
-            if (path != null) {
-                attributes.put("path", path.id);
-            } else {
-                attributes.put("name", title);
-            }
-            request.put("attributes", attributes);
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> newRoute = MainActivity.getRetrofitRequests(context).newRoute(body);
-            newRoute.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        try {
-                            JSONObject responseJson = new JSONObject(response.body().toString()).getJSONObject("path");
-                            Path newPath = new Path(responseJson);
-                            PathMap.getInstance().addPath(newPath);
-                            callback.onRouteEditSuccess(newPath);
-                        } catch (JSONException e) {
-                            Log.e("Route", "Getting path from submit response", e);
-                        }
-                        PreferencesManager.getInstance(context).changeRoutesRecorded(false);
-                    } else {
-                        callback.onRouteEditFailure();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("Route", "Sending new route request", t);
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        Gson gson = new Gson();
+        request.add("latitudes", JsonParser.parseString(gson.toJson(latitudes)));
+        request.add("longitudes", JsonParser.parseString(gson.toJson(longitudes)));
+        request.add("altitudes", JsonParser.parseString(gson.toJson(altitudes)));
+        if (path != null) {
+            request.addProperty("path", path.id);
+        } else {
+            request.addProperty("name", title);
+        }
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> newRoute = MainActivity.getRetrofitRequests(context).newRoute(body);
+        newRoute.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    JsonObject responseJson = response.body().getAsJsonObject().get("path").getAsJsonObject();
+                    Path newPath = new Path(responseJson);
+                    DataMap.getInstance().addPath(newPath);
+                    callback.onRouteEditSuccess(newPath);
+                    PreferencesManager.getInstance(context).changeRoutesRecorded(false);
+                } else {
                     callback.onRouteEditFailure();
                 }
-            });
-        } catch (JSONException e) {
-            Log.e("Route", "Creating new route request", e);
-            callback.onRouteEditFailure();
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("Route", "Sending new route request", t);
+                callback.onRouteEditFailure();
+            }
+        });
     }
 
     public Polyline makePolyline(GoogleMap map) {
@@ -153,45 +144,37 @@ public class Route implements Serializable {
         return editable;
     }
 
-    public void delete(final Context context, RouteModifyCallback callback) {
-        JSONObject request = new JSONObject();
-        JSONObject attributes = new JSONObject();
-        try {
-            attributes.put("device_id", PreferencesManager.getInstance(context).getDeviceId());
-            request.put("attributes", attributes);
-            RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
-            Call<JsonElement> deleteRoute = MainActivity.getRetrofitRequests(context).deleteRoute(id, body);
-            deleteRoute.enqueue(new Callback<JsonElement>() {
-                @Override
-                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                    if (response.isSuccessful()) {
-                        path.removeRoute(Route.this);
-                        if (path.getRoutes().size() == 0) {
-                            for (Marker marker : path.getMarkers()) {
-                                marker.remove();
-                            }
-                            PathMap.getInstance().deletePath(path);
-
+    public void delete(Context context, RouteModifyCallback callback) {
+        JsonObject request = new JsonObject();
+        request.addProperty("device_id", PreferencesManager.getInstance(context).getDeviceId());
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request.toString());
+        Call<JsonElement> deleteRoute = MainActivity.getRetrofitRequests(context).deleteRoute(id, body);
+        deleteRoute.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    path.removeRoute(Route.this);
+                    if (path.getRoutes().size() == 0) {
+                        for (Marker marker : path.getMarkers()) {
+                            marker.remove();
                         }
-                        for (Polyline polyline : polylines) {
-                            polyline.remove();
-                        }
-                        PreferencesManager.getInstance(context).changeRoutesRecorded(true);
-                        callback.onRouteEditSuccess(null);
-                    } else {
-                        callback.onRouteEditFailure();
+                        DataMap.getInstance().deletePath(path);
                     }
-                }
-
-                @Override
-                public void onFailure(Call<JsonElement> call, Throwable t) {
-                    Log.e("Route", "Sending delete route request", t);
+                    for (Polyline polyline : polylines) {
+                        polyline.remove();
+                    }
+                    PreferencesManager.getInstance(context).changeRoutesRecorded(true);
+                    callback.onRouteEditSuccess(null);
+                } else {
                     callback.onRouteEditFailure();
                 }
-            });
-        } catch (JSONException e) {
-            Log.e("Route", "Creating delete route request", e);
-            callback.onRouteEditFailure();
-        }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.e("Route", "Sending delete route request", t);
+                callback.onRouteEditFailure();
+            }
+        });
     }
 }

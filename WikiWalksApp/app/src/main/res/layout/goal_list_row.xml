@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingStart="16dp"
-    android:paddingTop="16dp"
-    android:paddingEnd="16dp">
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:paddingStart="16dp"
+                                                   android:paddingTop="16dp"
+                                                   android:paddingEnd="16dp">
 
     <TextView
-        android:id="@+id/goal_date_range"
+        android:id="@+id/goal_row_date_range"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/goal_edit_button"
+        app:layout_constraintEnd_toStartOf="@id/goal_row_edit_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/goal_progress"
+        android:id="@+id/goal_row_progress_indicator"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/goal_edit_button"
+        app:layout_constraintEnd_toStartOf="@id/goal_row_edit_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/goal_date_range" />
+        app:layout_constraintTop_toBottomOf="@id/goal_row_date_range" />
 
     <ImageButton
-        android:id="@+id/goal_edit_button"
+        android:id="@+id/goal_row_edit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@null"
@@ -37,12 +37,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
-        android:id="@+id/goal_separator"
+        android:id="@+id/goal_row_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/goal_progress" />
+        app:layout_constraintTop_toBottomOf="@id/goal_row_progress_indicator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

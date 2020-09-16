@@ -19,7 +19,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.wikiwalks.wikiwalks.Path;
-import com.wikiwalks.wikiwalks.PathMap;
+import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.PointOfInterest;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Route;
@@ -51,15 +51,15 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.poi_list_fragment, container, false);
 
-        path = PathMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
+        path = DataMap.getInstance().getPathList().get(getArguments().getInt("path_id"));
         pointOfInterestList = path.getPointsOfInterest();
 
-        MaterialToolbar toolbar = rootView.findViewById(R.id.poi_list_frag_toolbar);
+        MaterialToolbar toolbar = rootView.findViewById(R.id.poi_list_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
         toolbar.setTitle(String.format(getString(R.string.points_of_interest_title), path.getName()));
 
-        noPointsIndicator = rootView.findViewById(R.id.no_points_indicator);
+        noPointsIndicator = rootView.findViewById(R.id.poi_list_empty_indicator);
         recyclerView = rootView.findViewById(R.id.poi_list_recyclerview);
         recyclerView.setAdapter(new PointOfInterestListRecyclerViewAdapter(this, pointOfInterestList));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
@@ -67,7 +67,7 @@ public class PointOfInterestListFragment extends Fragment implements OnMapReadyC
             recyclerView.setVisibility(View.GONE);
             noPointsIndicator.setVisibility(View.VISIBLE);
         }
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_poi_list_frag);
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.poi_list_map);
 
         getParentFragmentManager().setFragmentResultListener("update_poi_list", this, (requestKey, result) -> update());
 

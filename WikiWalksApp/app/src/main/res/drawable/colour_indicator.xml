@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="16dp"
-    android:height="16dp"
-    android:shape="rectangle"
-    android:tint="?attr/colorOnBackground">
+       android:width="16dp"
+       android:height="16dp"
+       android:shape="rectangle"
+       android:tint="?attr/colorOnBackground">
 
     <padding
         android:bottom="4dp"

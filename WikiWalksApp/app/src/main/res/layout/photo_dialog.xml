@@ -1,83 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    app:cardCornerRadius="10dp">
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp"
+            app:cardCornerRadius="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/edit_group_walk_popup_time"
+        <ImageView
+            android:id="@+id/photo_dialog_selected_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
+            android:maxHeight="300dp"
             android:scaleType="fitStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/edit_group_walk_select_time_button"
+            android:id="@+id/photo_dialog_camera_button"
             style="@style/ButtonTheme"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:fontFamily="monospace"
+            android:text="@string/from_camera"
+            app:layout_constraintEnd_toStartOf="@id/photo_dialog_gallery_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/photo_dialog_selected_image" />
+
+        <Button
+            android:id="@+id/photo_dialog_gallery_button"
+            style="@style/ButtonTheme"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="@string/select_time"
+            android:text="@string/from_gallery"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_group_walk_popup_time" />
+            app:layout_constraintStart_toEndOf="@id/photo_dialog_camera_button"
+            app:layout_constraintTop_toBottomOf="@id/photo_dialog_selected_image" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/edit_group_walk_title"
+            android:id="@+id/photo_dialog_caption_input"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/title"
+            android:hint="@string/caption"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_group_walk_select_time_button">
+            app:layout_constraintTop_toBottomOf="@id/photo_dialog_camera_button">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textAutoCorrect"
+                android:inputType="textCapSentences|textAutoCorrect"
                 android:maxLength="200" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/edit_group_walk_popup_submit_button"
+            android:id="@+id/photo_dialog_save_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:enabled="false"
             android:fontFamily="monospace"
             android:text="@string/save"
-            app:layout_constraintEnd_toStartOf="@id/edit_group_walk_popup_delete_button"
+            app:layout_constraintEnd_toStartOf="@id/photo_dialog_delete_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_group_walk_title" />
+            app:layout_constraintTop_toBottomOf="@id/photo_dialog_caption_input" />
 
         <Button
-            android:id="@+id/edit_group_walk_popup_delete_button"
+            android:id="@+id/photo_dialog_delete_button"
             style="@style/ButtonTheme"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:fontFamily="monospace"
             android:text="@string/delete"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/edit_group_walk_popup_submit_button"
-            app:layout_constraintTop_toBottomOf="@id/edit_group_walk_title" />
+            app:layout_constraintStart_toEndOf="@id/photo_dialog_save_button"
+            app:layout_constraintTop_toBottomOf="@id/photo_dialog_caption_input" />
 
         <Button
-            android:id="@+id/edit_group_walk_popup_cancel_button"
+            android:id="@+id/photo_dialog_cancel_button"
             style="@style/ButtonTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -85,7 +100,7 @@
             android:text="@string/cancel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_group_walk_popup_submit_button" />
+            app:layout_constraintTop_toBottomOf="@id/photo_dialog_save_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

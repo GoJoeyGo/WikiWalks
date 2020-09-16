@@ -32,31 +32,23 @@ public class GetPathIntegrationTests {
     MapsFragment fragment;
     Context appContext;
     LatLngBounds bounds;
-    PathMap pathMap;
+    DataMap dataMap;
 
     @Before
     public void setup() {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         fragment = MapsFragment.newInstance();
-        pathMap = spy(PathMap.getInstance());
+        dataMap = spy(DataMap.getInstance());
 
-    }
-
-    @Test
-    public void getAllPaths() throws InterruptedException {
-        bounds = new LatLngBounds(new LatLng(-90, -180), new LatLng(90, 179));
-        pathMap.updatePaths(bounds, appContext);
-        new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
-        assertTrue(PathMap.getInstance().getPathList().size() > 0);
     }
 
     @Test
     public void getSomePaths() throws InterruptedException {
         bounds = new LatLngBounds(new LatLng(-28, 152), new LatLng(-27, 153));
-        pathMap.updatePaths(bounds, appContext);
+        dataMap.updatePaths(bounds, appContext);
         new CountDownLatch(1).await(2000, TimeUnit.MILLISECONDS);
         boolean inRange = true;
-        for (Map.Entry<Integer, Path> pathEntry : pathMap.getPathList().entrySet()) {
+        for (Map.Entry<Integer, Path> pathEntry : dataMap.getPathList().entrySet()) {
             Path path = pathEntry.getValue();
             if (!bounds.including(path.getBounds().northeast).including(path.getBounds().southwest).equals(bounds)) {
                 inRange = false;
@@ -70,9 +62,11 @@ public class GetPathIntegrationTests {
         ArrayList<Double> latitudes = new ArrayList<>();
         ArrayList<Double> longitudes = new ArrayList<>();
         ArrayList<Double> altitudes = new ArrayList<>();
-        latitudes.add(1.00);
-        longitudes.add(1.00);
-        altitudes.add(1.00);
+        for (int i = 0; i < 10; i++) {
+            latitudes.add(1.00);
+            longitudes.add(1.00);
+            altitudes.add(1.00);
+        }
         Route.submit(appContext, null, "Test Path", latitudes, longitudes, altitudes, mock(Route.RouteModifyCallback.class));
     }
 
