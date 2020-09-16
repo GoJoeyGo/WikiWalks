@@ -54,7 +54,7 @@ public class DataMap {
                     }
                     triggerChangeListeners();
                 } else {
-                    if (!response.body().getAsJsonObject().get("status").getAsString().equals("failed - distance too large")) {
+                    if (response.body() == null || !response.body().getAsJsonObject().get("status").getAsString().equals("failed - distance too large")) {
                         triggerFailedListeners();
                     }
                 }
