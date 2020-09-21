@@ -17,7 +17,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.wikiwalks.wikiwalks.MainActivity;
 import com.wikiwalks.wikiwalks.Path;
 import com.wikiwalks.wikiwalks.DataMap;
 import com.wikiwalks.wikiwalks.Photo;
@@ -29,7 +28,7 @@ import com.wikiwalks.wikiwalks.ui.dialogs.NameDialog;
 
 import java.util.ArrayList;
 
-public class PathFragment extends Fragment implements OnMapReadyCallback, NameDialog.EditDialogListener, Path.PathChangeCallback, DataMap.PathMapListener {
+public class PathFragment extends Fragment implements OnMapReadyCallback, NameDialog.EditDialogListener, Path.PathChangeCallback, DataMap.DataMapListener {
 
     private MaterialToolbar toolbar;
     private SupportMapFragment mapFragment;
@@ -159,7 +158,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, NameDi
     }
 
     @Override
-    public void onPathMapUpdateSuccess() {
+    public void onDataMapUpdateSuccess() {
         path = DataMap.getInstance().getPathList().get(path.getId());
         if (path != null) {
             for (Polyline polyline : polylines) {
@@ -174,7 +173,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, NameDi
     }
 
     @Override
-    public void onPathMapUpdateFailure() {
+    public void onDataMapUpdateFailure() {
 
     }
 }

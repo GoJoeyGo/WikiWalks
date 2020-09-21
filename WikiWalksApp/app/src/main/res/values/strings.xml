@@ -150,4 +150,6 @@
     <string name="open_settings">Open Settings</string>
     <string name="requires_location">WikiWalks needs location permissions to run.</string>
     <string name="requires_storage">WikiWalks needs storage permissions to submit photos and import/export settings.</string>
+
+    <item name="local_url" type="string">https://wikiwalks.xyz</item>
 </resources>

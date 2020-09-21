@@ -20,13 +20,13 @@ import retrofit2.Response;
 public class DataMap {
 
     private static DataMap instance = null;
-    public ArrayList<PathMapListener> changeListeners = new ArrayList<>();
+    public ArrayList<DataMapListener> changeListeners = new ArrayList<>();
     private LinkedHashMap<Integer, Path> pathList = new LinkedHashMap<>();
     private LinkedHashMap<Integer, PointOfInterest> pointOfInterestList = new LinkedHashMap<>();
 
-    public interface PathMapListener {
-        void onPathMapUpdateSuccess();
-        void onPathMapUpdateFailure();
+    public interface DataMapListener {
+        void onDataMapUpdateSuccess();
+        void onDataMapUpdateFailure();
     }
 
     public static DataMap getInstance() {
@@ -35,6 +35,8 @@ public class DataMap {
         }
         return instance;
     }
+
+    private DataMap() {}
 
     public void updatePaths(LatLngBounds bounds, Context context) {
         JsonObject request = new JsonObject();
@@ -69,22 +71,22 @@ public class DataMap {
     }
 
     private void triggerChangeListeners() {
-        for (PathMapListener listener : changeListeners) {
-            listener.onPathMapUpdateSuccess();
+        for (DataMapListener listener : changeListeners) {
+            listener.onDataMapUpdateSuccess();
         }
     }
 
     private void triggerFailedListeners() {
-        for (PathMapListener listener : changeListeners) {
-            listener.onPathMapUpdateFailure();
+        for (DataMapListener listener : changeListeners) {
+            listener.onDataMapUpdateFailure();
         }
     }
 
-    public void addListener(PathMapListener pathMapChangeListener) {
+    public void addListener(DataMapListener pathMapChangeListener) {
         changeListeners.add(pathMapChangeListener);
     }
 
-    public void removeListener(PathMapListener pathMapChangeListener) {
+    public void removeListener(DataMapListener pathMapChangeListener) {
         changeListeners.remove(pathMapChangeListener);
     }
 

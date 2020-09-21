@@ -3,8 +3,6 @@ package com.wikiwalks.wikiwalks;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.fragment.app.DialogFragment;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,7 +14,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GroupWalk extends DialogFragment {
+public class GroupWalk {
 
     private int id;
     private String title;

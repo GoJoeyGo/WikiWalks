@@ -30,7 +30,7 @@ import com.wikiwalks.wikiwalks.Route;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, DataMap.PathMapListener {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, DataMap.DataMapListener {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -123,7 +123,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
-    public void onPathMapUpdateSuccess() {
+    public void onDataMapUpdateSuccess() {
         DataMap dataMap = DataMap.getInstance();
         HashMap<Integer, Path> paths = dataMap.getPathList();
         for (Map.Entry<Integer, Polyline> polylineEntry : polylines.entrySet()) {
@@ -146,7 +146,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
-    public void onPathMapUpdateFailure() {
+    public void onDataMapUpdateFailure() {
         if (!hasFailed) {
             hasFailed = true;
             Toast.makeText(getContext(), R.string.get_paths_failure, Toast.LENGTH_SHORT).show();
