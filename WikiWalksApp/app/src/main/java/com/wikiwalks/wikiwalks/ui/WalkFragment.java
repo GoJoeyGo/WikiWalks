@@ -47,7 +47,7 @@ import com.wikiwalks.wikiwalks.ui.dialogs.PhotoDialog;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, NameDialog.EditDialogListener, PointOfInterest.PointOfInterestSubmitCallback, PhotoDialog.EditPhotoDialogListener {
+public class WalkFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, NameDialog.NameDialogListener, PointOfInterest.PointOfInterestSubmitCallback, PhotoDialog.EditPhotoDialogListener {
 
     private float distanceWalked = 0;
     private TextView offTrackVariable;
@@ -104,7 +104,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
         toolbar.setTitle(path.getName());
 
         markPointButton = rootView.findViewById(R.id.walk_fragment_mark_point_button);
-        markPointButton.setOnClickListener(v -> NameDialog.newInstance(NameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "EditPopup"));
+        markPointButton.setOnClickListener(v -> NameDialog.newInstance(NameDialog.NameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "EditPopup"));
 
         Button addPhotoButton = rootView.findViewById(R.id.walk_fragment_add_photo_button);
         addPhotoButton.setOnClickListener(v -> PhotoDialog.newInstance(Photo.PhotoType.PATH, path.getId(), -1, null).show(getChildFragmentManager(), "PhotoPopup"));
@@ -235,7 +235,7 @@ public class WalkFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
-    public void onEditName(NameDialog.EditNameDialogType type, String name) {
+    public void onEditName(NameDialog.NameDialogType type, String name) {
         if (name.isEmpty()) {
             name = String.format("Point at %f, %f", lastLocation.getLatitude(), lastLocation.getLongitude());
         }

@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 import com.wikiwalks.wikiwalks.Photo;
 import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.ui.PhotoListFragment;
+import com.wikiwalks.wikiwalks.ui.dialogs.ReportDialog;
 
 import java.util.ArrayList;
 
@@ -45,11 +46,14 @@ public class PhotoListRecyclerViewAdapter extends RecyclerView.Adapter<PhotoList
             holder.name.setTypeface(holder.name.getTypeface(), Typeface.BOLD_ITALIC);
             holder.name.setText(parentFragment.getString(R.string.you));
             holder.editButton.setVisibility(View.VISIBLE);
+            holder.reportButton.setVisibility(View.GONE);
             holder.editButton.setOnClickListener(v -> parentFragment.launchEditDialog(position, ((BitmapDrawable) holder.imageView.getDrawable()).getBitmap()));
         } else {
-            holder.editButton.setVisibility(View.INVISIBLE);
+            holder.editButton.setVisibility(View.GONE);
+            holder.reportButton.setVisibility(View.VISIBLE);
             holder.name.setTypeface(holder.name.getTypeface(), Typeface.NORMAL);
             holder.name.setText(photo.getSubmitter());
+            holder.reportButton.setOnClickListener(v -> ReportDialog.newInstance(ReportDialog.ReportType.PHOTO, photo.getId()).show(parentFragment.getChildFragmentManager(), "ReportPopup"));
         }
 
         if (!photo.getDescription().isEmpty()) {
@@ -77,6 +81,7 @@ public class PhotoListRecyclerViewAdapter extends RecyclerView.Adapter<PhotoList
         private TextView description;
         private ImageView imageView;
         private ImageButton editButton;
+        private ImageButton reportButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -84,6 +89,7 @@ public class PhotoListRecyclerViewAdapter extends RecyclerView.Adapter<PhotoList
             description = itemView.findViewById(R.id.path_photo_row_text);
             imageView = itemView.findViewById(R.id.path_photo_row_image);
             editButton = itemView.findViewById(R.id.path_photo_edit_button);
+            reportButton = itemView.findViewById(R.id.path_photo_report_button);
         }
     }
 }

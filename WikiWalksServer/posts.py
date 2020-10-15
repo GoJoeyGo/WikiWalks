@@ -5,6 +5,9 @@ import uuid
 from PIL import Image, ImageOps
 from flask import jsonify, request, Blueprint
 from sqlalchemy import func
+from email.header import Header
+from email.mime.text import MIMEText
+from smtplib import SMTP_SSL
 
 from schemas import *
 
@@ -39,6 +42,25 @@ def get_submitter(device):
 def get_time():
     time = int(datetime.datetime.now().timestamp())
     return time
+
+
+@posts.route("/report", methods=["POST"])
+def report():
+    import credentials
+    request_json = request.get_json(force=True)
+    emailText = f'Report:\nUser ID - {request_json["device_id"]}\nType - {request_json["type"]}\n' \
+                f'ID - {request_json["id"]}\nInfo - {request_json["info"]}'
+    email = MIMEText(emailText, "plain", "utf-8")
+    email['Subject'] = Header(f'New report - {request_json["type"]} {request_json["id"]}')
+
+    smtp = SMTP_SSL(credentials.smtpServer, credentials.smtpPort, timeout=10)
+    try:
+        smtp.login(credentials.smtpEmail, credentials.smtpPassword)
+        smtp.sendmail(credentials.emailFrom, credentials.emailTo, email.as_string())
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "failed"}), 500
+    return jsonify({"status": "success"}), 201
 
 
 @posts.route("/setname", methods=["POST"])

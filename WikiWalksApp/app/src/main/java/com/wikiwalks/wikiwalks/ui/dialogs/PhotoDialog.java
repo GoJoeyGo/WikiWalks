@@ -95,6 +95,7 @@ public class PhotoDialog extends DialogFragment implements Photo.EditPhotoCallba
 
     @Override
     public void onEditPhotoFailure() {
+        submitButton.setEnabled(true);
         Toast.makeText(getContext(), R.string.save_photo_failure, Toast.LENGTH_SHORT).show();
     }
 
@@ -160,6 +161,7 @@ public class PhotoDialog extends DialogFragment implements Photo.EditPhotoCallba
 
         submitButton = view.findViewById(R.id.photo_dialog_save_button);
         submitButton.setOnClickListener(v -> {
+            submitButton.setEnabled(false);
             if (photo != null) {
                 if (!photo.getDescription().equals(title.getEditText().getText().toString())) {
                     photo.edit(getContext(), title.getEditText().getText().toString(), this);

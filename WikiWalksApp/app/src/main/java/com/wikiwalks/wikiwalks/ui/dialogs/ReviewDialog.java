@@ -50,6 +50,7 @@ public class ReviewDialog extends DialogFragment implements Review.EditReviewCal
 
     @Override
     public void onEditReviewFailure() {
+        saveButton.setEnabled(true);
         Toast.makeText(getContext(), getString(R.string.save_review_failure), Toast.LENGTH_SHORT).show();
     }
 
@@ -91,6 +92,7 @@ public class ReviewDialog extends DialogFragment implements Review.EditReviewCal
 
         saveButton = view.findViewById(R.id.review_dialog_save_button);
         saveButton.setOnClickListener(v -> {
+            saveButton.setEnabled(false);
             if (review == null) {
                 Review.submit(getContext(), type, parentId, message.getEditText().getText().toString(), (int) rating.getRating(), this);
             } else {

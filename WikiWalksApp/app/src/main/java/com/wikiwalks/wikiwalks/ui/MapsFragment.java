@@ -39,10 +39,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private boolean hasFailed = false;
 
     public static MapsFragment newInstance() {
-        Bundle args = new Bundle();
-        MapsFragment fragment = new MapsFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new MapsFragment();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,12 +85,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         setMapLocation();
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMarkerClickListener(this);
-        DataMap dataMap = DataMap.getInstance();
-        dataMap.addListener(this);
         mMap.setOnCameraIdleListener(() -> {
             LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
             if (Math.abs(bounds.northeast.latitude - bounds.southwest.latitude) < 3) {
-                dataMap.updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getContext());
+                DataMap.getInstance().updatePaths(mMap.getProjection().getVisibleRegion().latLngBounds, getContext());
             }
         });
     }

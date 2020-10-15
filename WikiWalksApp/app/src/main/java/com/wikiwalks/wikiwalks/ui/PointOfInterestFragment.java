@@ -28,8 +28,9 @@ import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.dialogs.NameDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.ReportDialog;
 
-public class PointOfInterestFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, NameDialog.EditDialogListener, PointOfInterest.PointOfInterestEditCallback {
+public class PointOfInterestFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, NameDialog.NameDialogListener, PointOfInterest.PointOfInterestEditCallback {
 
     private MaterialToolbar toolbar;
     private PointOfInterest pointOfInterest;
@@ -61,7 +62,7 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.point_of_interest_menu_edit:
-                    NameDialog.newInstance(NameDialog.EditNameDialogType.POINT_OF_INTEREST, pointOfInterest.getId()).show(getChildFragmentManager(), "EditPopup");
+                    NameDialog.newInstance(NameDialog.NameDialogType.POINT_OF_INTEREST, pointOfInterest.getId()).show(getChildFragmentManager(), "EditPopup");
                     break;
 
                 case R.id.point_of_interest_menu_delete:
@@ -71,6 +72,9 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
                             .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
                             .create().show();
                     break;
+
+                case R.id.point_of_interest_menu_report:
+                    ReportDialog.newInstance(ReportDialog.ReportType.POINT_OF_INTEREST, pointOfInterest.getId()).show(getChildFragmentManager(), "ReportPopup");
             }
             return false;
         });
@@ -122,7 +126,7 @@ public class PointOfInterestFragment extends Fragment implements OnMapReadyCallb
     }
 
     @Override
-    public void onEditName(NameDialog.EditNameDialogType type, String name) {
+    public void onEditName(NameDialog.NameDialogType type, String name) {
         pointOfInterest.edit(getContext(), name, this);
     }
 

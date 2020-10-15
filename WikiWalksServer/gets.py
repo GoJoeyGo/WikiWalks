@@ -24,8 +24,6 @@ def get_path(path_id):
     if request.method == "POST":
         request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
-        if path in user.paths:
-            path.editable = True
         pois = PointOfInterest.query.filter_by(path=path.id)
         for poi in pois:
             if poi in user.points_of_interest:
@@ -62,8 +60,6 @@ def get_paths():
         request_json = request.get_json(force=True)
         user = get_submitter(request_json["device_id"])
         for path in in_range_paths:
-            if path in user.paths:
-                path.editable = True
             pois = PointOfInterest.query.filter_by(path=path.id)
             for poi in pois:
                 if poi in user.points_of_interest:

@@ -47,7 +47,7 @@ import com.wikiwalks.wikiwalks.ui.dialogs.NameDialog;
 
 import java.util.ArrayList;
 
-public class RecordingFragment extends Fragment implements OnMapReadyCallback, NameDialog.EditDialogListener, Route.RouteModifyCallback, PointOfInterest.PointOfInterestSubmitCallback {
+public class RecordingFragment extends Fragment implements OnMapReadyCallback, NameDialog.NameDialogListener, Route.RouteModifyCallback, PointOfInterest.PointOfInterestSubmitCallback {
 
     public Context context;
     private float distanceWalked = 0;
@@ -193,7 +193,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, N
         });
 
         markPointButton = rootView.findViewById(R.id.recording_fragment_mark_point_button);
-        markPointButton.setOnClickListener(v -> NameDialog.newInstance(NameDialog.EditNameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "SubmissionPopup"));
+        markPointButton.setOnClickListener(v -> NameDialog.newInstance(NameDialog.NameDialogType.POINT_OF_INTEREST, -1).show(getChildFragmentManager(), "SubmissionPopup"));
 
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.recording_fragment_map);
         mapFragment.getMapAsync(this);
@@ -300,7 +300,7 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, N
         new MaterialAlertDialogBuilder(context).setTitle(R.string.submit_prompt)
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
                     if (newPath) {
-                        NameDialog.newInstance(NameDialog.EditNameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
+                        NameDialog.newInstance(NameDialog.NameDialogType.PATH, -1).show(getChildFragmentManager(), "SubmissionPopup");
                     } else {
                         submitRoute("", this);
                     }
@@ -342,8 +342,8 @@ public class RecordingFragment extends Fragment implements OnMapReadyCallback, N
     }
 
     @Override
-    public void onEditName(NameDialog.EditNameDialogType type, String name) {
-        if (type == NameDialog.EditNameDialogType.PATH) {
+    public void onEditName(NameDialog.NameDialogType type, String name) {
+        if (type == NameDialog.NameDialogType.PATH) {
             submitRoute(name, this);
         } else {
             if (name.isEmpty()) {

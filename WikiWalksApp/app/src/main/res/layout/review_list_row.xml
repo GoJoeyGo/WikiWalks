@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:isIndicator="true"
         android:numStars="5"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/review_row_report_button"
         app:layout_constraintStart_toEndOf="@id/review_row_name"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,8 +29,19 @@
         android:id="@+id/review_row_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/review_row_report_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/review_row_name" />
+
+    <ImageButton
+        android:id="@+id/review_row_report_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:paddingStart="8dp"
+        android:src="@drawable/ic_baseline_flag_24"
+        android:tint="?attr/colorOnBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

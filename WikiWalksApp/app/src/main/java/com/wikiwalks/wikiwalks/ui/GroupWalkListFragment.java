@@ -36,8 +36,8 @@ public class GroupWalkListFragment extends Fragment implements GroupWalk.GetGrou
 
     public static GroupWalkListFragment newInstance(int pathId) {
         Bundle args = new Bundle();
-        GroupWalkListFragment fragment = new GroupWalkListFragment();
         args.putInt("path_id", pathId);
+        GroupWalkListFragment fragment = new GroupWalkListFragment();
         fragment.setArguments(args);
         return fragment;
     }

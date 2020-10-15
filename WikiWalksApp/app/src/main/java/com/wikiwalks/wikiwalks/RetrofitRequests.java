@@ -156,4 +156,7 @@ public interface RetrofitRequests {
     Call<JsonElement> deletePoIPhoto(@Path("id") int id,
                                      @Path("photo_id") int photoId,
                                      @Body RequestBody body);
+
+    @POST("/report")
+    Call<JsonElement> sendReport(@Body RequestBody body);
 }

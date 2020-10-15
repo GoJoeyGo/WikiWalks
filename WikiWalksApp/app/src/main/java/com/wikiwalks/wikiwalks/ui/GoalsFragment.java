@@ -29,10 +29,7 @@ public class GoalsFragment extends Fragment {
     private TextView noGoalsIndicator;
 
     public static GoalsFragment newInstance() {
-        Bundle args = new Bundle();
-        GoalsFragment fragment = new GoalsFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new GoalsFragment();
     }
 
     @Nullable

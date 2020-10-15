@@ -25,10 +25,11 @@ import com.wikiwalks.wikiwalks.R;
 import com.wikiwalks.wikiwalks.Review;
 import com.wikiwalks.wikiwalks.Route;
 import com.wikiwalks.wikiwalks.ui.dialogs.NameDialog;
+import com.wikiwalks.wikiwalks.ui.dialogs.ReportDialog;
 
 import java.util.ArrayList;
 
-public class PathFragment extends Fragment implements OnMapReadyCallback, NameDialog.EditDialogListener, Path.PathChangeCallback, DataMap.DataMapListener {
+public class PathFragment extends Fragment implements OnMapReadyCallback, NameDialog.NameDialogListener, Path.PathChangeCallback, DataMap.DataMapListener {
 
     private MaterialToolbar toolbar;
     private SupportMapFragment mapFragment;
@@ -62,12 +63,15 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, NameDi
         toolbar.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.path_menu_edit:
-                    NameDialog.newInstance(NameDialog.EditNameDialogType.PATH, path.getId()).show(getChildFragmentManager(), "EditPopup");
+                    NameDialog.newInstance(NameDialog.NameDialogType.PATH, path.getId()).show(getChildFragmentManager(), "EditPopup");
                     break;
 
                 case R.id.path_menu_bookmark:
                     menuItem.setIcon((PreferencesManager.getInstance(getContext()).toggleBookmark(path.getId())) ? R.drawable.ic_baseline_bookmark_24 : R.drawable.ic_baseline_bookmark_border_24);
                     break;
+
+                case R.id.path_menu_report:
+                    ReportDialog.newInstance(ReportDialog.ReportType.PATH, path.getId()).show(getChildFragmentManager(), "ReportPopup");
             }
             return true;
         });
@@ -138,7 +142,7 @@ public class PathFragment extends Fragment implements OnMapReadyCallback, NameDi
     }
 
     @Override
-    public void onEditName(NameDialog.EditNameDialogType type, String name) {
+    public void onEditName(NameDialog.NameDialogType type, String name) {
         if (name.equals("")) {
             name = String.format("Path at %f, %f", path.getMarkerPoint().latitude, path.getMarkerPoint().longitude);
         }

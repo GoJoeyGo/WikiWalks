@@ -76,6 +76,7 @@ public class GroupWalkDialog extends DialogFragment implements GroupWalk.EditGro
 
         submitButton = view.findViewById(R.id.group_walk_dialog_save_button);
         submitButton.setOnClickListener(v -> {
+            submitButton.setEnabled(false);
             String walkTitle = (title.getEditText().getText().toString().isEmpty()) ? String.format("Walk at %s", path.getName()) : title.getEditText().getText().toString();
             if (walk == null) {
                 GroupWalk.submit(getContext(), path, calendar.getTimeInMillis() / 1000, walkTitle, this);
@@ -134,6 +135,7 @@ public class GroupWalkDialog extends DialogFragment implements GroupWalk.EditGro
 
     @Override
     public void onEditFailure() {
+        submitButton.setEnabled(true);
         Toast.makeText(getContext(), R.string.save_group_walk_failure, Toast.LENGTH_SHORT).show();
     }
 

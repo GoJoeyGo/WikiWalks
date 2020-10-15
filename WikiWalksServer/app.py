@@ -9,13 +9,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 ma.init_app(app)
 
-
 app.register_blueprint(posts)
 app.register_blueprint(gets)
 
 if not os.path.exists('images'):
     os.makedirs('images')
-
 
 with app.app_context():
     db.create_all()

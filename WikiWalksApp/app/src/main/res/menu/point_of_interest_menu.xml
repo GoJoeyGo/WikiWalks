@@ -14,4 +14,10 @@
         android:icon="@drawable/ic_baseline_edit_24"
         android:title="Edit Name"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/point_of_interest_menu_report"
+        android:icon="@drawable/ic_baseline_flag_24"
+        android:title="Report"
+        app:showAsAction="ifRoom" />
 </menu>

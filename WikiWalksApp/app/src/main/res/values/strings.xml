@@ -151,5 +151,8 @@
     <string name="requires_location">WikiWalks needs location permissions to run.</string>
     <string name="requires_storage">WikiWalks needs storage permissions to submit photos and import/export settings.</string>
 
-    <item name="local_url" type="string">https://wikiwalks.xyz</item>
+    <string name="report_title">Report</string>
+    <string name="report_info">Report Info</string>
+    <string name="report_success">Report submitted successfully!</string>
+    <string name="report_failure">Failed to submit report…</string>
 </resources>

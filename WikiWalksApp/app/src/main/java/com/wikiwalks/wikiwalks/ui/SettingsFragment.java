@@ -32,7 +32,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SettingsFragment extends Fragment implements NameDialog.EditDialogListener {
+public class SettingsFragment extends Fragment implements NameDialog.NameDialogListener {
 
     NameDialog nameDialog;
     ActivityResultLauncher<String> exportSettings = registerForActivityResult(new CustomActivityResultContracts.ExportSettings(), uri -> {
@@ -59,7 +59,7 @@ public class SettingsFragment extends Fragment implements NameDialog.EditDialogL
     }
 
     @Override
-    public void onEditName(NameDialog.EditNameDialogType type, String name) {
+    public void onEditName(NameDialog.NameDialogType type, String name) {
         JsonObject request = new JsonObject();
         request.addProperty("device_id", PreferencesManager.getInstance(getContext()).getDeviceId());
         request.addProperty("name", name);
@@ -97,7 +97,7 @@ public class SettingsFragment extends Fragment implements NameDialog.EditDialogL
         toolbar.setTitle(R.string.settings_title);
 
         Button setNameButton = rootView.findViewById(R.id.settings_fragment_set_name_button);
-        setNameButton.setOnClickListener(v -> NameDialog.newInstance(NameDialog.EditNameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
+        setNameButton.setOnClickListener(v -> NameDialog.newInstance(NameDialog.NameDialogType.USERNAME, -1).show(getChildFragmentManager(), "NamePopup"));
 
         Button statisticsButton = rootView.findViewById(R.id.settings_fragment_statistics_button);
         statisticsButton.setOnClickListener(v -> getParentFragmentManager().beginTransaction().add(R.id.main_frame, StatisticsFragment.newInstance()).addToBackStack(null).commit());

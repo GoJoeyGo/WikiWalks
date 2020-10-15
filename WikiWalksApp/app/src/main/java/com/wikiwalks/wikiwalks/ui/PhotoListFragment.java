@@ -49,9 +49,9 @@ public class PhotoListFragment extends Fragment implements Photo.GetPhotosCallba
     public void updatePhotosList(boolean refresh) {
         swipeRefreshLayout.setRefreshing(refresh);
         if (type == Photo.PhotoType.PATH) {
-            DataMap.getInstance().getPathList().get(parentId).getPhotos(getContext(), refresh, PhotoListFragment.this);
+            DataMap.getInstance().getPathList().get(parentId).getPhotos(getContext(), refresh, this);
         } else {
-            DataMap.getInstance().getPointOfInterestList().get(parentId).getPhotos(getContext(), refresh, PhotoListFragment.this);
+            DataMap.getInstance().getPointOfInterestList().get(parentId).getPhotos(getContext(), refresh, this);
         }
     }
 

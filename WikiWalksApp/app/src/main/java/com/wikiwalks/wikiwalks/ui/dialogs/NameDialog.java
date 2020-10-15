@@ -18,15 +18,15 @@ import com.wikiwalks.wikiwalks.R;
 
 public class NameDialog extends DialogFragment {
 
-    private EditDialogListener listener;
+    private NameDialogListener listener;
     private TextInputLayout title;
 
-    public interface EditDialogListener {
+    public interface NameDialogListener {
         void setNameDialog(NameDialog nameDialog);
-        void onEditName(EditNameDialogType type, String name);
+        void onEditName(NameDialogType type, String name);
     }
 
-    public static NameDialog newInstance(EditNameDialogType type, int parentId) {
+    public static NameDialog newInstance(NameDialogType type, int parentId) {
         Bundle args = new Bundle();
         NameDialog fragment = new NameDialog();
         args.putSerializable("type", type);
@@ -43,23 +43,23 @@ public class NameDialog extends DialogFragment {
         View view = inflater.inflate(R.layout.name_dialog, null);
         builder.setTitle(R.string.name);
 
-        listener = (EditDialogListener) getParentFragment();
+        listener = (NameDialogListener) getParentFragment();
         listener.setNameDialog(this);
 
-        EditNameDialogType type = (EditNameDialogType) getArguments().getSerializable("type");
+        NameDialogType type = (NameDialogType) getArguments().getSerializable("type");
         title = view.findViewById(R.id.name_dialog_name_input);
 
         if (savedInstanceState != null && savedInstanceState.containsKey("name")) {
             title.getEditText().setText(savedInstanceState.getString("name"));
         } else if (getArguments().getInt("parent_id") > -1) {
-            if (type == EditNameDialogType.PATH) {
+            if (type == NameDialogType.PATH) {
                 title.getEditText().setText(DataMap.getInstance().getPathList().get(getArguments().getInt("parent_id")).getName());
-            } else if (type == EditNameDialogType.POINT_OF_INTEREST) {
+            } else if (type == NameDialogType.POINT_OF_INTEREST) {
                 title.getEditText().setText(DataMap.getInstance().getPointOfInterestList().get(getArguments().getInt("parent_id")).getName());
             }
         }
 
-        if (type == EditNameDialogType.USERNAME) {
+        if (type == NameDialogType.USERNAME) {
             title.getEditText().setText(PreferencesManager.getInstance(getContext()).getName());
         }
         Button editButton = view.findViewById(R.id.name_dialog_save_button);
@@ -79,5 +79,5 @@ public class NameDialog extends DialogFragment {
         super.onSaveInstanceState(outState);
     }
 
-    public enum EditNameDialogType {PATH, POINT_OF_INTEREST, USERNAME}
+    public enum NameDialogType {PATH, POINT_OF_INTEREST, USERNAME}
 }

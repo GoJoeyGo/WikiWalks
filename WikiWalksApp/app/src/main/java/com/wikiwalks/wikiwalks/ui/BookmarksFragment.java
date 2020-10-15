@@ -28,10 +28,7 @@ public class BookmarksFragment extends Fragment {
     private int pathsRequested = 0;
 
     public static BookmarksFragment newInstance() {
-        Bundle args = new Bundle();
-        BookmarksFragment fragment = new BookmarksFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new BookmarksFragment();
     }
 
     @Nullable
